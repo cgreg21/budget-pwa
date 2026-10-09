@@ -1,0 +1,22 @@
+<app-header [title]="s.t().stats.title" />
+<app-month-bar [month]="month()" (monthChange)="month.set($event)" (labelTap)="monthPickerOpen.set(true)" />
+
+<div class="relative min-h-0 flex-1 overflow-hidden">
+  <div class="flex h-full w-[200%] transition-transform duration-300 ease-out"
+       [style.transform]="tab() === 'recurring' ? 'translateX(-50%)' : 'translateX(0)'">
+    <div class="h-full w-1/2 overflow-y-auto" [attr.inert]="tab() === 'all' ? null : ''">
+      <app-category-pie [title]="s.t().stats.expensesByCategory" [slices]="expenseSlices()" />
+    </div>
+    <div class="h-full w-1/2 overflow-y-auto" [attr.inert]="tab() === 'recurring' ? null : ''">
+      <app-category-pie [title]="s.t().stats.recurringExpensesByCategory" [slices]="recurringSlices()" />
+    </div>
+  </div>
+</div>
+
+<div class="bg-surface pb-[env(safe-area-inset-bottom)]">
+  <app-tab-bar [tabs]="tabs" [active]="tab()" (select)="tab.set($any($event))" />
+</div>
+
+@if (monthPickerOpen()) {
+  <app-month-picker [month]="month()" (picked)="chooseMonth($event)" (closed)="monthPickerOpen.set(false)" />
+}

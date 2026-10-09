@@ -1,0 +1,278 @@
+@import "tailwindcss";
+
+@font-face {
+  font-family: "DM Sans";
+  font-weight: 400;
+  src: url("/fonts/DMSans-Regular.ttf") format("truetype");
+  font-display: swap;
+}
+@font-face {
+  font-family: "DM Sans";
+  font-weight: 500;
+  src: url("/fonts/DMSans-Medium.ttf") format("truetype");
+  font-display: swap;
+}
+@font-face {
+  font-family: "DM Sans";
+  font-weight: 700;
+  src: url("/fonts/DMSans-Bold.ttf") format("truetype");
+  font-display: swap;
+}
+@font-face {
+  font-family: "Material Design Icons";
+  src: url("/fonts/MaterialDesignIcons.ttf") format("truetype");
+  font-display: block;
+}
+
+/*
+ * Design system of the mobile app (budget-mobile/src/styles/_variables.scss).
+ * Dark is the base; the light theme only overrides surfaces, text and tints.
+ */
+:root {
+  color-scheme: dark;
+  --c-bg: #0a0f1e;
+  --c-surface: #111827;
+  --c-card: #1a2235;
+  --c-line: #1e2d45;
+  --c-ink: #f0f4ff;
+  --c-muted: #7a8ba6;
+  --c-brand: #00e5a0;
+  --c-green: #00e5a0;
+  --c-red: #ff6b6b;
+  --c-danger: #ff6b6b;
+  --c-amber: #f7c948;
+  --c-blue: #4f8ef7;
+  --c-on-brand: #0a0f1e;
+  --c-tint: rgb(0 229 160 / 0.12);
+  --c-tint-line: rgb(0 229 160 / 0.3);
+  --c-bar-income: #00e5a0;
+  --c-stat-income: rgb(0 229 160 / 0.08);
+  --c-stat-expense: rgb(255 107 107 / 0.08);
+  --c-lvl-critical: rgb(255 107 107 / 0.12);
+  --c-lvl-critical-line: rgb(255 107 107 / 0.35);
+  --c-lvl-low: rgb(247 201 72 / 0.12);
+  --c-lvl-low-line: rgb(247 201 72 / 0.35);
+  --c-lvl-medium: rgb(79 142 247 / 0.12);
+  --c-lvl-medium-line: rgb(79 142 247 / 0.35);
+  --c-lvl-high: rgb(0 229 160 / 0.12);
+  --c-lvl-high-line: rgb(0 229 160 / 0.35);
+  --c-editing: rgb(247 201 72 / 0.2);
+  --c-data: rgb(79 142 247 / 0.18);
+  --c-data-line: rgb(79 142 247 / 0.5);
+  --c-backdrop: rgb(0 0 0 / 0.6);
+}
+
+[data-theme="light"] {
+  color-scheme: light;
+  --c-bg: #f4f6fb;
+  --c-surface: #ffffff;
+  --c-card: #ffffff;
+  --c-line: #dde3ee;
+  --c-ink: #0a0f1e;
+  --c-muted: #5b6b85;
+  --c-green: #00805c;
+  --c-red: #d93f3f;
+  --c-amber: #b7791f;
+  --c-blue: #2f6de0;
+  --c-tint: #d9faee;
+  --c-tint-line: #8fe9c8;
+  --c-bar-income: #00c98d;
+  --c-stat-income: #e8fbf3;
+  --c-stat-expense: #fff0f0;
+  --c-lvl-critical: #ffe3e3;
+  --c-lvl-critical-line: #ffb3b3;
+  --c-lvl-low: #fff4d1;
+  --c-lvl-low-line: #f2d98a;
+  --c-lvl-medium: #e1ecff;
+  --c-lvl-medium-line: #b4cdfa;
+  --c-lvl-high: #d9faee;
+  --c-lvl-high-line: #8fe9c8;
+  --c-editing: rgb(183 121 31 / 0.15);
+  --c-data: rgb(47 109 224 / 0.12);
+  --c-data-line: rgb(47 109 224 / 0.45);
+  --c-backdrop: rgb(0 0 0 / 0.6);
+  --shadow-pop: 0 8px 20px rgb(0 0 0 / 0.18);
+}
+
+@theme inline {
+  --color-bg: var(--c-bg);
+  --color-surface: var(--c-surface);
+  --color-card: var(--c-card);
+  --color-line: var(--c-line);
+  --color-ink: var(--c-ink);
+  --color-muted: var(--c-muted);
+  --color-brand: var(--c-brand);
+  --color-green: var(--c-green);
+  --color-bad: var(--c-red);
+  --color-danger: var(--c-danger);
+  --color-amber: var(--c-amber);
+  --color-blue: var(--c-blue);
+  --color-on-brand: var(--c-on-brand);
+  --color-tint: var(--c-tint);
+  --color-tint-line: var(--c-tint-line);
+  --color-stat-income: var(--c-stat-income);
+  --color-stat-expense: var(--c-stat-expense);
+  --color-editing: var(--c-editing);
+  --color-data: var(--c-data);
+  --color-data-line: var(--c-data-line);
+  --color-backdrop: var(--c-backdrop);
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+}
+
+@theme {
+  --shadow-pop: 0 8px 20px rgb(0 0 0 / 0.5);
+  --font-sans: "DM Sans", system-ui, sans-serif;
+  --font-mdi: "Material Design Icons";
+  --animate-appear: appear 0.35s ease-out both;
+  --animate-pop: pop 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+  --animate-fade: fade 0.2s ease-out both;
+  --animate-sheet: sheet 0.25s ease-out both;
+  --animate-page: appear 0.25s ease-out both;
+
+  @keyframes appear {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: none; }
+  }
+  @keyframes pop {
+    from { opacity: 0; transform: scale(0.4); }
+    to { opacity: 1; transform: none; }
+  }
+  @keyframes fade {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+  @keyframes sheet {
+    from { transform: translateY(100%); }
+    to { transform: none; }
+  }
+}
+
+@layer base {
+  html, body {
+    height: 100%;
+    margin: 0;
+    background: var(--c-bg);
+    color: var(--c-ink);
+    font-family: var(--font-sans);
+    -webkit-tap-highlight-color: transparent;
+    overscroll-behavior: none;
+  }
+  button, input, select, textarea {
+    font: inherit;
+    color: inherit;
+  }
+  button {
+    cursor: pointer;
+  }
+  button:disabled {
+    opacity: 0.4;
+    cursor: default;
+  }
+  ::placeholder {
+    color: var(--c-muted);
+  }
+}
+
+/* Widgets repeated across the screens, named like the classes of the mobile app. */
+@layer components {
+  .card {
+    @apply m-1 rounded-lg border border-line bg-card px-3.5 py-3;
+  }
+  .card-title {
+    @apply text-xs text-muted;
+  }
+  .input, .select, .search {
+    @apply box-border h-12 w-full rounded-md border border-line bg-surface px-3.5 text-ink outline-none focus:border-brand;
+  }
+  .select {
+    @apply my-1 flex items-center text-left;
+  }
+  .input, .search {
+    @apply my-1;
+  }
+  .chip {
+    @apply m-0.5 h-12 rounded-full border border-line bg-card px-3 text-sm text-muted;
+  }
+  .chip-active {
+    @apply border-brand bg-brand text-on-brand;
+  }
+  .chip-editing {
+    @apply border-amber bg-editing text-amber;
+  }
+  .chip-data {
+    @apply border-data-line bg-data text-blue;
+  }
+  .primary {
+    @apply mt-3 h-12 rounded-md px-4 text-base font-bold transition-transform active:scale-95 bg-brand text-on-brand;
+  }
+  .secondary {
+    @apply mt-3 h-12 rounded-md px-4 text-base font-bold transition-transform active:scale-95 border border-tint-line bg-tint text-green;
+  }
+  .danger {
+    @apply mt-4 h-12 rounded-md px-4 text-base font-bold transition-transform active:scale-95 bg-danger text-on-brand;
+  }
+  .compact {
+    @apply ml-1.5 mt-1 mb-1 px-4;
+  }
+  .field-label {
+    @apply mt-3.5 block text-xs uppercase text-muted;
+  }
+  .section-title {
+    @apply mt-5 block text-[13px] font-bold uppercase text-muted;
+  }
+  .setting {
+    @apply my-[3px] flex w-full items-center justify-between rounded-md border border-line bg-card px-3.5 py-3 text-left;
+  }
+  .setting-value {
+    @apply text-green;
+  }
+  .row {
+    @apply mx-3 my-[3px] rounded-lg border border-line bg-card px-3.5 py-2.5;
+  }
+  .row-icon {
+    @apply mr-3 inline-flex size-11 shrink-0 items-center justify-center rounded-[14px] bg-tint text-[22px] text-green font-mdi;
+  }
+  .row-title {
+    @apply truncate text-base font-medium;
+  }
+  .row-sub {
+    @apply text-xs text-muted;
+  }
+  .row-amount {
+    @apply text-base font-bold;
+  }
+  .income {
+    @apply text-green;
+  }
+  .expense {
+    @apply text-bad;
+  }
+  .empty-text {
+    @apply p-3 text-center text-sm text-muted;
+  }
+  .error {
+    @apply mt-2 text-bad;
+  }
+  .modal-title {
+    @apply mb-2 text-xl font-bold;
+  }
+  .pick-row {
+    @apply my-0.5 flex w-full items-center rounded-md px-2.5 py-2 text-left;
+  }
+  .pick-row-selected {
+    @apply bg-tint;
+  }
+  .nav-btn {
+    @apply flex h-12 w-12 items-center justify-center bg-transparent text-2xl text-green font-mdi transition-transform active:scale-90;
+  }
+  .bar-track {
+    @apply flex h-2 overflow-hidden rounded bg-line;
+  }
+}
+
+/* The numeric keypad of the amount fields hides the spin buttons of the mobile app. */
+input[type="number"]::-webkit-inner-spin-button {
+  display: none;
+}

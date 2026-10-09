@@ -1,0 +1,85 @@
+<app-header [title]="s.t().settings.title" />
+
+<div class="min-h-0 flex-1 overflow-y-auto px-4 pb-8 pt-3">
+  <span class="section-title mt-0">{{ s.t().settings.general }}</span>
+  <button type="button" class="setting" (click)="pickLanguage()">
+    <span>{{ s.t().settings.language }}</span><span class="setting-value">{{ languageName(s.settings().language) }}</span>
+  </button>
+  <button type="button" class="setting" (click)="pickCurrency()">
+    <span>{{ s.t().settings.currency }}</span><span class="setting-value">{{ s.settings().currency }}</span>
+  </button>
+  <button type="button" class="setting" (click)="pickDateFormat()">
+    <span>{{ s.t().settings.dateFormat }}</span><span class="setting-value">{{ dateFormatName(s.settings().dateFormat) }}</span>
+  </button>
+  <button type="button" class="setting" (click)="pickAmountFormat()">
+    <span>{{ s.t().settings.amountFormat }}</span><span class="setting-value">{{ amountFormatName(s.settings().amountFormat) }}</span>
+  </button>
+  <button type="button" class="setting" (click)="pickTheme()">
+    <span>{{ s.t().settings.theme }}</span><span class="setting-value">{{ themeName(s.settings().theme) }}</span>
+  </button>
+
+  <span class="section-title">{{ s.t().settings.manage }}</span>
+  <button type="button" class="setting" (click)="openRecurrences()">
+    <span>{{ s.t().settings.recurrences }}</span><span class="setting-value">&#x203A;</span>
+  </button>
+
+  <span class="section-title">{{ s.t().calendar.title }}</span>
+  <p class="row-sub">{{ s.t().calendar.help }}</p>
+  <div class="setting">
+    <span id="calendar-enable-label">{{ s.t().calendar.enable }}</span>
+    <button type="button" role="switch" aria-labelledby="calendar-enable-label" [attr.aria-checked]="calendarEnabled()"
+            class="relative h-7 w-12 shrink-0 rounded-full transition-colors" [class]="calendarEnabled() ? 'bg-brand' : 'bg-line'"
+            (click)="toggleCalendar()">
+      <span class="absolute top-0.5 size-6 rounded-full bg-white shadow transition-all" [class]="calendarEnabled() ? 'left-[22px]' : 'left-0.5'"></span>
+    </button>
+  </div>
+  <label class="field-label" for="calendar-url">{{ s.t().calendar.url }}</label>
+  <input id="calendar-url" class="input" type="url" autocomplete="off" autocapitalize="none" spellcheck="false"
+         placeholder="https://cloud.example.com/remote.php/dav/calendars/user/budget"
+         [value]="calendarUrl()" (input)="calendarUrl.set($any($event.target).value)" />
+  <label class="field-label" for="calendar-user">{{ s.t().calendar.username }}</label>
+  <input id="calendar-user" class="input" type="text" autocomplete="username" autocapitalize="none" spellcheck="false"
+         [value]="calendarUser()" (input)="calendarUser.set($any($event.target).value)" />
+  <label class="field-label" for="calendar-password">{{ s.t().calendar.password }}</label>
+  <input id="calendar-password" class="input" type="password" autocomplete="current-password"
+         [placeholder]="calendar.hasPassword() ? s.t().calendar.passwordKept : ''"
+         [value]="calendarPassword()" (input)="calendarPassword.set($any($event.target).value)" />
+  <p class="row-sub mt-2">{{ s.t().calendar.passwordSession }}</p>
+  <p class="mt-2 text-[13px]" role="status" aria-live="polite"
+     [class]="calendar.status().state === 'error' ? 'text-bad' : calendar.status().state === 'offline' ? 'text-amber' : 'text-muted'">
+    {{ calendarStatusText() }}
+  </p>
+  @if (calendar.status().message) {
+    <p class="row-sub" [class.text-bad]="calendar.status().state === 'error'">{{ calendar.status().message }}</p>
+  }
+  <button type="button" class="primary w-full" (click)="saveCalendar()">{{ s.t().calendar.save }}</button>
+  <button type="button" class="secondary w-full" [disabled]="calendar.busy()" (click)="saveCalendar('check')">{{ s.t().calendar.check }}</button>
+  <button type="button" class="secondary w-full" [disabled]="!calendarEnabled() || calendar.busy()" (click)="saveCalendar('sync')">{{ s.t().calendar.syncNow }}</button>
+
+  <span class="section-title">{{ s.t().settings.thresholds }}</span>
+  <p class="row-sub">{{ s.t().settings.thresholdsHelp }}</p>
+  <label class="field-label" for="threshold-low">{{ s.t().settings.low }}</label>
+  <input id="threshold-low" class="input" type="text" inputmode="decimal"
+         [value]="low()" (input)="low.set($any($event.target).value)" (blur)="low.set(s.normalizeInput(low()))" />
+  <label class="field-label" for="threshold-medium">{{ s.t().settings.medium }}</label>
+  <input id="threshold-medium" class="input" type="text" inputmode="decimal"
+         [value]="medium()" (input)="medium.set($any($event.target).value)" (blur)="medium.set(s.normalizeInput(medium()))" />
+  <label class="field-label" for="threshold-high">{{ s.t().settings.high }}</label>
+  <input id="threshold-high" class="input" type="text" inputmode="decimal"
+         [value]="high()" (input)="high.set($any($event.target).value)" (blur)="high.set(s.normalizeInput(high()))" />
+  @if (message()) {
+    <p class="error">{{ message() }}</p>
+  }
+  <button type="button" class="primary w-full" (click)="saveThresholds()">{{ s.t().common.save }}</button>
+
+  <span class="section-title">{{ s.t().backup.title }}</span>
+  <p class="row-sub">{{ s.t().backup.help }}</p>
+  <button type="button" class="secondary w-full" (click)="exportBackup()">{{ s.t().backup.export }}</button>
+  <label class="secondary flex w-full cursor-pointer items-center justify-center">
+    {{ s.t().backup.import }}
+    <input type="file" accept="application/json,.json" class="sr-only" (change)="importBackup($event)" />
+  </label>
+  @if (backupError()) {
+    <p class="error">{{ backupError() }}</p>
+  }
+</div>

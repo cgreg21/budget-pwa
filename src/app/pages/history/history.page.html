@@ -1,0 +1,40 @@
+<app-header [title]="s.t().stats.history" />
+
+<div class="min-h-0 flex-1 overflow-y-auto">
+  <div class="mx-3 grid grid-cols-2">
+    <button type="button" class="select mx-1 text-left" (click)="choosing.set('start')">
+      <span class="row-sub mr-2">{{ s.t().stats.fromMonth }}</span>
+      <span>{{ s.monthLabel(start()) }}</span>
+    </button>
+    <button type="button" class="select mx-1 text-left" (click)="choosing.set('end')">
+      <span class="row-sub mr-2">{{ s.t().stats.toMonth }}</span>
+      <span>{{ s.monthLabel(end()) }}</span>
+    </button>
+  </div>
+
+  <app-monthly-lines [rows]="rows()" />
+
+  <div class="pb-3">
+    @for (row of history(); track row.month; let index = $index) {
+      <button type="button" class="row block w-[calc(100%-24px)] animate-appear text-left" [style.animation-delay.ms]="index < 12 ? index * 30 : 0"
+              (click)="open(row.month)">
+        <div class="flex items-center">
+          <span class="row-icon">{{ ui.calendar }}</span>
+          <div class="min-w-0 flex-1">
+            <div class="row-title">{{ s.monthLabel(row.month) }}</div>
+            <div class="row-sub">{{ s.formatSigned('income', row.income) }}  ·  {{ s.formatSigned('expense', row.expense) }}</div>
+          </div>
+          <span class="row-amount ml-2 whitespace-nowrap" [class]="row.income >= row.expense ? 'income' : 'expense'">{{ s.formatAmount(row.income - row.expense) }}</span>
+        </div>
+        <div class="bar-track mt-2.5 mb-0.5">
+          <div class="h-2 bg-[var(--c-bar-income)]" [style.width.%]="row.incomeShare"></div>
+          <div class="h-2 bg-danger" [style.width.%]="row.expenseShare"></div>
+        </div>
+      </button>
+    }
+  </div>
+</div>
+
+@if (choosing() !== null) {
+  <app-month-picker [month]="choosing() === 'start' ? start() : end()" (picked)="choose($event)" (closed)="choosing.set(null)" />
+}
