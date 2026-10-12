@@ -14,7 +14,7 @@
       "installMode": "lazy",
       "updateMode": "prefetch",
       "resources": {
-        "files": ["/assets/**", "/fonts/**", "/*.(svg|png|jpg|jpeg|webp|woff2)"]
+        "files": ["/assets/**", "/media/**", "/*.(svg|png|jpg|jpeg|webp|woff2|ttf)"]
       }
     }
   ]
