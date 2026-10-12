@@ -1,9 +1,9 @@
-<div #shell class="relative mx-auto flex h-dvh max-w-[520px] flex-col overflow-hidden bg-bg text-ink sm:border-x sm:border-line"
+<div #shell class="relative mx-auto flex h-dvh max-w-[520px] touch-pan-y flex-col overflow-hidden bg-bg text-ink sm:border-x sm:border-line"
      (pointerdown)="onDown($event)" (pointermove)="onMove($event)" (pointerup)="onUp($event)" (pointercancel)="onUp($event)">
   <router-outlet />
 
   @if (!drawer.opened()) {
-    <div #edge class="absolute inset-y-0 left-0 z-20 w-6 touch-pan-y" aria-hidden="true"></div>
+    <div #edge class="absolute inset-y-0 left-0 z-20 w-6 touch-none" aria-hidden="true"></div>
   }
 
   <div class="absolute inset-0 z-30 bg-backdrop"

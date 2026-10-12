@@ -71,6 +71,10 @@ export class AppComponent {
     window.addEventListener('storage', (event) => {
       if (event.key === 'budget-pwa:data:v1') window.location.reload();
     });
+    // Non-passive so the browser's back/forward swipe gesture is cancelled while the drawer is dragged.
+    document.addEventListener('touchmove', (event) => {
+      if (this.drag?.direction === 'horizontal') event.preventDefault();
+    }, { passive: false });
     if (this.budget.loadFailed) {
       void this.dialog.alert({ message: this.s.t().backup.corrupted, ok: this.s.t().common.ok });
     }

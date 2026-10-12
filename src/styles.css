@@ -159,6 +159,7 @@
     font-family: var(--font-sans);
     -webkit-tap-highlight-color: transparent;
     overscroll-behavior: none;
+    overflow: hidden;
   }
   button, input, select, textarea {
     font: inherit;
