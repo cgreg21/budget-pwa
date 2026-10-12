@@ -28,6 +28,20 @@ npm run build
 
 Pour installer la PWA, publier le build de production sur un hôte HTTPS puis utiliser l’action d’installation du navigateur. Le service worker est désactivé par le serveur de développement.
 
+## Déploiement sur GitHub Pages
+
+Le workflow `.github/workflows/deploy-pages.yml` publie l’application sur `https://cgreg21.github.io/budget-pwa/` à chaque push sur `master` (ou manuellement via *Run workflow*). Il clone `budget-lib` à côté de l’application, car `package.json` la référence par `file:../budget-lib`, puis exécute `npm run build:pages -- --base-href /<nom-du-dépôt>/`, copie `index.html` en `404.html` pour que les liens profonds (`/budget-pwa/stats`, …) tombent sur le routeur Angular, et ajoute `.nojekyll`.
+
+Activation, une seule fois, dans les réglages du dépôt : **Settings → Pages → Build and deployment → Source : GitHub Actions**.
+
+Le manifeste utilise `start_url` et `scope` relatifs (`./`), et le service worker est enregistré par un chemin relatif : l’application fonctionne donc aussi bien à la racine d’un domaine que dans un sous-répertoire. Pour reproduire le build localement :
+
+```sh
+npm run build:pages -- --base-href /budget-pwa/
+```
+
+Le serveur CalDAV doit autoriser l’origine `https://cgreg21.github.io` (voir [CORS et hébergement web](#cors-et-hébergement-web)).
+
 ## Stockage et confidentialité
 
 Les transactions, catégories, récurrences et seuils sont conservés dans le `localStorage` du navigateur, sous la clé `budget-pwa:data:v1`. Sans synchronisation activée, les données restent locales. Lorsque le calendrier est activé, seules les transactions sont échangées avec le serveur CalDAV choisi. Les sauvegardes JSON restent exportées et restaurées manuellement depuis les réglages. Le contenu local n’est pas chiffré : protégez l’accès au profil de navigateur et exportez régulièrement une sauvegarde.

@@ -5,6 +5,7 @@ import {
 } from 'budget-lib';
 
 import { STRINGS, type Strings } from './i18n';
+import { readValidJson } from './storage';
 
 const SETTINGS_KEY = 'budget-pwa:settings:v1';
 
@@ -14,10 +15,7 @@ const DEFAULT_SETTINGS: GeneralSettings = { ...DEFAULT_GENERAL_SETTINGS, languag
 const CURRENCY_SYMBOLS: Record<Currency, string> = { EUR: '\u20AC', USD: '$', GBP: '\u00A3', CHF: 'CHF' };
 
 function readSettings(): GeneralSettings {
-  const saved = localStorage.getItem(SETTINGS_KEY);
-  if (saved === null) return { ...DEFAULT_SETTINGS };
-  const parsed: unknown = JSON.parse(saved);
-  return isGeneralSettings(parsed) ? parsed : { ...DEFAULT_SETTINGS };
+  return readValidJson(SETTINGS_KEY, isGeneralSettings, () => ({ ...DEFAULT_SETTINGS })).value;
 }
 
 /**

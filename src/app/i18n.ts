@@ -23,6 +23,7 @@ export interface Strings {
     deleteTitle: string; deleteBody(details: string): string;
     deleteScopeBody: string; thisOccurrence: string; wholeSeries: string;
     categoryFilter: string; resetFilters: string; filters: string;
+    previousMonth: string; nextMonth: string; previousYear: string; nextYear: string;
   };
   levels: { critical: string; low: string; medium: string; high: string };
   editor: {
@@ -55,6 +56,7 @@ export interface Strings {
   };
   backup: {
     title: string; help: string; export: string; import: string; confirm: string; invalid: string;
+    corrupted: string;
   };
   recurrences: {
     title: string; empty: string; deleteBody(name: string): string;
@@ -86,6 +88,7 @@ const en: Strings = {
     deleteScopeBody: 'This transaction belongs to a recurring series.',
     thisOccurrence: 'This occurrence only', wholeSeries: 'Delete the whole series',
     categoryFilter: 'Category', resetFilters: 'Reset', filters: 'Filters',
+    previousMonth: 'Previous month', nextMonth: 'Next month', previousYear: 'Previous year', nextYear: 'Next year',
   },
   levels: { critical: 'Critical', low: 'Low', medium: 'Medium', high: 'Comfortable' },
   editor: {
@@ -142,6 +145,7 @@ const en: Strings = {
     export: 'Export a backup', import: 'Import a backup',
     confirm: 'Replace all the data of this device with this backup?',
     invalid: 'This file is not a recognised Budget backup.',
+    corrupted: 'The saved budget could not be read and was set aside. The app starts empty; restore a backup if you have one.',
   },
   recurrences: {
     title: 'Recurring transactions', empty: 'No recurring transaction yet. Enable "Repeat" when adding a transaction.',
@@ -174,6 +178,7 @@ const fr: Strings = {
     deleteScopeBody: 'Cette transaction fait partie d’une série récurrente.',
     thisOccurrence: 'Cette occurrence uniquement', wholeSeries: 'Supprimer toute la série',
     categoryFilter: 'Catégorie', resetFilters: 'Réinitialiser', filters: 'Filtres',
+    previousMonth: 'Mois précédent', nextMonth: 'Mois suivant', previousYear: 'Année précédente', nextYear: 'Année suivante',
   },
   levels: { critical: 'Critique', low: 'Faible', medium: 'Moyen', high: 'Confortable' },
   editor: {
@@ -230,6 +235,7 @@ const fr: Strings = {
     export: 'Exporter une sauvegarde', import: 'Importer une sauvegarde',
     confirm: 'Remplacer toutes les données de cet appareil par cette sauvegarde ?',
     invalid: 'Ce fichier n’est pas une sauvegarde Budget reconnue.',
+    corrupted: 'Le budget enregistré est illisible et a été mis de côté. L’application démarre vide ; restaurez une sauvegarde si vous en avez une.',
   },
   recurrences: {
     title: 'Transactions récurrentes', empty: 'Aucune transaction récurrente. Activez « Répéter » en ajoutant une transaction.',

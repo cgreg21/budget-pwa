@@ -12,11 +12,11 @@ import { SettingsService } from '../settings.service';
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <div class="flex items-center px-3 py-0.5">
-      <button type="button" class="nav-btn" (click)="shiftYear(-1)">{{ ui.previousYear }}</button>
-      <button type="button" class="nav-btn" [disabled]="!hasOlder()" (click)="shift(-1)">{{ ui.previous }}</button>
+      <button type="button" class="nav-btn" [attr.aria-label]="s.t().budget.previousYear" (click)="shiftYear(-1)">{{ ui.previousYear }}</button>
+      <button type="button" class="nav-btn" [attr.aria-label]="s.t().budget.previousMonth" [disabled]="!hasOlder()" (click)="shift(-1)">{{ ui.previous }}</button>
       <button type="button" class="h-12 flex-1 text-center text-lg font-bold" (click)="labelTap.emit()">{{ s.monthLabel(month()) }}</button>
-      <button type="button" class="nav-btn" [disabled]="!hasNewer()" (click)="shift(1)">{{ ui.next }}</button>
-      <button type="button" class="nav-btn" (click)="shiftYear(1)">{{ ui.nextYear }}</button>
+      <button type="button" class="nav-btn" [attr.aria-label]="s.t().budget.nextMonth" [disabled]="!hasNewer()" (click)="shift(1)">{{ ui.next }}</button>
+      <button type="button" class="nav-btn" [attr.aria-label]="s.t().budget.nextYear" (click)="shiftYear(1)">{{ ui.nextYear }}</button>
     </div>
   `,
 })

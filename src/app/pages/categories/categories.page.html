@@ -3,7 +3,7 @@
 <form class="px-4 pb-1.5 pt-3" (submit)="$event.preventDefault(); add()">
   <div class="flex items-center">
     <button type="button" class="mr-1.5 my-1 h-12 w-[52px] shrink-0 rounded-md border border-line bg-surface px-2.5 text-2xl font-mdi"
-            (click)="pickerTarget.set(NEW)">{{ glyphOf(newIcon()) }}</button>
+            [attr.aria-label]="s.t().categories.pickIcon" (click)="pickerTarget.set(NEW)">{{ glyphOf(newIcon()) }}</button>
     <input class="input flex-1" type="text" autocomplete="off" [placeholder]="s.t().categories.newName"
            [value]="newName()" (input)="newName.set($any($event.target).value)" />
     <button type="submit" class="primary compact">{{ s.t().common.add }}</button>
@@ -17,7 +17,7 @@
   <div class="h-full overflow-y-auto px-4 pb-6">
     @for (category of b.categories(); track category.name; let index = $index) {
       <div class="setting animate-appear" [style.animation-delay.ms]="index < 12 ? index * 30 : 0">
-        <button type="button" class="row-icon" (click)="pickerTarget.set(category.name)">{{ glyphOf(category.icon) }}</button>
+        <button type="button" class="row-icon" [attr.aria-label]="s.t().categories.pickIcon" (click)="pickerTarget.set(category.name)">{{ glyphOf(category.icon) }}</button>
         <button type="button" class="flex-1 truncate text-left" (click)="rename(category)">{{ category.name }}</button>
         <button type="button" class="h-12 bg-transparent px-2 text-[22px] text-bad font-mdi" [attr.aria-label]="s.t().common.delete"
                 (click)="remove(category)">{{ ui.remove }}</button>
@@ -34,7 +34,8 @@
       <span class="section-title mt-0">{{ s.t().categories.pickIcon }}</span>
       <div class="mt-2 flex max-h-80 flex-wrap overflow-y-auto">
         @for (choice of choices; track choice.name) {
-          <button type="button" class="m-0.5 flex size-14 items-center justify-center rounded-lg text-[28px] font-mdi"
+          <button type="button" class="m-0.5 flex size-14 items-center justify-center rounded-lg text-[28px] font-mdi" [attr.aria-label]="choice.name"
+                  [attr.aria-pressed]="choice.name === currentIcon()"
                   [class]="choice.name === currentIcon() ? 'bg-brand text-on-brand' : ''" (click)="pickIcon(choice.name)">{{ glyphOf(choice.name) }}</button>
         }
       </div>

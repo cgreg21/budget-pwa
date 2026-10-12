@@ -1,0 +1,81 @@
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: [master]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# One deployment at a time; a newer push supersedes the one still queued.
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout budget-pwa
+        uses: actions/checkout@v4
+        with:
+          path: budget-pwa
+
+      # package.json points at "file:../budget-lib": the library has to sit next to the app.
+      - name: Checkout budget-lib
+        uses: actions/checkout@v4
+        with:
+          repository: cgreg21/budget-lib
+          path: budget-lib
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: |
+            budget-lib/package-lock.json
+            budget-pwa/package-lock.json
+
+      - name: Build budget-lib
+        working-directory: budget-lib
+        run: npm ci
+
+      - name: Install budget-pwa
+        working-directory: budget-pwa
+        run: npm ci
+
+      - name: Type check
+        working-directory: budget-pwa
+        run: npm run typecheck
+
+      - name: Build for GitHub Pages
+        working-directory: budget-pwa
+        run: npm run build:pages -- --base-href "/${{ github.event.repository.name }}/"
+
+      - name: Prepare the Pages artifact
+        working-directory: budget-pwa/dist/budget-pwa/browser
+        run: |
+          # Deep links: Pages serves 404.html for unknown paths, the Angular router takes over from there.
+          cp index.html 404.html
+          # Pages would otherwise skip files and folders starting with an underscore.
+          touch .nojekyll
+
+      - name: Upload the Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: budget-pwa/dist/budget-pwa/browser
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

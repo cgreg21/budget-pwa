@@ -7,6 +7,7 @@ import {
 
 import { BudgetService } from './budget.service';
 import { SettingsService } from './settings.service';
+import { readValidJson } from './storage';
 
 const CONFIG_KEY = 'budget-pwa:calendar:v1';
 const BASELINE_KEY = 'budget-pwa:calendar-baseline:v1';
@@ -22,12 +23,9 @@ export const calendarTransport: HttpTransport = async (request) => {
   return { status: response.status, headers, body: await response.text() };
 };
 
+/** The saved calendar settings; unreadable ones fall back to "disabled" rather than blocking the app. */
 function readConfig(): CalendarConfig {
-  const text = localStorage.getItem(CONFIG_KEY);
-  if (text === null) return { ...DEFAULT_CALENDAR_CONFIG };
-  const value: unknown = JSON.parse(text);
-  if (!isCalendarConfig(value)) throw new Error('Invalid calendar configuration.');
-  return normalizeCalendarConfig(value);
+  return normalizeCalendarConfig(readValidJson(CONFIG_KEY, isCalendarConfig, () => ({ ...DEFAULT_CALENDAR_CONFIG })).value);
 }
 
 interface SavedBaseline { baseline: SyncBaseline; lastSync?: string }
@@ -42,15 +40,15 @@ function isBaseline(value: unknown): value is SyncBaseline {
     });
 }
 
+function isSavedBaseline(value: unknown): value is SavedBaseline {
+  return typeof value === 'object' && value !== null && 'baseline' in value && isBaseline(value.baseline)
+    && (!('lastSync' in value) || value.lastSync === undefined
+      || (typeof value.lastSync === 'string' && Number.isFinite(Date.parse(value.lastSync))));
+}
+
+/** The last known server state; an unreadable one is dropped, the next sync starts from scratch. */
 function readBaseline(): SavedBaseline {
-  const text = localStorage.getItem(BASELINE_KEY);
-  if (text === null) return { baseline: {} };
-  const value: unknown = JSON.parse(text);
-  if (typeof value !== 'object' || value === null || !('baseline' in value) || !isBaseline(value.baseline)
-    || ('lastSync' in value && (typeof value.lastSync !== 'string' || !Number.isFinite(Date.parse(value.lastSync))))) {
-    throw new Error('Invalid calendar synchronisation baseline.');
-  }
-  return { baseline: value.baseline, lastSync: 'lastSync' in value ? String(value.lastSync) : undefined };
+  return readValidJson(BASELINE_KEY, isSavedBaseline, () => ({ baseline: {} })).value;
 }
 
 @Injectable({ providedIn: 'root' })

@@ -30,6 +30,8 @@ import {
   type TransactionInput,
 } from 'budget-lib';
 
+import { readValidJson } from './storage';
+
 /** Income and expenses of one month. */
 export interface MonthlyTotals {
   month: MonthKey;
@@ -61,37 +63,36 @@ function defaultData(): BudgetData {
   };
 }
 
-function readData(): BudgetData {
-  const saved = localStorage.getItem(DATA_KEY);
-  if (saved === null) return defaultData();
-  const parsed: unknown = JSON.parse(saved);
-  if (typeof parsed !== 'object' || parsed === null) throw new Error('Les données du budget sont illisibles.');
-  const candidate = parsed as Partial<BudgetData>;
+function isBudgetData(value: unknown): value is BudgetData {
+  if (typeof value !== 'object' || value === null) return false;
+  const candidate = value as Partial<BudgetData>;
   const months = candidate.months;
-  if (!isCategoryList(candidate.categories) || !isBalanceThresholds(candidate.thresholds)
-    || !isRecurrenceList(candidate.recurrences) || typeof months !== 'object' || months === null) {
-    throw new Error('Les données du budget sont invalides. Exportez-les avant toute modification.');
-  }
+  return isCategoryList(candidate.categories) && isBalanceThresholds(candidate.thresholds)
+    && isRecurrenceList(candidate.recurrences) && typeof months === 'object' && months !== null
+    && Object.entries(months).every(([month, transactions]) => isMonthKey(month) && isTransactionArray(transactions));
+}
+
+/**
+ * The saved budget, or the defaults. Unreadable data is set aside under `${DATA_KEY}:corrupted`
+ * rather than lost, and `corrupted` tells the UI to warn the user.
+ */
+function readData(): { value: BudgetData; corrupted: boolean } {
+  const { value, corrupted } = readValidJson(DATA_KEY, isBudgetData, defaultData, true);
   const validMonths: Record<string, Transaction[]> = {};
-  for (const [month, transactions] of Object.entries(months)) {
-    if (!isMonthKey(month) || !isTransactionArray(transactions)) {
-      throw new Error(`Les transactions du mois ${month} sont invalides.`);
-    }
+  for (const [month, transactions] of Object.entries(value.months)) {
     if (transactions.length > 0) validMonths[month] = transactions;
   }
-  return {
-    months: validMonths,
-    categories: candidate.categories,
-    thresholds: candidate.thresholds,
-    recurrences: candidate.recurrences,
-  };
+  return { value: { ...value, months: validMonths }, corrupted };
 }
 
 @Injectable({ providedIn: 'root' })
 export class BudgetService {
   private readonly transactionChangesSubject = new Subject<void>();
   readonly transactionChanges = this.transactionChangesSubject.asObservable();
-  private readonly dataState = signal<BudgetData>(readData());
+  private readonly loaded = readData();
+  /** Whether the saved data could not be read and was replaced with the defaults. */
+  readonly loadFailed = this.loaded.corrupted;
+  private readonly dataState = signal<BudgetData>(this.loaded.value);
   readonly data = this.dataState.asReadonly();
   readonly selectedMonth = signal<MonthKey>(currentMonthKey());
   readonly transactions = computed(() => this.dataState().months[this.selectedMonth()] ?? []);
