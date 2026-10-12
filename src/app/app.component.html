@@ -46,5 +46,19 @@
     }
   </aside>
 
+  @if (install.available()) {
+    <div class="absolute inset-x-3 bottom-3 z-20 flex items-center gap-3 rounded-md border border-line bg-card p-3 shadow-pop" role="dialog" [attr.aria-label]="s.t().install.title">
+      <img src="icons/icon-192.png" alt="" class="size-11 shrink-0 rounded-md">
+      <div class="min-w-0 flex-1">
+        <div class="text-sm font-bold">{{ s.t().install.title }}</div>
+        <div class="text-xs text-muted">{{ s.t().install.body }}</div>
+      </div>
+      <div class="flex shrink-0 flex-col gap-1">
+        <button type="button" class="rounded-md bg-green px-3 py-1.5 text-sm font-bold text-bg transition-transform active:scale-95" (click)="install.install()">{{ s.t().install.install }}</button>
+        <button type="button" class="rounded-md px-3 py-1.5 text-sm font-medium text-muted transition-transform active:scale-95" (click)="install.dismiss()">{{ s.t().install.later }}</button>
+      </div>
+    </div>
+  }
+
   <app-dialog-host />
 </div>

@@ -58,6 +58,7 @@ export interface Strings {
     title: string; help: string; export: string; import: string; confirm: string; invalid: string;
     corrupted: string;
   };
+  install: { title: string; body: string; install: string; later: string };
   recurrences: {
     title: string; empty: string; deleteBody(name: string): string;
     from(month: string): string; range(start: string, end: string, count: number): string;
@@ -146,6 +147,10 @@ const en: Strings = {
     confirm: 'Replace all the data of this device with this backup?',
     invalid: 'This file is not a recognised Budget backup.',
     corrupted: 'The saved budget could not be read and was set aside. The app starts empty; restore a backup if you have one.',
+  },
+  install: {
+    title: 'Install Budget', body: 'Add the app to your home screen to use it full screen and offline.',
+    install: 'Install', later: 'Not now',
   },
   recurrences: {
     title: 'Recurring transactions', empty: 'No recurring transaction yet. Enable "Repeat" when adding a transaction.',
@@ -236,6 +241,10 @@ const fr: Strings = {
     confirm: 'Remplacer toutes les données de cet appareil par cette sauvegarde ?',
     invalid: 'Ce fichier n’est pas une sauvegarde Budget reconnue.',
     corrupted: 'Le budget enregistré est illisible et a été mis de côté. L’application démarre vide ; restaurez une sauvegarde si vous en avez une.',
+  },
+  install: {
+    title: 'Installer Budget', body: 'Ajoutez l’application à votre écran d’accueil pour l’utiliser en plein écran et hors ligne.',
+    install: 'Installer', later: 'Plus tard',
   },
   recurrences: {
     title: 'Transactions récurrentes', empty: 'Aucune transaction récurrente. Activez « Répéter » en ajoutant une transaction.',
