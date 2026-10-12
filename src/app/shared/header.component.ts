@@ -8,7 +8,7 @@ import { UI_ICONS } from '../icons';
   selector: 'app-header',
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
-    <header class="flex items-center bg-bg px-3 py-2">
+    <header class="flex items-center bg-bg px-3 py-2 pt-[calc(8px+env(safe-area-inset-top))]">
       <button type="button" class="flex size-11 items-center justify-center rounded-full bg-card text-[22px] text-ink font-mdi transition-transform active:scale-90"
               (click)="drawer.show()">{{ ui.menu }}</button>
       <h1 class="ml-3 flex-1 truncate text-[22px] font-bold">{{ title() }}</h1>
