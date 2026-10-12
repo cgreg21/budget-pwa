@@ -17,7 +17,7 @@ Le style utilise Tailwind CSS v4 (`src/styles.css`, thème sombre/clair via vari
 
 ## Développement
 
-Node.js 20 ou plus récent.
+Node.js 22 ou plus récent (exigé par Angular CLI 22).
 
 ```sh
 npm install
