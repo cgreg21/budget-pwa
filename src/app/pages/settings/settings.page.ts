@@ -8,6 +8,7 @@ import {
 import { BudgetService } from '../../budget.service';
 import { CalendarSyncService } from '../../calendar-sync.service';
 import { DialogService } from '../../dialog.service';
+import { InstallService } from '../../install.service';
 import { parseAmount, SettingsService } from '../../settings.service';
 import { HeaderComponent } from '../../shared/header.component';
 
@@ -28,6 +29,7 @@ export class SettingsPage {
   readonly b = inject(BudgetService);
   readonly s = inject(SettingsService);
   readonly calendar = inject(CalendarSyncService);
+  readonly install = inject(InstallService);
   private readonly dialogs = inject(DialogService);
   private readonly router = inject(Router);
 

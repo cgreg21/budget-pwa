@@ -82,4 +82,10 @@
   @if (backupError()) {
     <p class="error">{{ backupError() }}</p>
   }
+
+  @if (install.canInstall()) {
+    <span class="section-title">{{ s.t().install.title }}</span>
+    <p class="row-sub">{{ s.t().install.settingsHelp }}</p>
+    <button type="button" class="secondary w-full" (click)="install.install()">{{ s.t().install.install }}</button>
+  }
 </div>

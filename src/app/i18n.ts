@@ -58,7 +58,7 @@ export interface Strings {
     title: string; help: string; export: string; import: string; confirm: string; invalid: string;
     corrupted: string;
   };
-  install: { title: string; body: string; install: string; later: string };
+  install: { title: string; body: string; install: string; dismiss: string; settingsHelp: string };
   recurrences: {
     title: string; empty: string; deleteBody(name: string): string;
     from(month: string): string; range(start: string, end: string, count: number): string;
@@ -150,7 +150,8 @@ const en: Strings = {
   },
   install: {
     title: 'Install Budget', body: 'Add the app to your home screen to use it full screen and offline.',
-    install: 'Install', later: 'Not now',
+    install: 'Install', dismiss: 'No thanks',
+    settingsHelp: 'Install the app on this device to use it full screen and offline.',
   },
   recurrences: {
     title: 'Recurring transactions', empty: 'No recurring transaction yet. Enable "Repeat" when adding a transaction.',
@@ -244,7 +245,8 @@ const fr: Strings = {
   },
   install: {
     title: 'Installer Budget', body: 'Ajoutez l’application à votre écran d’accueil pour l’utiliser en plein écran et hors ligne.',
-    install: 'Installer', later: 'Plus tard',
+    install: 'Installer', dismiss: 'Non merci',
+    settingsHelp: 'Installez l’application sur cet appareil pour l’utiliser en plein écran et hors ligne.',
   },
   recurrences: {
     title: 'Transactions récurrentes', empty: 'Aucune transaction récurrente. Activez « Répéter » en ajoutant une transaction.',
