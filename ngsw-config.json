@@ -14,7 +14,7 @@
       "installMode": "prefetch",
       "updateMode": "prefetch",
       "resources": {
-        "files": ["/assets/**", "/media/**", "/*.(svg|png|jpg|jpeg|webp|woff2|ttf)"]
+        "files": ["/assets/**", "/icons/**", "/media/**", "/*.(svg|png|jpg|jpeg|webp|woff2|ttf)"]
       }
     }
   ]

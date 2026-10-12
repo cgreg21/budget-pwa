@@ -1,4 +1,4 @@
-import { Component, computed, inject } from '@angular/core';
+import { Component, computed, ElementRef, inject, signal, viewChild } from '@angular/core';
 import { Router, RouterOutlet } from '@angular/router';
 
 import { DialogHostComponent } from './shared/dialog-host.component';
@@ -8,6 +8,9 @@ import { DrawerService } from './drawer.service';
 import { CalendarSyncService } from './calendar-sync.service';
 import { UI_ICONS } from './icons';
 import { SettingsService } from './settings.service';
+
+const DRAWER_WIDTH = 280;
+const SWIPE_SLOP = 10;
 
 @Component({
   selector: 'budget-shell',
@@ -24,6 +27,17 @@ export class AppComponent {
   private readonly router = inject(Router);
   readonly logo = UI_ICONS.logo;
   readonly settingsIcon = UI_ICONS.settings;
+
+  private readonly shell = viewChild.required<ElementRef<HTMLElement>>('shell');
+  private readonly edge = viewChild<ElementRef<HTMLElement>>('edge');
+  /** Horizontal offset of the drawer while a swipe is in progress, in [-DRAWER_WIDTH, 0]. */
+  private readonly dragX = signal<number | null>(null);
+  private drag: { x: number; y: number; origin: number; id: number; direction: 'horizontal' | 'vertical' | null } | null = null;
+  private swiped = false;
+
+  readonly dragging = computed(() => this.dragX() !== null);
+  readonly drawerX = computed(() => this.dragX() ?? (this.drawer.opened() ? 0 : -DRAWER_WIDTH));
+  readonly backdropOpacity = computed(() => 1 + this.drawerX() / DRAWER_WIDTH);
 
   readonly items = computed(() => {
     const t = this.s.t();
@@ -69,5 +83,50 @@ export class AppComponent {
   go(url: string): void {
     this.drawer.close();
     void this.router.navigateByUrl(url);
+  }
+
+  onBackdropClick(): void {
+    if (this.swiped) {
+      this.swiped = false;
+      return;
+    }
+    this.drawer.close();
+  }
+
+  onDown(event: PointerEvent): void {
+    if (event.pointerType === 'mouse' && event.button !== 0) return;
+    if (!this.drawer.opened() && event.target !== this.edge()?.nativeElement) return;
+    this.drag = { x: event.clientX, y: event.clientY, origin: this.drawerX(), id: event.pointerId, direction: null };
+    this.swiped = false;
+  }
+
+  onMove(event: PointerEvent): void {
+    const drag = this.drag;
+    if (!drag || event.pointerId !== drag.id) return;
+    const dx = event.clientX - drag.x;
+    const dy = event.clientY - drag.y;
+    if (drag.direction === null && Math.max(Math.abs(dx), Math.abs(dy)) >= SWIPE_SLOP) {
+      drag.direction = Math.abs(dx) > Math.abs(dy) ? 'horizontal' : 'vertical';
+      if (drag.direction === 'horizontal') {
+        this.shell().nativeElement.setPointerCapture(event.pointerId);
+      } else {
+        this.drag = null;
+        return;
+      }
+    }
+    if (drag.direction === 'horizontal') {
+      this.swiped = true;
+      this.dragX.set(Math.min(0, Math.max(-DRAWER_WIDTH, drag.origin + dx)));
+    }
+  }
+
+  onUp(event: PointerEvent): void {
+    const drag = this.drag;
+    this.drag = null;
+    if (!drag || event.pointerId !== drag.id || drag.direction !== 'horizontal') return;
+    const open = this.drawerX() > -DRAWER_WIDTH / 2;
+    this.shell().nativeElement.releasePointerCapture?.(event.pointerId);
+    this.dragX.set(null);
+    if (open) this.drawer.show(); else this.drawer.close();
   }
 }
