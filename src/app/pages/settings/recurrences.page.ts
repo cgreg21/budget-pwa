@@ -11,14 +11,14 @@ import { SettingsService } from '../../settings.service';
   selector: 'app-recurrences-page',
   standalone: true,
   imports: [RouterLink],
-  host: { class: 'flex min-h-0 flex-1 flex-col animate-page' },
+  host: { class: 'flex min-h-0 min-w-0 flex-1 flex-col animate-page' },
   template: `
     <header class="flex items-center bg-surface px-3 py-2">
       <a routerLink="/settings" class="flex size-11 items-center justify-center rounded-full text-[26px] font-mdi transition-transform active:scale-90"
          [attr.aria-label]="s.t().common.back">{{ ui.previous }}</a>
       <h1 class="ml-2 flex-1 truncate text-xl font-bold">{{ s.t().recurrences.title }}</h1>
     </header>
-    <div class="min-h-0 flex-1 overflow-y-auto px-4 py-3">
+    <div class="min-h-0 flex-1 overflow-y-auto px-4 py-3 md:px-6">
       @for (r of b.recurrences(); track r.id; let index = $index) {
         <div class="animate-appear" [style.animation-delay.ms]="index < 12 ? index * 30 : 0">
           <div class="setting">

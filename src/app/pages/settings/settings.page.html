@@ -1,6 +1,8 @@
 <app-header [title]="s.t().settings.title" />
 
-<div class="min-h-0 flex-1 overflow-y-auto px-4 pb-8 pt-3">
+<div class="min-h-0 flex-1 overflow-y-auto px-4 pb-8 pt-3 md:px-6">
+<div class="md:grid md:grid-cols-2 md:gap-x-8">
+<div class="min-w-0">
   <span class="section-title mt-0">{{ s.t().settings.general }}</span>
   <button type="button" class="setting" (click)="pickLanguage()">
     <span>{{ s.t().settings.language }}</span><span class="setting-value">{{ languageName(s.settings().language) }}</span>
@@ -23,7 +25,24 @@
     <span>{{ s.t().settings.recurrences }}</span><span class="setting-value">&#x203A;</span>
   </button>
 
-  <span class="section-title">{{ s.t().calendar.title }}</span>
+  <span class="section-title">{{ s.t().settings.thresholds }}</span>
+  <p class="row-sub">{{ s.t().settings.thresholdsHelp }}</p>
+  <label class="field-label" for="threshold-low">{{ s.t().settings.low }}</label>
+  <input id="threshold-low" class="input" type="text" inputmode="decimal"
+         [value]="low()" (input)="low.set($any($event.target).value)" (blur)="low.set(s.normalizeInput(low()))" />
+  <label class="field-label" for="threshold-medium">{{ s.t().settings.medium }}</label>
+  <input id="threshold-medium" class="input" type="text" inputmode="decimal"
+         [value]="medium()" (input)="medium.set($any($event.target).value)" (blur)="medium.set(s.normalizeInput(medium()))" />
+  <label class="field-label" for="threshold-high">{{ s.t().settings.high }}</label>
+  <input id="threshold-high" class="input" type="text" inputmode="decimal"
+         [value]="high()" (input)="high.set($any($event.target).value)" (blur)="high.set(s.normalizeInput(high()))" />
+  @if (message()) {
+    <p class="error">{{ message() }}</p>
+  }
+  <button type="button" class="primary w-full" (click)="saveThresholds()">{{ s.t().common.save }}</button>
+</div>
+<div class="min-w-0">
+  <span class="section-title md:mt-0">{{ s.t().calendar.title }}</span>
   <p class="row-sub">{{ s.t().calendar.help }}</p>
   <div class="setting">
     <span id="calendar-enable-label">{{ s.t().calendar.enable }}</span>
@@ -56,22 +75,6 @@
   <button type="button" class="secondary w-full" [disabled]="calendar.busy()" (click)="saveCalendar('check')">{{ s.t().calendar.check }}</button>
   <button type="button" class="secondary w-full" [disabled]="!calendarEnabled() || calendar.busy()" (click)="saveCalendar('sync')">{{ s.t().calendar.syncNow }}</button>
 
-  <span class="section-title">{{ s.t().settings.thresholds }}</span>
-  <p class="row-sub">{{ s.t().settings.thresholdsHelp }}</p>
-  <label class="field-label" for="threshold-low">{{ s.t().settings.low }}</label>
-  <input id="threshold-low" class="input" type="text" inputmode="decimal"
-         [value]="low()" (input)="low.set($any($event.target).value)" (blur)="low.set(s.normalizeInput(low()))" />
-  <label class="field-label" for="threshold-medium">{{ s.t().settings.medium }}</label>
-  <input id="threshold-medium" class="input" type="text" inputmode="decimal"
-         [value]="medium()" (input)="medium.set($any($event.target).value)" (blur)="medium.set(s.normalizeInput(medium()))" />
-  <label class="field-label" for="threshold-high">{{ s.t().settings.high }}</label>
-  <input id="threshold-high" class="input" type="text" inputmode="decimal"
-         [value]="high()" (input)="high.set($any($event.target).value)" (blur)="high.set(s.normalizeInput(high()))" />
-  @if (message()) {
-    <p class="error">{{ message() }}</p>
-  }
-  <button type="button" class="primary w-full" (click)="saveThresholds()">{{ s.t().common.save }}</button>
-
   <span class="section-title">{{ s.t().backup.title }}</span>
   <p class="row-sub">{{ s.t().backup.help }}</p>
   <button type="button" class="secondary w-full" (click)="exportBackup()">{{ s.t().backup.export }}</button>
@@ -88,4 +91,6 @@
     <p class="row-sub">{{ s.t().install.settingsHelp }}</p>
     <button type="button" class="secondary w-full" (click)="install.install()">{{ s.t().install.install }}</button>
   }
+</div>
+</div>
 </div>

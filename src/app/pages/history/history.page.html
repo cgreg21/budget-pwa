@@ -1,7 +1,7 @@
 <app-header [title]="s.t().stats.history" />
 
 <div class="min-h-0 flex-1 overflow-y-auto">
-  <div class="mx-3 grid grid-cols-2">
+  <div class="mx-3 grid grid-cols-2 md:mx-5">
     <button type="button" class="select mx-1 text-left" (click)="choosing.set('start')">
       <span class="row-sub mr-2">{{ s.t().stats.fromMonth }}</span>
       <span>{{ s.monthLabel(start()) }}</span>
@@ -14,7 +14,7 @@
 
   <app-monthly-lines [rows]="rows()" />
 
-  <div class="pb-3">
+  <div class="pb-3 md:grid md:grid-cols-2">
     @for (row of history(); track row.month; let index = $index) {
       <button type="button" class="row block w-[calc(100%-24px)] animate-appear text-left" [style.animation-delay.ms]="index < 12 ? index * 30 : 0"
               (click)="open(row.month)">

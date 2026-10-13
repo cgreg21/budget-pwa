@@ -20,6 +20,7 @@ export interface Strings {
     searchPlaceholder: string; emptyTitle: string; emptyText: string;
     noMatch: string; recurringBadge: string;
     emptyRecurring: string; emptyOneOff: string; currentMonth: string;
+    oneOff: string; recurring: string;
     deleteTitle: string; deleteBody(details: string): string;
     deleteScopeBody: string; thisOccurrence: string; wholeSeries: string;
     categoryFilter: string; resetFilters: string; filters: string;
@@ -84,6 +85,7 @@ const en: Strings = {
     noMatch: 'No transaction matches these filters.', recurringBadge: 'recurring',
     currentMonth: 'Current month',
     emptyRecurring: 'No recurring transactions this month.', emptyOneOff: 'No one-off transactions this month.',
+    oneOff: 'One-off', recurring: 'Recurring',
     deleteTitle: 'Delete transaction?',
     deleteBody: (details) => `${details} will be permanently deleted.`,
     deleteScopeBody: 'This transaction belongs to a recurring series.',
@@ -179,6 +181,7 @@ const fr: Strings = {
     noMatch: 'Aucune transaction ne correspond à ces filtres.', recurringBadge: 'récurrente',
     currentMonth: 'Mois en cours',
     emptyRecurring: 'Aucune transaction récurrente ce mois-ci.', emptyOneOff: 'Aucune transaction ponctuelle ce mois-ci.',
+    oneOff: 'Ponctuelles', recurring: 'Récurrentes',
     deleteTitle: 'Supprimer la transaction ?',
     deleteBody: (details) => `${details} sera définitivement supprimée.`,
     deleteScopeBody: 'Cette transaction fait partie d’une série récurrente.',

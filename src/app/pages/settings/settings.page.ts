@@ -22,7 +22,7 @@ const THEMES: Theme[] = ['system', 'light', 'dark'];
   selector: 'app-settings-page',
   standalone: true,
   imports: [HeaderComponent],
-  host: { class: 'flex min-h-0 flex-1 flex-col animate-page' },
+  host: { class: 'flex min-h-0 min-w-0 flex-1 flex-col animate-page' },
   templateUrl: './settings.page.html',
 })
 export class SettingsPage {

@@ -6,6 +6,7 @@ import { BudgetService } from './budget.service';
 import { DialogService } from './dialog.service';
 import { DrawerService } from './drawer.service';
 import { InstallService } from './install.service';
+import { LayoutService } from './layout.service';
 import { CalendarSyncService } from './calendar-sync.service';
 import { UI_ICONS } from './icons';
 import { SettingsService } from './settings.service';
@@ -24,6 +25,7 @@ export class AppComponent {
   readonly calendar = inject(CalendarSyncService);
   readonly drawer = inject(DrawerService);
   readonly install = inject(InstallService);
+  readonly layout = inject(LayoutService);
   private readonly budget = inject(BudgetService);
   private readonly dialog = inject(DialogService);
   private readonly router = inject(Router);
@@ -38,8 +40,10 @@ export class AppComponent {
   private swiped = false;
 
   readonly dragging = computed(() => this.dragX() !== null);
-  readonly drawerX = computed(() => this.dragX() ?? (this.drawer.opened() ? 0 : -DRAWER_WIDTH));
-  readonly backdropOpacity = computed(() => 1 + this.drawerX() / DRAWER_WIDTH);
+  readonly drawerX = computed(() => this.layout.wide() ? 0 : this.dragX() ?? (this.drawer.opened() ? 0 : -DRAWER_WIDTH));
+  readonly backdropOpacity = computed(() => this.layout.wide() ? 0 : 1 + this.drawerX() / DRAWER_WIDTH);
+  /** The drawer is reachable: open on a phone, or always as the sidebar of the wide layout. */
+  readonly drawerActive = computed(() => this.layout.wide() || this.drawer.opened());
 
   readonly items = computed(() => {
     const t = this.s.t();
@@ -101,6 +105,7 @@ export class AppComponent {
 
   onDown(event: PointerEvent): void {
     if (event.pointerType === 'mouse' && event.button !== 0) return;
+    if (this.layout.wide()) return;
     if (!this.drawer.opened() && event.target !== this.edge()?.nativeElement) return;
     this.drag = { x: event.clientX, y: event.clientY, origin: this.drawerX(), id: event.pointerId, direction: null };
     this.swiped = false;

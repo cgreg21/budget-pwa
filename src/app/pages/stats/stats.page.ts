@@ -5,6 +5,7 @@ import {
 
 import { BudgetService } from '../../budget.service';
 import { UI_ICONS, categoryGlyph } from '../../icons';
+import { LayoutService } from '../../layout.service';
 import { SettingsService } from '../../settings.service';
 import { CategoryPieComponent } from '../../shared/category-pie.component';
 import { HeaderComponent } from '../../shared/header.component';
@@ -16,12 +17,13 @@ import { TabBarComponent, type TabItem } from '../../shared/tab-bar.component';
   selector: 'app-stats-page',
   standalone: true,
   imports: [CategoryPieComponent, HeaderComponent, MonthBarComponent, MonthPickerComponent, TabBarComponent],
-  host: { class: 'flex min-h-0 flex-1 flex-col animate-page' },
+  host: { class: 'flex min-h-0 min-w-0 flex-1 flex-col animate-page' },
   templateUrl: './stats.page.html',
 })
 export class StatsPage {
   readonly b = inject(BudgetService);
   readonly s = inject(SettingsService);
+  readonly layout = inject(LayoutService);
 
   readonly tab = signal<'all' | 'recurring'>('all');
   readonly tabs: TabItem[] = [

@@ -17,7 +17,7 @@ const NEW_CATEGORY = '';
   selector: 'app-categories-page',
   standalone: true,
   imports: [HeaderComponent, AutofocusDirective],
-  host: { class: 'flex min-h-0 flex-1 flex-col animate-page' },
+  host: { class: 'flex min-h-0 min-w-0 flex-1 flex-col animate-page' },
   templateUrl: './categories.page.html',
 })
 export class CategoriesPage {

@@ -6,6 +6,7 @@ import {
 import { BudgetService } from '../../budget.service';
 import { DialogService } from '../../dialog.service';
 import { UI_ICONS, categoryGlyph } from '../../icons';
+import { LayoutService } from '../../layout.service';
 import { SettingsService } from '../../settings.service';
 import { HeaderComponent } from '../../shared/header.component';
 import { MonthBarComponent } from '../../shared/month-bar.component';
@@ -39,12 +40,13 @@ const LEVEL_TEXT = {
     HeaderComponent, MonthBarComponent, MonthPickerComponent, SwipeRowComponent, TabBarComponent,
     EditorModalComponent, FiltersModalComponent,
   ],
-  host: { class: 'flex min-h-0 flex-1 flex-col animate-page' },
+  host: { class: 'flex min-h-0 min-w-0 flex-1 flex-col animate-page' },
   templateUrl: './budget.page.html',
 })
 export class BudgetPage {
   readonly b = inject(BudgetService);
   readonly s = inject(SettingsService);
+  readonly layout = inject(LayoutService);
   private readonly dialogs = inject(DialogService);
   readonly ui = UI_ICONS;
 
@@ -77,6 +79,8 @@ export class BudgetPage {
         key,
         items: filtered.filter((transaction) => (transaction.recurrenceId !== undefined) === recurring),
         message: filtered.length > 0 || this.hasFilters() ? t.noMatch : recurring ? t.emptyRecurring : t.emptyOneOff,
+        title: recurring ? t.recurring : t.oneOff,
+        count: recurring ? this.recurringCount() : this.oneOffCount(),
       };
     });
   });

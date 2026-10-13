@@ -17,7 +17,7 @@ const DEFAULT_MONTHS = 6;
   selector: 'app-history-page',
   standalone: true,
   imports: [HeaderComponent, MonthlyLinesComponent, MonthPickerComponent],
-  host: { class: 'flex min-h-0 flex-1 flex-col animate-page' },
+  host: { class: 'flex min-h-0 min-w-0 flex-1 flex-col animate-page' },
   templateUrl: './history.page.html',
 })
 export class HistoryPage {
