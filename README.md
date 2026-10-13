@@ -23,8 +23,11 @@ Node.js 22 ou plus récent (exigé par Angular CLI 22).
 npm install
 npm start
 npm run typecheck
+npm test
 npm run build
 ```
+
+Les tests unitaires (`src/app/**/*.spec.ts`) s’exécutent avec vitest via `ng test` (environnement jsdom, `localStorage` et IndexedDB simulés dans `src/test-setup.ts`) ; `npm run test:coverage` affiche la couverture.
 
 Pour installer la PWA, publier le build de production sur un hôte HTTPS puis utiliser l’action d’installation du navigateur. Le service worker est désactivé par le serveur de développement.
 
