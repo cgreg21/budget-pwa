@@ -63,7 +63,7 @@
   <input id="calendar-password" class="input" type="password" autocomplete="current-password"
          [placeholder]="calendar.hasPassword() ? s.t().calendar.passwordKept : ''"
          [value]="calendarPassword()" (input)="calendarPassword.set($any($event.target).value)" />
-  <p class="row-sub mt-2">{{ s.t().calendar.passwordSession }}</p>
+  <p class="row-sub mt-2">{{ calendar.passwordPersistent() ? s.t().calendar.passwordStored : s.t().calendar.passwordSession }}</p>
   <label class="field-label" for="calendar-proxy">{{ s.t().calendar.proxy }}</label>
   <input id="calendar-proxy" class="input" type="url" autocomplete="off" autocapitalize="none" spellcheck="false"
          placeholder="https://budget-caldav-proxy.example.workers.dev"

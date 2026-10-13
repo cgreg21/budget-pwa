@@ -46,7 +46,7 @@ export interface Strings {
   };
   calendar: {
     title: string; help: string; enable: string; url: string; username: string; password: string;
-    passwordKept: string; passwordSession: string; proxy: string; proxyHelp: string; save: string; check: string; syncNow: string;
+    passwordKept: string; passwordSession: string; passwordStored: string; proxy: string; proxyHelp: string; save: string; check: string; syncNow: string;
     states: Record<CalendarState, string>; never: string; lastSync(date: string): string;
     invalidConfig: string; passwordRequired: string; connected: string; connectedDisabled: string; authError: string;
     networkError: string; serverError(message: string): string; conflicts(count: number): string;
@@ -124,8 +124,9 @@ const en: Strings = {
     title: 'Calendar synchronisation',
     help: 'Transactions are stored as all-day events in this CalDAV calendar, shared between desktop, mobile and web. Recurrence templates stay on this device.',
     enable: 'Enable synchronisation', url: 'Calendar URL', username: 'Username', password: 'Password / app password',
-    passwordKept: 'Leave empty to keep the session password',
-    passwordSession: 'The password stays in memory for this session only. Enter it again after reloading the app.',
+    passwordKept: 'Leave empty to keep the saved password',
+    passwordSession: 'This browser cannot keep secrets: the password stays in memory for this session only. Enter it again after reloading the app.',
+    passwordStored: 'The password is stored encrypted on this device only; it is never shown again and never leaves the device except to reach the calendar server.',
     proxy: 'CORS proxy (optional)',
     proxyHelp: 'Address of a budget-caldav-proxy deployment, needed when the calendar server does not allow web apps (most hosted providers). Leave empty for direct access.',
     save: 'Save settings', check: 'Test connection', syncNow: 'Synchronise now',
@@ -224,8 +225,9 @@ const fr: Strings = {
     title: 'Synchronisation du calendrier',
     help: 'Les transactions sont stock\u00e9es comme des \u00e9v\u00e9nements sur toute la journ\u00e9e dans ce calendrier CalDAV, partag\u00e9 entre bureau, mobile et web. Les mod\u00e8les de r\u00e9currence restent sur cet appareil.',
     enable: 'Activer la synchronisation', url: 'URL du calendrier', username: 'Identifiant', password: 'Mot de passe / mot de passe d\'application',
-    passwordKept: 'Laisser vide pour conserver le mot de passe de la session',
-    passwordSession: 'Le mot de passe reste en m\u00e9moire pour cette session uniquement. Saisissez-le \u00e0 nouveau apr\u00e8s rechargement.',
+    passwordKept: 'Laisser vide pour conserver le mot de passe enregistr\u00e9',
+    passwordSession: 'Ce navigateur ne peut pas conserver de secret : le mot de passe reste en m\u00e9moire pour cette session uniquement. Saisissez-le \u00e0 nouveau apr\u00e8s rechargement.',
+    passwordStored: 'Le mot de passe est conserv\u00e9 chiffr\u00e9 sur cet appareil uniquement ; il n\u2019est jamais r\u00e9affich\u00e9 et ne quitte l\u2019appareil que pour joindre le serveur de calendrier.',
     proxy: 'Proxy CORS (optionnel)',
     proxyHelp: 'Adresse d\u2019un d\u00e9ploiement de budget-caldav-proxy, n\u00e9cessaire quand le serveur de calendrier n\u2019autorise pas les applications web (la plupart des h\u00e9bergeurs). Laisser vide pour un acc\u00e8s direct.',
     save: 'Enregistrer les r\u00e9glages', check: 'Tester la connexion', syncNow: 'Synchroniser maintenant',

@@ -6,6 +6,7 @@ import {
 } from 'budget-lib';
 
 import { BudgetService } from './budget.service';
+import { CALENDAR_PASSWORD_SECRET, isSecretStorageAvailable, readSecret, writeSecret } from './secrets';
 import { SettingsService } from './settings.service';
 import { readValidJson } from './storage';
 
@@ -99,6 +100,13 @@ export class CalendarSyncService implements OnDestroy {
   });
   readonly status = this.statusState.asReadonly();
   private password = '';
+  /** Resolves once the saved password has been looked up; sync waits for it so it does not report a missing password too early. */
+  private readonly passwordLoaded: Promise<void>;
+  private readonly passwordPersistentState = signal(isSecretStorageAvailable());
+  /** Whether the password survives a reload (encrypted on this device) rather than this session only. */
+  readonly passwordPersistent = this.passwordPersistentState.asReadonly();
+  private readonly hasPasswordState = signal(false);
+  readonly hasPassword = this.hasPasswordState.asReadonly();
   private generation = 0;
   private scheduled: ReturnType<typeof setTimeout> | undefined;
   private running: Promise<void> | undefined;
@@ -115,11 +123,12 @@ export class CalendarSyncService implements OnDestroy {
     this.subscription = budget.transactionChanges.subscribe(() => this.schedule());
     window.addEventListener('online', this.resumed);
     document.addEventListener('visibilitychange', this.visible);
+    this.passwordLoaded = readSecret(CALENDAR_PASSWORD_SECRET).then((password) => {
+      if (this.destroyed || this.password !== '') return;
+      this.password = password;
+      this.hasPasswordState.set(password !== '');
+    });
     queueMicrotask(() => { if (!this.destroyed && this.active()) void this.syncNow(); });
-  }
-
-  hasPassword(): boolean {
-    return this.password !== '';
   }
 
   configure(config: CalendarConfig, password: string | null, proxyUrl?: string): boolean {
@@ -140,9 +149,9 @@ export class CalendarSyncService implements OnDestroy {
     if (changed) {
       localStorage.removeItem(BASELINE_KEY);
       this.saved = { baseline: {} };
-      this.password = '';
+      this.setPassword('');
     }
-    if (password !== null) this.password = password;
+    if (password !== null) this.setPassword(password);
     if (restart) {
       this.generation += 1;
       this.cancelScheduled();
@@ -154,6 +163,15 @@ export class CalendarSyncService implements OnDestroy {
       ? { state: 'offline', lastSync: this.saved.lastSync }
       : { ...DISABLED_CALENDAR_STATUS, lastSync: this.saved.lastSync });
     return true;
+  }
+
+  /** Keeps the password for this session and, when the device can, encrypted for later ones. */
+  private setPassword(password: string): void {
+    this.password = password;
+    this.hasPasswordState.set(password !== '');
+    void writeSecret(CALENDAR_PASSWORD_SECRET, password).then((persisted) => {
+      if (!this.destroyed && password !== '') this.passwordPersistentState.set(persisted);
+    });
   }
 
   syncNow(): Promise<void> {
@@ -200,6 +218,7 @@ export class CalendarSyncService implements OnDestroy {
   }
 
   private async drain(): Promise<void> {
+    await this.passwordLoaded;
     while (!this.destroyed && (this.syncRequested || this.checkRequested)) {
       const check = this.checkRequested;
       if (check) this.checkRequested = false;
