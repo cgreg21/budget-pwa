@@ -62,6 +62,19 @@
             }
           },
           "defaultConfiguration": "development"
+        },
+        "test": {
+          "builder": "@angular/build:unit-test",
+          "options": {
+            "tsConfig": "tsconfig.spec.json",
+            "buildTarget": "budget-pwa:build:development",
+            "runner": "vitest",
+            "runnerConfig": "vitest-base.config.mts",
+            "setupFiles": ["src/test-setup.ts"],
+            "coverageInclude": ["src/app/**/*.ts"],
+            "coverageExclude": ["src/main.ts", "src/test-setup.ts", "src/**/*.spec.ts"],
+            "coverageReporters": ["text"]
+          }
         }
       }
     }
