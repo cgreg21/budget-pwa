@@ -222,7 +222,10 @@ export class CalendarSyncService implements OnDestroy {
         if (check) {
           await client.check();
           if (generation === this.generation) {
-            this.statusState.set({ state: config.enabled ? 'online' : 'disabled', lastSync: this.saved.lastSync, message: strings.connected });
+            this.statusState.set({
+              state: config.enabled ? 'online' : 'disabled', lastSync: this.saved.lastSync,
+              message: config.enabled ? strings.connected : strings.connectedDisabled,
+            });
           }
         } else {
           const snapshot = this.budget.allTransactions().map((item) => ({ ...item }));

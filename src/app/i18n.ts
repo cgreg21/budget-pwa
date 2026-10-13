@@ -48,7 +48,7 @@ export interface Strings {
     title: string; help: string; enable: string; url: string; username: string; password: string;
     passwordKept: string; passwordSession: string; proxy: string; proxyHelp: string; save: string; check: string; syncNow: string;
     states: Record<CalendarState, string>; never: string; lastSync(date: string): string;
-    invalidConfig: string; passwordRequired: string; connected: string; authError: string;
+    invalidConfig: string; passwordRequired: string; connected: string; connectedDisabled: string; authError: string;
     networkError: string; serverError(message: string): string; conflicts(count: number): string;
   };
   categories: {
@@ -133,7 +133,9 @@ const en: Strings = {
     never: 'never', lastSync: (date) => 'Last synchronisation: ' + date,
     invalidConfig: 'Enter an HTTP(S) calendar URL and a username.',
     passwordRequired: 'Enter the calendar password for this session in Settings.',
-    connected: 'Connection successful.', authError: 'Authentication failed. Check the username and password.',
+    connected: 'Connection successful.',
+    connectedDisabled: 'Connection successful. Turn on "Enable synchronisation" to start exchanging transactions.',
+    authError: 'Authentication failed. Check the username and password.',
     networkError: 'Calendar unreachable. Changes stay on this device. Check your connection and the server CORS settings.',
     serverError: (message) => 'Calendar error: ' + message,
     conflicts: (count) => count + ' conflict(s) skipped. Synchronise again to retry.',
@@ -231,7 +233,9 @@ const fr: Strings = {
     never: 'jamais', lastSync: (date) => 'Derni\u00e8re synchronisation : ' + date,
     invalidConfig: 'Saisissez une URL de calendrier HTTP(S) et un identifiant.',
     passwordRequired: 'Saisissez le mot de passe du calendrier pour cette session dans les r\u00e9glages.',
-    connected: 'Connexion r\u00e9ussie.', authError: 'Authentification refus\u00e9e. V\u00e9rifiez l\'identifiant et le mot de passe.',
+    connected: 'Connexion r\u00e9ussie.',
+    connectedDisabled: 'Connexion r\u00e9ussie. Activez \u00ab Activer la synchronisation \u00bb pour commencer \u00e0 \u00e9changer les transactions.',
+    authError: 'Authentification refus\u00e9e. V\u00e9rifiez l\'identifiant et le mot de passe.',
     networkError: 'Calendrier inaccessible. Les changements restent sur cet appareil. V\u00e9rifiez la connexion et les r\u00e9glages CORS du serveur.',
     serverError: (message) => 'Erreur du calendrier : ' + message,
     conflicts: (count) => count + ' conflit(s) ignor\u00e9(s). Relancez la synchronisation.',
