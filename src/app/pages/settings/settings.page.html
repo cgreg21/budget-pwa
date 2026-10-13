@@ -64,6 +64,11 @@
          [placeholder]="calendar.hasPassword() ? s.t().calendar.passwordKept : ''"
          [value]="calendarPassword()" (input)="calendarPassword.set($any($event.target).value)" />
   <p class="row-sub mt-2">{{ s.t().calendar.passwordSession }}</p>
+  <label class="field-label" for="calendar-proxy">{{ s.t().calendar.proxy }}</label>
+  <input id="calendar-proxy" class="input" type="url" autocomplete="off" autocapitalize="none" spellcheck="false"
+         placeholder="https://budget-caldav-proxy.example.workers.dev"
+         [value]="calendarProxy()" (input)="calendarProxy.set($any($event.target).value)" />
+  <p class="row-sub mt-2">{{ s.t().calendar.proxyHelp }}</p>
   <p class="mt-2 text-[13px]" role="status" aria-live="polite"
      [class]="calendar.status().state === 'error' ? 'text-bad' : calendar.status().state === 'offline' ? 'text-amber' : 'text-muted'">
     {{ calendarStatusText() }}

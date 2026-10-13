@@ -41,6 +41,7 @@ export class SettingsPage {
   readonly calendarEnabled = signal(this.calendar.config().enabled);
   readonly calendarUrl = signal(this.calendar.config().calendarUrl);
   readonly calendarUser = signal(this.calendar.config().username);
+  readonly calendarProxy = signal(this.calendar.proxyUrl());
   readonly calendarPassword = signal('');
   readonly calendarStatusText = computed(() => {
     const strings = this.s.t().calendar;
@@ -58,13 +59,14 @@ export class SettingsPage {
   async saveCalendar(action: 'save' | 'check' | 'sync' = 'save'): Promise<void> {
     const saved = this.calendar.configure({
       enabled: this.calendarEnabled(), calendarUrl: this.calendarUrl(), username: this.calendarUser(),
-    }, this.calendarPassword() === '' ? null : this.calendarPassword());
+    }, this.calendarPassword() === '' ? null : this.calendarPassword(), this.calendarProxy());
     if (!saved) return;
     this.calendarPassword.set('');
     const config = this.calendar.config();
     this.calendarEnabled.set(config.enabled);
     this.calendarUrl.set(config.calendarUrl);
     this.calendarUser.set(config.username);
+    this.calendarProxy.set(this.calendar.proxyUrl());
     if (action === 'check') await this.calendar.checkConnection();
     else if (config.enabled) await this.calendar.syncNow();
   }

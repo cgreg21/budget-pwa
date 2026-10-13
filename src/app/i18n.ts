@@ -46,7 +46,7 @@ export interface Strings {
   };
   calendar: {
     title: string; help: string; enable: string; url: string; username: string; password: string;
-    passwordKept: string; passwordSession: string; save: string; check: string; syncNow: string;
+    passwordKept: string; passwordSession: string; proxy: string; proxyHelp: string; save: string; check: string; syncNow: string;
     states: Record<CalendarState, string>; never: string; lastSync(date: string): string;
     invalidConfig: string; passwordRequired: string; connected: string; authError: string;
     networkError: string; serverError(message: string): string; conflicts(count: number): string;
@@ -126,6 +126,8 @@ const en: Strings = {
     enable: 'Enable synchronisation', url: 'Calendar URL', username: 'Username', password: 'Password / app password',
     passwordKept: 'Leave empty to keep the session password',
     passwordSession: 'The password stays in memory for this session only. Enter it again after reloading the app.',
+    proxy: 'CORS proxy (optional)',
+    proxyHelp: 'Address of a budget-caldav-proxy deployment, needed when the calendar server does not allow web apps (most hosted providers). Leave empty for direct access.',
     save: 'Save settings', check: 'Test connection', syncNow: 'Synchronise now',
     states: { disabled: 'Synchronisation off', syncing: 'Synchronising...', online: 'Connected', offline: 'Offline', error: 'Error' },
     never: 'never', lastSync: (date) => 'Last synchronisation: ' + date,
@@ -222,6 +224,8 @@ const fr: Strings = {
     enable: 'Activer la synchronisation', url: 'URL du calendrier', username: 'Identifiant', password: 'Mot de passe / mot de passe d\'application',
     passwordKept: 'Laisser vide pour conserver le mot de passe de la session',
     passwordSession: 'Le mot de passe reste en m\u00e9moire pour cette session uniquement. Saisissez-le \u00e0 nouveau apr\u00e8s rechargement.',
+    proxy: 'Proxy CORS (optionnel)',
+    proxyHelp: 'Adresse d\u2019un d\u00e9ploiement de budget-caldav-proxy, n\u00e9cessaire quand le serveur de calendrier n\u2019autorise pas les applications web (la plupart des h\u00e9bergeurs). Laisser vide pour un acc\u00e8s direct.',
     save: 'Enregistrer les r\u00e9glages', check: 'Tester la connexion', syncNow: 'Synchroniser maintenant',
     states: { disabled: 'Synchronisation d\u00e9sactiv\u00e9e', syncing: 'Synchronisation...', online: 'Connect\u00e9', offline: 'Hors ligne', error: 'Erreur' },
     never: 'jamais', lastSync: (date) => 'Derni\u00e8re synchronisation : ' + date,
