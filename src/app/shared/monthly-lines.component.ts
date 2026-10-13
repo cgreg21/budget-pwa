@@ -1,4 +1,6 @@
-import { ChangeDetectionStrategy, Component, computed, inject, input } from '@angular/core';
+import {
+  ChangeDetectionStrategy, Component, DestroyRef, ElementRef, afterNextRender, computed, inject, input, signal,
+} from '@angular/core';
 import { monthNumberOf, yearOf, type MonthKey } from 'budget-lib';
 
 import type { MonthlyTotals } from '../budget.service';
@@ -7,12 +9,13 @@ import { SettingsService } from '../settings.service';
 const INCOME_COLOR = '#00E5A0';
 const EXPENSE_COLOR = '#FF6B6B';
 
-const WIDTH = 360;
+/** Width used until the container has been measured, and the minimum the chart is drawn at. */
+const MIN_WIDTH = 280;
 const HEIGHT = 240;
-const PLOT = { left: 40, right: 12, top: 12, bottom: 70 };
+const PLOT = { left: 44, right: 12, top: 12, bottom: 70 };
 
-/** From this many months on, the month labels are tilted to stay readable. */
-const TILT_LABELS_FROM = 7;
+/** Months get at least this many pixels each before labels are tilted or skipped. */
+const LABEL_WIDTH = 46;
 
 const compactAmount = (value: number): string => (value >= 1000 ? `${Math.round(value / 100) / 10}k` : `${Math.round(value)}`);
 
@@ -32,53 +35,72 @@ function niceMax(value: number): number {
   return nice * magnitude;
 }
 
-/** A line chart with, for each month, the total income and the total expenses. */
+/**
+ * A line chart with, for each month, the total income and the total expenses. It is drawn at the
+ * container's width, one SVG unit per CSS pixel, so text keeps the application's font size.
+ */
 @Component({
   selector: 'app-monthly-lines',
   changeDetection: ChangeDetectionStrategy.OnPush,
+  host: { class: 'mx-3 my-1 block min-w-0' },
   template: `
-    <div class="mx-3 my-1">
-      <svg class="block h-auto w-full animate-fade" [attr.viewBox]="'0 0 ' + width + ' ' + height" role="img">
-        @for (tick of chart().ticks; track tick.value) {
-          <line [attr.x1]="plot.left" [attr.x2]="width - plot.right" [attr.y1]="tick.y" [attr.y2]="tick.y" stroke="var(--c-line)" />
-          <text [attr.x]="plot.left - 6" [attr.y]="tick.y" text-anchor="end" dominant-baseline="central" font-size="11" fill="var(--c-muted)">{{ tick.label }}</text>
+    <svg class="block animate-fade text-[12px]" [attr.width]="width()" [attr.height]="height"
+         [attr.viewBox]="'0 0 ' + width() + ' ' + height" role="img">
+      @for (tick of chart().ticks; track tick.value) {
+        <line [attr.x1]="plot.left" [attr.x2]="width() - plot.right" [attr.y1]="tick.y" [attr.y2]="tick.y" stroke="var(--c-line)" />
+        <text [attr.x]="plot.left - 6" [attr.y]="tick.y" text-anchor="end" dominant-baseline="central" fill="var(--c-muted)">{{ tick.label }}</text>
+      }
+      <line [attr.x1]="plot.left" [attr.x2]="width() - plot.right" [attr.y1]="chart().baseline" [attr.y2]="chart().baseline" stroke="var(--c-line)" />
+      @for (label of chart().labels; track label.x) {
+        <text [attr.x]="label.x" [attr.y]="chart().baseline + 14" fill="var(--c-muted)"
+              [attr.text-anchor]="label.tilt ? 'end' : 'middle'"
+              [attr.transform]="label.tilt ? 'rotate(-45 ' + label.x + ' ' + (chart().baseline + 14) + ')' : null">{{ label.text }}</text>
+      }
+      @for (line of chart().lines; track line.color) {
+        <polyline [attr.points]="line.points" fill="none" [attr.stroke]="line.color" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" />
+        @for (dot of line.dots; track dot.x) {
+          <circle [attr.cx]="dot.x" [attr.cy]="dot.y" r="4" [attr.fill]="line.color" />
         }
-        <line [attr.x1]="plot.left" [attr.x2]="width - plot.right" [attr.y1]="chart().baseline" [attr.y2]="chart().baseline" stroke="var(--c-line)" />
-        @for (label of chart().labels; track label.x) {
-          <text [attr.x]="label.x" [attr.y]="chart().baseline + 14" font-size="11" fill="var(--c-muted)"
-                [attr.text-anchor]="label.tilt ? 'end' : 'middle'"
-                [attr.transform]="label.tilt ? 'rotate(-45 ' + label.x + ' ' + (chart().baseline + 14) + ')' : null">{{ label.text }}</text>
-        }
-        @for (line of chart().lines; track line.color) {
-          <polyline [attr.points]="line.points" fill="none" [attr.stroke]="line.color" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" />
-          @for (dot of line.dots; track dot.x) {
-            <circle [attr.cx]="dot.x" [attr.cy]="dot.y" r="4" [attr.fill]="line.color" />
-          }
-        }
-        @for (item of chart().legend; track item.color; let index = $index) {
-          <rect [attr.x]="width / 2 - 70 + index * 76" [attr.y]="height - 14" width="10" height="10" rx="2" [attr.fill]="item.color" />
-          <text [attr.x]="width / 2 - 56 + index * 76" [attr.y]="height - 9" dominant-baseline="central" font-size="12" fill="var(--c-muted)">{{ item.label }}</text>
-        }
-      </svg>
-    </div>
+      }
+      @for (item of chart().legend; track item.color; let index = $index) {
+        <rect [attr.x]="width() / 2 - 70 + index * 76" [attr.y]="height - 14" width="10" height="10" rx="2" [attr.fill]="item.color" />
+        <text [attr.x]="width() / 2 - 56 + index * 76" [attr.y]="height - 9" dominant-baseline="central" fill="var(--c-muted)">{{ item.label }}</text>
+      }
+    </svg>
   `,
 })
 export class MonthlyLinesComponent {
   private readonly s = inject(SettingsService);
+  private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);
   readonly rows = input.required<MonthlyTotals[]>();
 
-  readonly width = WIDTH;
+  readonly width = signal(MIN_WIDTH);
   readonly height = HEIGHT;
   readonly plot = PLOT;
+
+  constructor() {
+    const destroyRef = inject(DestroyRef);
+    afterNextRender(() => {
+      const measure = (): void => {
+        this.width.set(Math.max(MIN_WIDTH, Math.floor(this.host.nativeElement.clientWidth)));
+      };
+      measure();
+      if (typeof ResizeObserver === 'undefined') return;
+      const observer = new ResizeObserver(measure);
+      observer.observe(this.host.nativeElement);
+      destroyRef.onDestroy(() => observer.disconnect());
+    });
+  }
 
   readonly chart = computed(() => {
     const t = this.s.t();
     const rows = this.rows();
+    const width = this.width();
     const months = shortMonths(t.months);
     const labelOf = (month: MonthKey): string => `${months[monthNumberOf(month) - 1]} ${String(yearOf(month)).slice(2)}`;
 
     const max = niceMax(Math.max(0, ...rows.flatMap((row) => [row.income, row.expense])));
-    const innerWidth = WIDTH - PLOT.left - PLOT.right;
+    const innerWidth = width - PLOT.left - PLOT.right;
     const innerHeight = HEIGHT - PLOT.top - PLOT.bottom;
     const baseline = PLOT.top + innerHeight;
     // Half a unit of margin on each side keeps the first and last points off the edges.
@@ -90,8 +112,10 @@ export class MonthlyLinesComponent {
       return { color, points: dots.map((dot) => `${dot.x},${dot.y}`).join(' '), dots };
     };
 
-    const tilt = rows.length >= TILT_LABELS_FROM;
-    const every = Math.max(1, Math.ceil(rows.length / 12));
+    // Labels are tilted once a month gets less room than a label needs, then thinned out when even that is not enough.
+    const perMonth = innerWidth / Math.max(rows.length, 1);
+    const tilt = perMonth < LABEL_WIDTH;
+    const every = tilt ? Math.max(1, Math.ceil(LABEL_WIDTH / 2 / perMonth)) : 1;
     return {
       baseline,
       ticks: [0, 1, 2, 3, 4].map((step) => ({ value: (max * step) / 4, y: yOf((max * step) / 4), label: compactAmount((max * step) / 4) })),
