@@ -6,6 +6,7 @@ import {
   DEFAULT_CATEGORY_ICON,
   FALLBACK_CATEGORY,
   categoryIcon,
+  ensureCategories,
   clampMonth,
   computeTotals,
   currentMonthKey,
@@ -89,6 +90,9 @@ function readData(): { value: BudgetData; corrupted: boolean } {
 export class BudgetService {
   private readonly transactionChangesSubject = new Subject<void>();
   readonly transactionChanges = this.transactionChangesSubject.asObservable();
+  private readonly categoryChangesSubject = new Subject<void>();
+  /** Local edits of the category list (add, rename, delete, icon, order); calendar writes do not emit. */
+  readonly categoryChanges = this.categoryChangesSubject.asObservable();
   private readonly loaded = readData();
   /** Whether the saved data could not be read and was replaced with the defaults. */
   readonly loadFailed = this.loaded.corrupted;
@@ -123,7 +127,7 @@ export class BudgetService {
   }
 
   /** Calendar writes stay local: they must not schedule another synchronisation. */
-  applyCalendarChanges(upserts: Transaction[], removals: string[], snapshot: Transaction[]): void {
+  applyCalendarChanges(upserts: Transaction[], removals: string[], snapshot: Transaction[], categoryList: Category[] | null = null): void {
     if (!isTransactionArray(upserts) || upserts.some((item) => !isMonthKey(monthKeyOf(item.date)) || item.category === '')) {
       throw new Error('Invalid calendar transactions.');
     }
@@ -136,7 +140,7 @@ export class BudgetService {
     };
     const accepted = upserts.filter((item) => unchanged(item.id));
     const removed = removals.filter(unchanged);
-    if (accepted.length === 0 && removed.length === 0) return;
+    if (accepted.length === 0 && removed.length === 0 && categoryList === null) return;
     const replaced = new Set([...accepted.map((item) => item.id), ...removed]);
     const data = this.dataState();
     const months: Record<string, Transaction[]> = {};
@@ -155,7 +159,7 @@ export class BudgetService {
         names.add(item.category);
       }
     }
-    const next = { ...data, months, categories };
+    const next = { ...data, months, categories: categoryList === null ? categories : ensureCategories(categoryList, categories.map((category) => category.name)) };
     localStorage.setItem(DATA_KEY, JSON.stringify(next));
     this.dataState.set(next);
   }
@@ -323,6 +327,7 @@ export class BudgetService {
     if (after.months !== before.months || after.recurrences !== before.recurrences) {
       this.transactionChangesSubject.next();
     }
+    if (after.categories !== before.categories) this.categoryChangesSubject.next();
   }
 
   private persist(): void {

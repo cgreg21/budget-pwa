@@ -261,6 +261,8 @@ describe('BudgetService', () => {
       const b = service();
       const changes = vi.fn();
       b.transactionChanges.subscribe(changes);
+      const categoryChanges = vi.fn();
+      b.categoryChanges.subscribe(categoryChanges);
       b.removeCategory('A');
       expect(b.categories()).toHaveLength(1);
       b.addCategory('B', 'tabler:bus');
@@ -269,6 +271,20 @@ describe('BudgetService', () => {
       b.removeCategory('Z');
       expect(b.categories()).toEqual([{ name: 'B', icon: 'tabler:bus' }]);
       expect(stored().categories).toEqual([{ name: 'B', icon: 'tabler:bus' }]);
+      expect(changes).not.toHaveBeenCalled();
+      expect(categoryChanges).toHaveBeenCalledTimes(3);
+    });
+
+    it('stores a category list from the calendar without notifying or touching transactions', () => {
+      localStorage.setItem(DATA_KEY, JSON.stringify(data({ categories: [{ name: 'A', icon: 'folder-symbolic' }], months: { '2026-10': [tx({ category: 'A' })] } })));
+      const b = service();
+      const changes = vi.fn();
+      b.transactionChanges.subscribe(changes);
+      b.categoryChanges.subscribe(changes);
+      b.applyCalendarChanges([], [], b.allTransactions(), [{ name: 'B', icon: 'tabler:bus' }]);
+      expect(b.categories()).toEqual([{ name: 'B', icon: 'tabler:bus' }, { name: 'A', icon: expect.any(String) }]);
+      expect(stored().categories).toEqual(b.categories());
+      expect(b.transactionsOf('2026-10')).toHaveLength(1);
       expect(changes).not.toHaveBeenCalled();
     });
 

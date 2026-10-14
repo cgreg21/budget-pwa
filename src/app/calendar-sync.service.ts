@@ -1,6 +1,7 @@
 import { Injectable, OnDestroy, computed, signal } from '@angular/core';
+import { merge } from 'rxjs';
 import {
-  CalDavClient, CalendarError, DEFAULT_CALENDAR_CONFIG, DISABLED_CALENDAR_STATUS,
+  CATEGORIES_BASELINE_KEY, CalDavClient, CalendarError, DEFAULT_CALENDAR_CONFIG, DISABLED_CALENDAR_STATUS,
   isCalendarConfig, isCalendarConfigComplete, normalizeCalendarConfig, syncCalendar,
   type CalendarConfig, type CalendarStatus, type HttpRequest, type HttpTransport, type SyncBaseline,
 } from 'budget-lib';
@@ -120,7 +121,7 @@ export class CalendarSyncService implements OnDestroy {
   private readonly subscription;
 
   constructor(private readonly budget: BudgetService, private readonly settings: SettingsService) {
-    this.subscription = budget.transactionChanges.subscribe(() => this.schedule());
+    this.subscription = merge(budget.transactionChanges, budget.categoryChanges).subscribe(() => this.schedule());
     window.addEventListener('online', this.resumed);
     document.addEventListener('visibilitychange', this.visible);
     this.passwordLoaded = readSecret(CALENDAR_PASSWORD_SECRET).then((password) => {
@@ -254,10 +255,18 @@ export class CalendarSyncService implements OnDestroy {
           }
         } else {
           const snapshot = this.budget.allTransactions().map((item) => ({ ...item }));
-          const outcome = await syncCalendar(client, snapshot, this.saved.baseline);
+          const categories = this.budget.categories();
+          const outcome = await syncCalendar(client, snapshot, this.saved.baseline, categories);
           if (generation !== this.generation || this.destroyed) continue;
-          this.budget.applyCalendarChanges(outcome.upsertLocal, outcome.removeLocal, snapshot);
-          const saved = { baseline: outcome.baseline, lastSync: new Date().toISOString() };
+          const baseline = { ...outcome.baseline };
+          let nextCategories = outcome.categories;
+          if (nextCategories !== null && this.budget.categories() !== categories) {
+            // A local edit made meanwhile must not be overwritten; forgetting the category baseline makes the next run merge.
+            nextCategories = null;
+            delete baseline[CATEGORIES_BASELINE_KEY];
+          }
+          this.budget.applyCalendarChanges(outcome.upsertLocal, outcome.removeLocal, snapshot, nextCategories);
+          const saved = { baseline, lastSync: new Date().toISOString() };
           localStorage.setItem(BASELINE_KEY, JSON.stringify(saved));
           this.saved = saved;
           this.statusState.set({

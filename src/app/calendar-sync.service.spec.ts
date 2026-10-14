@@ -1,5 +1,5 @@
 import { TestBed } from '@angular/core/testing';
-import { base64Utf8, transactionToIcs, type Transaction } from 'budget-lib';
+import { DEFAULT_CATEGORIES, base64Utf8, categoriesToIcs, transactionToIcs, type Category, type Transaction } from 'budget-lib';
 
 import { BudgetService } from './budget.service';
 import { CalendarSyncService, calendarTransport, normalizeProxyUrl, proxied } from './calendar-sync.service';
@@ -16,11 +16,16 @@ const PROPFIND_BODY = '<?xml version="1.0"?><d:multistatus xmlns:d="DAV:"><d:res
   + '<d:resourcetype><d:collection/><c:calendar xmlns:c="urn:ietf:params:xml:ns:caldav"/></d:resourcetype></d:prop>'
   + '<d:status>HTTP/1.1 200 OK</d:status></d:propstat></d:response></d:multistatus>';
 const EMPTY_LIST = '<?xml version="1.0"?><d:multistatus xmlns:d="DAV:" xmlns:c="urn:ietf:params:xml:ns:caldav"></d:multistatus>';
-const listOf = (...events: { href: string; etag: string; transaction: Transaction }[]): string =>
+const listOf = (...events: { href: string; etag: string; transaction?: Transaction; categories?: readonly Category[] }[]): string =>
   '<?xml version="1.0"?><d:multistatus xmlns:d="DAV:" xmlns:c="urn:ietf:params:xml:ns:caldav">'
-  + events.map(({ href, etag, transaction }) => `<d:response><d:href>${href}</d:href><d:propstat><d:prop><d:getetag>"${etag}"</d:getetag>`
-    + `<c:calendar-data><![CDATA[${transactionToIcs(transaction)}]]></c:calendar-data></d:prop><d:status>HTTP/1.1 200 OK</d:status></d:propstat></d:response>`).join('')
+  + events.map(({ href, etag, transaction, categories }) => `<d:response><d:href>${href}</d:href><d:propstat><d:prop><d:getetag>"${etag}"</d:getetag>`
+    + `<c:calendar-data><![CDATA[${categories ? categoriesToIcs(categories) : transactionToIcs(transaction as Transaction)}]]></c:calendar-data></d:prop><d:status>HTTP/1.1 200 OK</d:status></d:propstat></d:response>`).join('')
   + '</d:multistatus>';
+
+const CATEGORIES_HREF = '/cal/categories.ics';
+/** A calendar holding the given category list (the default one unless told otherwise) and the given transactions. */
+const calendarWith = (categories: readonly Category[] = DEFAULT_CATEGORIES, ...events: { href: string; etag: string; transaction: Transaction }[]): string =>
+  listOf({ href: CATEGORIES_HREF, etag: 'c1', categories }, ...events);
 
 const tx = (over: Partial<Transaction> = {}): Transaction => ({
   id: 't1', date: '2026-10-05', description: 'Courses', category: 'Alimentation', kind: 'expense', amount: 50, ...over,
@@ -36,7 +41,7 @@ function server(handlers: Partial<Record<string, Handler>> = {}): { calls: Call[
   const calls: Call[] = [];
   const defaults: Record<string, Handler> = {
     PROPFIND: () => respond(207, PROPFIND_BODY),
-    REPORT: () => respond(207, EMPTY_LIST),
+    REPORT: () => respond(207, calendarWith()),
     PUT: () => respond(201, '', { ETag: '"e1"' }),
     DELETE: () => respond(204),
   };
@@ -355,7 +360,7 @@ describe('CalendarSyncService', () => {
     });
 
     it('uploads local transactions and remembers the server state', async () => {
-      localStorage.setItem(DATA_KEY, JSON.stringify({ months: { '2026-10': [tx()] }, categories: [{ name: 'Alimentation', icon: 'folder-symbolic' }], recurrences: [], thresholds: { low: 0, medium: 1, high: 2 } }));
+      localStorage.setItem(DATA_KEY, JSON.stringify({ months: { '2026-10': [tx()] }, categories: DEFAULT_CATEGORIES, recurrences: [], thresholds: { low: 0, medium: 1, high: 2 } }));
       const { calls } = server();
       const c = await service();
       c.configure(CONFIG, 'pw');
@@ -367,13 +372,17 @@ describe('CalendarSyncService', () => {
       expect(calls[1].body).toContain('UID:t1');
       expect(c.status()).toEqual({ state: 'online', lastSync: '2026-10-13T10:00:00.000Z', message: undefined });
       expect(JSON.parse(localStorage.getItem(BASELINE_KEY) ?? '')).toEqual({
-        baseline: { t1: { href: 'https://dav.test/cal/t1.ics', etag: '"e1"', hash: expect.any(String) } }, lastSync: '2026-10-13T10:00:00.000Z',
+        baseline: {
+          t1: { href: 'https://dav.test/cal/t1.ics', etag: '"e1"', hash: expect.any(String) },
+          '@categories': { href: CATEGORIES_HREF, etag: '"c1"', hash: expect.any(String) },
+        },
+        lastSync: '2026-10-13T10:00:00.000Z',
       });
     });
 
     it('downloads remote transactions into the budget', async () => {
       const remote = tx({ id: 'r9', date: '2026-11-02', category: 'Vacances', amount: 12 });
-      server({ REPORT: () => respond(207, listOf({ href: '/cal/r9.ics', etag: 'z', transaction: remote })) });
+      server({ REPORT: () => respond(207, calendarWith(DEFAULT_CATEGORIES, { href: '/cal/r9.ics', etag: 'z', transaction: remote })) });
       const c = await service();
       const budget = TestBed.inject(BudgetService);
       c.configure(CONFIG, 'pw');
@@ -383,8 +392,85 @@ describe('CalendarSyncService', () => {
       expect(c.status().state).toBe('online');
     });
 
+    describe('categories', () => {
+      const remoteList: Category[] = [{ name: 'Vacances', icon: 'tabler:plane' }, { name: 'Alimentation', icon: 'tabler:bus' }];
+      const savedCategories = (): Category[] => (JSON.parse(localStorage.getItem(DATA_KEY) ?? '') as { categories: Category[] }).categories;
+
+      it('takes the list from the calendar, order and icons included', async () => {
+        server({ REPORT: () => respond(207, calendarWith(remoteList)) });
+        const c = await service();
+        const budget = TestBed.inject(BudgetService);
+        c.configure(CONFIG, 'pw');
+        await c.syncNow();
+        // The local-only default categories are kept after the calendar's own.
+        expect(budget.categories().slice(0, 2)).toEqual(remoteList);
+        expect(budget.categories().length).toBe(DEFAULT_CATEGORIES.length + 1);
+        expect(savedCategories()).toEqual(budget.categories());
+      });
+
+      it('adds the categories of downloaded transactions, with the default icon', async () => {
+        const remote = tx({ id: 'r9', category: 'Cadeaux' });
+        server({ REPORT: () => respond(207, calendarWith(DEFAULT_CATEGORIES, { href: '/cal/r9.ics', etag: 'z', transaction: remote })) });
+        const c = await service();
+        const budget = TestBed.inject(BudgetService);
+        c.configure(CONFIG, 'pw');
+        await c.syncNow();
+        expect(budget.categories().map((category) => category.name)).toContain('Cadeaux');
+        expect(budget.transactionsOf('2026-10')).toEqual([remote]);
+      });
+
+      it('uploads a local change once the list is saved, and tolerates the reserved baseline key', async () => {
+        const { calls } = server();
+        const c = await service();
+        const budget = TestBed.inject(BudgetService);
+        c.configure(CONFIG, 'pw');
+        await c.syncNow();
+        expect(calls.map((call) => call.method)).toEqual(['REPORT']);
+        expect(Object.keys(JSON.parse(localStorage.getItem(BASELINE_KEY) ?? '').baseline)).toEqual(['@categories']);
+        budget.addCategory('Cadeaux', 'tabler:gift');
+        vi.advanceTimersByTime(2000);
+        await settle();
+        const put = calls.find((call) => call.method === 'PUT');
+        expect(put?.url).toBe('https://dav.test/cal/categories.ics');
+        expect(put?.headers['If-Match']).toBe('"c1"');
+        expect(put?.body).toContain('Cadeaux');
+        // A restart reads the baseline holding the reserved key without dropping it.
+        TestBed.resetTestingModule();
+        const again = await service();
+        expect(again.status().lastSync).toBe('2026-10-13T10:00:02.000Z');
+      });
+
+      it('applies renames and reorders by synchronising after each edit', async () => {
+        const { calls } = server();
+        const c = await service();
+        const budget = TestBed.inject(BudgetService);
+        c.configure(CONFIG, 'pw');
+        await c.syncNow();
+        budget.updateCategory('Logement', { icon: 'tabler:home' });
+        vi.advanceTimersByTime(2000);
+        await settle();
+        expect(calls.filter((call) => call.method === 'REPORT')).toHaveLength(2);
+      });
+
+      it('keeps a local edit made while the calendar list was being fetched', async () => {
+        const report = deferred<Response>();
+        const { calls } = server({ REPORT: () => (calls.length === 1 ? report.promise : respond(207, calendarWith(remoteList))) });
+        const c = await service();
+        const budget = TestBed.inject(BudgetService);
+        c.configure(CONFIG, 'pw');
+        const run = c.syncNow();
+        await settle(1);
+        budget.addCategory('Cadeaux', 'tabler:gift');
+        report.resolve(respond(207, calendarWith(remoteList)));
+        await run;
+        await settle();
+        expect(budget.categories().map((category) => category.name)).toContain('Cadeaux');
+        expect(savedCategories().map((category) => category.name)).toContain('Cadeaux');
+      });
+    });
+
     it('counts conflicts and asks to retry', async () => {
-      localStorage.setItem(DATA_KEY, JSON.stringify({ months: { '2026-10': [tx()] }, categories: [{ name: 'Alimentation', icon: 'folder-symbolic' }], recurrences: [], thresholds: { low: 0, medium: 1, high: 2 } }));
+      localStorage.setItem(DATA_KEY, JSON.stringify({ months: { '2026-10': [tx()] }, categories: DEFAULT_CATEGORIES, recurrences: [], thresholds: { low: 0, medium: 1, high: 2 } }));
       server({ PUT: () => respond(412) });
       const c = await service();
       c.configure(CONFIG, 'pw');
@@ -410,7 +496,7 @@ describe('CalendarSyncService', () => {
       c.configure(CONFIG, 'pw');
       const pending = c.syncNow();
       c.configure({ ...CONFIG, calendarUrl: 'https://other.test/cal' }, 'pw');
-      report.resolve(respond(207, EMPTY_LIST));
+      report.resolve(respond(207, calendarWith()));
       await pending;
       expect(c.status()).toEqual({ state: 'offline', lastSync: undefined });
       expect(localStorage.getItem(BASELINE_KEY)).toBeNull();
@@ -430,7 +516,7 @@ describe('CalendarSyncService', () => {
 
     it('shares one run between concurrent requests and runs again for changes made meanwhile', async () => {
       const report = deferred<Response>();
-      const { calls } = server({ REPORT: () => (calls.length === 1 ? report.promise : respond(207, EMPTY_LIST)) });
+      const { calls } = server({ REPORT: () => (calls.length === 1 ? report.promise : respond(207, calendarWith())) });
       const c = await service();
       const budget = TestBed.inject(BudgetService);
       c.configure(CONFIG, 'pw');
@@ -439,7 +525,7 @@ describe('CalendarSyncService', () => {
       await settle(1);
       expect(calls).toHaveLength(1);
       budget.add({ date: '2026-10-02', description: 'x', category: 'Alimentation', kind: 'expense', amount: 1 });
-      report.resolve(respond(207, EMPTY_LIST));
+      report.resolve(respond(207, calendarWith()));
       await first;
       await settle();
       expect(calls.map((call) => call.method)).toEqual(['REPORT', 'REPORT', 'PUT']);
