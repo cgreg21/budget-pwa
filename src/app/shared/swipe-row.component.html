@@ -1,0 +1,14 @@
+<div class="relative py-[3px]">
+  <button type="button"
+          class="absolute bottom-[3px] right-3 top-[3px] w-[88px] rounded-lg bg-danger text-sm font-bold text-on-brand"
+          [attr.tabindex]="open() ? 0 : -1"
+          (click)="remove.emit()">{{ removeLabel() }}</button>
+  <div class="row relative m-0 mx-3 flex cursor-pointer touch-pan-y select-none items-center"
+       [class.transition-transform]="!dragging()"
+       [style.transform]="'translateX(' + x() + 'px)'"
+       (pointerdown)="onDown($event)" (pointermove)="onMove($event)"
+       (pointerup)="onUp($event)" (pointercancel)="onUp($event)"
+       (click)="onClick()">
+    <ng-content />
+  </div>
+</div>

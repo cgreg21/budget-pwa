@@ -43,31 +43,7 @@ function niceMax(value: number): number {
   selector: 'app-monthly-lines',
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: { class: 'mx-3 my-1 block min-w-0' },
-  template: `
-    <svg class="block animate-fade text-[12px]" [attr.width]="width()" [attr.height]="height"
-         [attr.viewBox]="'0 0 ' + width() + ' ' + height" role="img">
-      @for (tick of chart().ticks; track tick.value) {
-        <line [attr.x1]="plot.left" [attr.x2]="width() - plot.right" [attr.y1]="tick.y" [attr.y2]="tick.y" stroke="var(--c-line)" />
-        <text [attr.x]="plot.left - 6" [attr.y]="tick.y" text-anchor="end" dominant-baseline="central" fill="var(--c-muted)">{{ tick.label }}</text>
-      }
-      <line [attr.x1]="plot.left" [attr.x2]="width() - plot.right" [attr.y1]="chart().baseline" [attr.y2]="chart().baseline" stroke="var(--c-line)" />
-      @for (label of chart().labels; track label.x) {
-        <text [attr.x]="label.x" [attr.y]="chart().baseline + 14" fill="var(--c-muted)"
-              [attr.text-anchor]="label.tilt ? 'end' : 'middle'"
-              [attr.transform]="label.tilt ? 'rotate(-45 ' + label.x + ' ' + (chart().baseline + 14) + ')' : null">{{ label.text }}</text>
-      }
-      @for (line of chart().lines; track line.color) {
-        <polyline [attr.points]="line.points" fill="none" [attr.stroke]="line.color" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" />
-        @for (dot of line.dots; track dot.x) {
-          <circle [attr.cx]="dot.x" [attr.cy]="dot.y" r="4" [attr.fill]="line.color" />
-        }
-      }
-      @for (item of chart().legend; track item.color; let index = $index) {
-        <rect [attr.x]="width() / 2 - 70 + index * 76" [attr.y]="height - 14" width="10" height="10" rx="2" [attr.fill]="item.color" />
-        <text [attr.x]="width() / 2 - 56 + index * 76" [attr.y]="height - 9" dominant-baseline="central" fill="var(--c-muted)">{{ item.label }}</text>
-      }
-    </svg>
-  `,
+  templateUrl: './monthly-lines.component.html',
 })
 export class MonthlyLinesComponent {
   private readonly s = inject(SettingsService);

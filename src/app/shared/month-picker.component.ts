@@ -14,21 +14,7 @@ import { SheetComponent } from './sheet.component';
   selector: 'app-month-picker',
   imports: [SheetComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  template: `
-    <app-sheet (dismiss)="closed.emit()">
-      <div class="flex items-center">
-        <button type="button" class="nav-btn" [disabled]="year() <= firstYear" (click)="year.set(year() - 1)">{{ ui.previous }}</button>
-        <span class="flex-1 text-center text-lg font-bold">{{ year() }}</span>
-        <button type="button" class="nav-btn" [disabled]="year() >= lastYear" (click)="year.set(year() + 1)">{{ ui.next }}</button>
-      </div>
-      <div class="my-2 grid grid-cols-3">
-        @for (m of months(); track m.key) {
-          <button type="button" class="chip m-1.5" [class]="m.class" (click)="picked.emit(m.key)">{{ m.label }}</button>
-        }
-      </div>
-      <button type="button" class="chip" (click)="picked.emit(currentMonth)">{{ s.t().budget.currentMonth }}</button>
-    </app-sheet>
-  `,
+  templateUrl: './month-picker.component.html',
 })
 export class MonthPickerComponent implements OnInit {
   readonly s = inject(SettingsService);

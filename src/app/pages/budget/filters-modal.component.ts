@@ -11,32 +11,7 @@ import { SheetComponent } from '../../shared/sheet.component';
   selector: 'app-filters-modal',
   standalone: true,
   imports: [SheetComponent],
-  template: `
-    <app-sheet (dismiss)="closed.emit()">
-      <h2 class="modal-title">{{ s.t().budget.filters }}</h2>
-      <input class="search" type="search" [placeholder]="s.t().budget.searchPlaceholder"
-             [value]="filter().search" (input)="patch({ search: $any($event.target).value })" />
-      <div class="grid grid-cols-3">
-        <button type="button" class="chip" [class.chip-active]="filter().kind === null" (click)="patch({ kind: null })">{{ s.t().common.all }}</button>
-        <button type="button" class="chip" [class.chip-active]="filter().kind === 'income'" (click)="patch({ kind: 'income' })">{{ s.t().common.income }}</button>
-        <button type="button" class="chip" [class.chip-active]="filter().kind === 'expense'" (click)="patch({ kind: 'expense' })">{{ s.t().common.expense }}</button>
-      </div>
-      <span class="field-label">{{ categoriesTitle() }}</span>
-      <div class="my-1 h-[220px] overflow-y-auto">
-        @for (c of rows(); track c.name) {
-          <button type="button" class="pick-row" [class.pick-row-selected]="c.selected" (click)="toggle(c.name)">
-            <span class="w-8 text-xl font-mdi" [class]="c.selected ? 'text-green' : 'text-muted'">{{ c.icon }}</span>
-            <span class="flex-1 text-[15px]">{{ c.name }}</span>
-            <span class="text-[22px] font-mdi" [class]="c.selected ? 'text-green' : 'text-muted'">{{ c.selected ? ui.checked : ui.unchecked }}</span>
-          </button>
-        }
-      </div>
-      <div class="grid grid-cols-2">
-        <button type="button" class="secondary" [disabled]="!hasFilters()" (click)="reset()">{{ s.t().budget.resetFilters }}</button>
-        <button type="button" class="primary ml-2" (click)="done.emit(filter())">{{ s.t().common.ok }}</button>
-      </div>
-    </app-sheet>
-  `,
+  templateUrl: './filters-modal.component.html',
 })
 export class FiltersModalComponent implements OnInit {
   readonly s = inject(SettingsService);

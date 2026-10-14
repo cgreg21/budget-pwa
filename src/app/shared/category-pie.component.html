@@ -1,0 +1,38 @@
+<section class="px-4 py-3">
+  <span class="field-label mt-0">{{ title() }}</span>
+  @if (slices().length > 0) {
+    <svg class="mx-auto my-3 block animate-fade" [attr.width]="size" [attr.height]="size" [attr.viewBox]="'0 0 ' + size + ' ' + size" role="img">
+      @for (part of parts(); track part.label) {
+        @if (part.full) {
+          <circle [attr.cx]="center" [attr.cy]="center" [attr.r]="(outer + inner) / 2" fill="none"
+                  [attr.stroke]="part.color" [attr.stroke-width]="outer - inner" />
+        } @else {
+          <path [attr.d]="part.path" [attr.fill]="part.color" stroke="var(--c-bg)" stroke-width="2" stroke-linejoin="round" />
+        }
+        @if (part.percent) {
+          <text [attr.x]="part.labelX" [attr.y]="part.labelY" text-anchor="middle" dominant-baseline="central"
+                font-size="12" fill="#0A0F1E">{{ part.percent }}</text>
+        }
+      }
+    </svg>
+    <div class="-mx-4 pb-3">
+      @for (item of legend(); track item.label) {
+        <div class="row">
+          <div class="flex items-center">
+            <span class="row-icon" [style.color]="item.color">{{ item.icon }}</span>
+            <div class="min-w-0 flex-1">
+              <div class="row-title">{{ item.label }}</div>
+              <div class="row-sub">{{ item.percent }}</div>
+            </div>
+            <span class="row-amount" [class]="kind()">{{ item.amount }}</span>
+          </div>
+          <div class="bar-track mt-2.5 mb-0.5">
+            <div class="h-2 rounded" [style.width.%]="item.width" [style.background-color]="item.color"></div>
+          </div>
+        </div>
+      }
+    </div>
+  } @else {
+    <p class="empty-text">{{ s.t().stats.noData }}</p>
+  }
+</section>
