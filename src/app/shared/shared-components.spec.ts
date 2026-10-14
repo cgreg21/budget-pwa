@@ -129,29 +129,47 @@ describe('SheetComponent', () => {
       return { fixture, dismissed, handle, dialog };
     };
 
-    it('follows the finger, then closes past the distance', () => {
-      const { fixture, dismissed, handle, dialog } = setup();
-      handle.dispatchEvent(pointer('pointerdown', { y: 100 }));
-      handle.dispatchEvent(pointer('pointermove', { y: 40 }));
-      fixture.detectChanges();
-      expect(dialog.style.transform).toBe('');
-      handle.dispatchEvent(pointer('pointermove', { y: 160 }));
-      fixture.detectChanges();
-      expect(dialog.style.transform).toBe('translateY(60px)');
-      handle.dispatchEvent(pointer('pointermove', { y: 230, id: 2 }));
-      fixture.detectChanges();
-      expect(dialog.style.transform).toBe('translateY(60px)');
-      handle.dispatchEvent(pointer('pointerup', { y: 230, time: 2000 }));
-      fixture.detectChanges();
-      expect(dismissed).toHaveBeenCalledTimes(1);
-      expect(dialog.style.transform).toBe('');
+    it('follows the finger, fading the backdrop, then slides out and closes past the distance', () => {
+      vi.useFakeTimers();
+      try {
+        const { fixture, dismissed, handle, dialog } = setup();
+        const backdrop = fixture.nativeElement.querySelector('.fixed') as HTMLElement;
+        handle.dispatchEvent(pointer('pointerdown', { y: 100 }));
+        handle.dispatchEvent(pointer('pointermove', { y: 40 }));
+        fixture.detectChanges();
+        expect(dialog.style.transform).toBe('');
+        expect(backdrop.style.opacity).toBe('');
+        handle.dispatchEvent(pointer('pointermove', { y: 160 }));
+        fixture.detectChanges();
+        expect(dialog.style.transform).toBe('translateY(60px)');
+        expect(Number(backdrop.style.opacity)).toBeCloseTo(0.85);
+        handle.dispatchEvent(pointer('pointermove', { y: 230, id: 2 }));
+        fixture.detectChanges();
+        expect(dialog.style.transform).toBe('translateY(60px)');
+        handle.dispatchEvent(pointer('pointerup', { y: 230, time: 2000 }));
+        fixture.detectChanges();
+        expect(dialog.style.transform).toBe('translateY(100%)');
+        expect(backdrop.style.opacity).toBe('0');
+        expect(dismissed).not.toHaveBeenCalled();
+        handle.dispatchEvent(pointer('pointerdown', { y: 100 }));
+        vi.advanceTimersByTime(250);
+        expect(dismissed).toHaveBeenCalledTimes(1);
+      } finally {
+        vi.useRealTimers();
+      }
     });
 
     it('closes on a quick flick', () => {
-      const { dismissed, handle } = setup();
-      handle.dispatchEvent(pointer('pointerdown', { y: 100, time: 0 }));
-      handle.dispatchEvent(pointer('pointerup', { y: 150, time: 50 }));
-      expect(dismissed).toHaveBeenCalledTimes(1);
+      vi.useFakeTimers();
+      try {
+        const { dismissed, handle } = setup();
+        handle.dispatchEvent(pointer('pointerdown', { y: 100, time: 0 }));
+        handle.dispatchEvent(pointer('pointerup', { y: 150, time: 50 }));
+        vi.advanceTimersByTime(250);
+        expect(dismissed).toHaveBeenCalledTimes(1);
+      } finally {
+        vi.useRealTimers();
+      }
     });
 
     it('springs back after a short or slow drag, a cancel, another pointer or a right click', () => {
