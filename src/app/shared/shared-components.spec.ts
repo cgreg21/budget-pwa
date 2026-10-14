@@ -105,6 +105,72 @@ describe('SheetComponent', () => {
     expect(fixture.nativeElement.querySelector('.h-1')).toBeNull();
     expect((fixture.nativeElement.querySelector('[role="dialog"]') as HTMLElement).className).toContain('h-full');
   });
+
+  describe('swiping the handle down', () => {
+    const pointer = (type: string, init: { y: number; id?: number; time?: number; pointerType?: string; button?: number }): Event => {
+      const event = new Event(type, { bubbles: true });
+      Object.defineProperties(event, {
+        clientY: { value: init.y },
+        pointerId: { value: init.id ?? 1 },
+        timeStamp: { value: init.time ?? 0 },
+        pointerType: { value: init.pointerType ?? 'touch' },
+        button: { value: init.button ?? 0 },
+      });
+      return event;
+    };
+
+    const setup = () => {
+      const fixture = TestBed.createComponent(SheetComponent);
+      fixture.detectChanges();
+      const dismissed = vi.fn();
+      fixture.componentInstance.dismiss.subscribe(dismissed);
+      const handle = fixture.nativeElement.querySelector('.touch-none') as HTMLElement;
+      const dialog = fixture.nativeElement.querySelector('[role="dialog"]') as HTMLElement;
+      return { fixture, dismissed, handle, dialog };
+    };
+
+    it('follows the finger, then closes past the distance', () => {
+      const { fixture, dismissed, handle, dialog } = setup();
+      handle.dispatchEvent(pointer('pointerdown', { y: 100 }));
+      handle.dispatchEvent(pointer('pointermove', { y: 40 }));
+      fixture.detectChanges();
+      expect(dialog.style.transform).toBe('');
+      handle.dispatchEvent(pointer('pointermove', { y: 160 }));
+      fixture.detectChanges();
+      expect(dialog.style.transform).toBe('translateY(60px)');
+      handle.dispatchEvent(pointer('pointermove', { y: 230, id: 2 }));
+      fixture.detectChanges();
+      expect(dialog.style.transform).toBe('translateY(60px)');
+      handle.dispatchEvent(pointer('pointerup', { y: 230, time: 2000 }));
+      fixture.detectChanges();
+      expect(dismissed).toHaveBeenCalledTimes(1);
+      expect(dialog.style.transform).toBe('');
+    });
+
+    it('closes on a quick flick', () => {
+      const { dismissed, handle } = setup();
+      handle.dispatchEvent(pointer('pointerdown', { y: 100, time: 0 }));
+      handle.dispatchEvent(pointer('pointerup', { y: 150, time: 50 }));
+      expect(dismissed).toHaveBeenCalledTimes(1);
+    });
+
+    it('springs back after a short or slow drag, a cancel, another pointer or a right click', () => {
+      const { fixture, dismissed, handle, dialog } = setup();
+      handle.dispatchEvent(pointer('pointerdown', { y: 100, time: 0 }));
+      handle.dispatchEvent(pointer('pointermove', { y: 150 }));
+      handle.dispatchEvent(pointer('pointerup', { y: 150, time: 2000 }));
+      handle.dispatchEvent(pointer('pointerdown', { y: 100 }));
+      handle.dispatchEvent(pointer('pointerup', { y: 300, id: 2 }));
+      handle.dispatchEvent(pointer('pointercancel', { y: 300, id: 2 }));
+      handle.dispatchEvent(pointer('pointermove', { y: 300 }));
+      handle.dispatchEvent(pointer('pointercancel', { y: 300 }));
+      handle.dispatchEvent(pointer('pointerdown', { y: 100, pointerType: 'mouse', button: 2 }));
+      handle.dispatchEvent(pointer('pointerup', { y: 300 }));
+      fixture.detectChanges();
+      expect(dismissed).not.toHaveBeenCalled();
+      expect(dialog.style.transform).toBe('');
+    });
+  });
 });
 
 describe('DialogHostComponent', () => {
