@@ -112,12 +112,11 @@
       <h2 class="modal-title">{{ mode === 'export' ? s.t().config.export : s.t().config.import }}</h2>
       <p class="row-sub">{{ s.t().config.passphraseHelp }}</p>
       <label class="field-label" for="config-passphrase">{{ s.t().config.passphrase }}</label>
-      <input id="config-passphrase" class="input" type="password" appAutofocus
-             [autocomplete]="mode === 'export' ? 'new-password' : 'current-password'"
+      <input id="config-passphrase" class="input" type="password" appAutofocus autocomplete="off"
              [value]="passphrase()" (input)="passphrase.set($any($event.target).value)" />
       @if (mode === 'export') {
         <label class="field-label" for="config-passphrase-confirm">{{ s.t().config.passphraseConfirm }}</label>
-        <input id="config-passphrase-confirm" class="input" type="password" autocomplete="new-password"
+        <input id="config-passphrase-confirm" class="input" type="password"         autocomplete="off"
                [value]="passphraseConfirm()" (input)="passphraseConfirm.set($any($event.target).value)" />
       }
       @if (passphraseError()) {

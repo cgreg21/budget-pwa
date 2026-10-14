@@ -152,7 +152,7 @@
 
 @layer base {
   html, body {
-    height: 100vh;
+    height: 100%;
     margin: 0;
     background: var(--c-bg);
     color: var(--c-ink);
@@ -163,6 +163,10 @@
   button, input, select, textarea {
     font: inherit;
     color: inherit;
+  }
+  /* Below 16px iOS zooms into a focused field and the page stays zoomed afterwards. */
+  input, select, textarea {
+    font-size: max(16px, 1em);
   }
   button {
     cursor: pointer;

@@ -97,6 +97,12 @@ export class AppComponent {
       if (Math.abs(touch.clientX - edgeTouch.x) >= Math.abs(touch.clientY - edgeTouch.y)) event.preventDefault();
       else edgeTouch = null;
     }, { passive: false });
+    // iOS leaves the page scrolled/shrunk once the keyboard of a field closes: bring the view back.
+    document.addEventListener('focusout', () => {
+      setTimeout(() => {
+        if (!(document.activeElement instanceof HTMLInputElement || document.activeElement instanceof HTMLTextAreaElement)) window.scrollTo(0, 0);
+      }, 100);
+    });
     if (this.budget.loadFailed) {
       void this.dialog.alert({ message: this.s.t().backup.corrupted, ok: this.s.t().common.ok });
     }

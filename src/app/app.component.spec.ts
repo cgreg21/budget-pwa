@@ -236,6 +236,32 @@ describe('AppComponent', () => {
     expect(!document.dispatchEvent(new Event('touchmove', { cancelable: true }))).toBe(false);
   });
 
+  it('brings the view back to the top once a field loses focus, unless another field takes it', () => {
+    vi.useFakeTimers();
+    const scrollTo = vi.spyOn(window, 'scrollTo').mockImplementation(() => undefined);
+    try {
+      shell();
+      const first = document.createElement('input');
+      const second = document.createElement('textarea');
+      document.body.append(first, second);
+      first.focus();
+      first.blur();
+      vi.advanceTimersByTime(150);
+      expect(scrollTo).toHaveBeenCalledWith(0, 0);
+
+      scrollTo.mockClear();
+      first.focus();
+      second.focus();
+      vi.advanceTimersByTime(150);
+      expect(scrollTo).not.toHaveBeenCalled();
+      first.remove();
+      second.remove();
+    } finally {
+      scrollTo.mockRestore();
+      vi.useRealTimers();
+    }
+  });
+
   it('reloads when another tab changes the data', () => {
     shell();
     window.dispatchEvent(new StorageEvent('storage', { key: 'other' }));
