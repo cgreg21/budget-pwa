@@ -106,6 +106,15 @@ describe('SheetComponent', () => {
     expect((fixture.nativeElement.querySelector('[role="dialog"]') as HTMLElement).className).toContain('h-full');
   });
 
+  it('enters with animations that do not keep overriding the transform and opacity set while swiping', () => {
+    const fixture = TestBed.createComponent(SheetComponent);
+    fixture.detectChanges();
+    const classes = (fixture.nativeElement as HTMLElement).innerHTML;
+    expect(classes).toContain('animate-sheet-in');
+    expect(classes).toContain('animate-fade-in');
+    expect(classes).not.toMatch(/animate-(sheet|fade)[ "]/);
+  });
+
   describe('swiping the handle down', () => {
     const pointer = (type: string, init: { y: number; id?: number; time?: number; pointerType?: string; button?: number }): Event => {
       const event = new Event(type, { bubbles: true });
