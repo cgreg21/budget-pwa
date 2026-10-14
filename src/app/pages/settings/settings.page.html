@@ -94,7 +94,7 @@
   <button type="button" class="secondary w-full" (click)="exportConfig()">{{ s.t().config.export }}</button>
   <label class="secondary flex w-full cursor-pointer items-center justify-center">
     {{ s.t().config.import }}
-    <input type="file" accept=".budgetcfg,application/json" class="sr-only" (change)="importConfig($event)" />
+    <input type="file" class="sr-only" (change)="importConfig($event)" />
   </label>
 
   @if (install.canInstall()) {
