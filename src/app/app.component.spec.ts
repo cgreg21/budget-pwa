@@ -211,6 +211,31 @@ describe('AppComponent', () => {
     expect(touchmove()).toBe(false);
   });
 
+  it('cancels horizontal swipes that start on a screen edge, but not scrolling', () => {
+    shell();
+    const touchEvent = (type: string, x: number, y: number): boolean => {
+      const event = new Event(type, { cancelable: true, bubbles: true });
+      Object.defineProperty(event, 'touches', { value: [{ clientX: x, clientY: y }] });
+      return !document.dispatchEvent(event);
+    };
+    const width = window.innerWidth;
+
+    touchEvent('touchstart', 5, 100);
+    expect(touchEvent('touchmove', 40, 110)).toBe(true);
+
+    touchEvent('touchstart', width - 5, 100);
+    expect(touchEvent('touchmove', width - 40, 110)).toBe(true);
+
+    touchEvent('touchstart', 5, 100);
+    expect(touchEvent('touchmove', 8, 160)).toBe(false);
+    expect(touchEvent('touchmove', 80, 170)).toBe(false);
+
+    touchEvent('touchstart', width / 2, 100);
+    expect(touchEvent('touchmove', width / 2 + 60, 100)).toBe(false);
+
+    expect(!document.dispatchEvent(new Event('touchmove', { cancelable: true }))).toBe(false);
+  });
+
   it('reloads when another tab changes the data', () => {
     shell();
     window.dispatchEvent(new StorageEvent('storage', { key: 'other' }));

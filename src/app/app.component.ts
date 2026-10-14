@@ -13,6 +13,8 @@ import { SettingsService } from './settings.service';
 
 const DRAWER_WIDTH = 280;
 const SWIPE_SLOP = 10;
+/** Width of the screen-edge bands where the browser starts its back/forward swipe. */
+const EDGE_WIDTH = 24;
 
 @Component({
   selector: 'budget-shell',
@@ -77,9 +79,23 @@ export class AppComponent {
     window.addEventListener('storage', (event) => {
       if (event.key === 'budget-pwa:data:v1') window.location.reload();
     });
-    // Non-passive so the browser's back/forward swipe gesture is cancelled while the drawer is dragged.
+    // Non-passive so the browser's back/forward swipe is cancelled: while the drawer is dragged, and
+    // for horizontal moves of a touch that started on a screen edge (where that gesture begins).
+    let edgeTouch: { x: number; y: number } | null = null;
+    document.addEventListener('touchstart', (event) => {
+      const touch = event.touches?.[0];
+      const onEdge = touch !== undefined && (touch.clientX < EDGE_WIDTH || touch.clientX > window.innerWidth - EDGE_WIDTH);
+      edgeTouch = onEdge ? { x: touch.clientX, y: touch.clientY } : null;
+    }, { passive: true });
     document.addEventListener('touchmove', (event) => {
-      if (this.drag?.direction === 'horizontal') event.preventDefault();
+      if (this.drag?.direction === 'horizontal') {
+        event.preventDefault();
+        return;
+      }
+      const touch = event.touches?.[0];
+      if (!edgeTouch || !touch) return;
+      if (Math.abs(touch.clientX - edgeTouch.x) >= Math.abs(touch.clientY - edgeTouch.y)) event.preventDefault();
+      else edgeTouch = null;
     }, { passive: false });
     if (this.budget.loadFailed) {
       void this.dialog.alert({ message: this.s.t().backup.corrupted, ok: this.s.t().common.ok });
