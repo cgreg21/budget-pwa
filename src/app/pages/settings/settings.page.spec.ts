@@ -1,9 +1,12 @@
 import { provideRouter, Router } from '@angular/router';
 import { TestBed, type ComponentFixture } from '@angular/core/testing';
-import { createArchive, DEFAULT_CATEGORIES, type Recurrence } from 'budget-lib';
+import {
+  createArchive, DEFAULT_CATEGORIES, sealConfig, webCryptoConfigCipher, type ConfigData, type Recurrence, type WebCryptoLike,
+} from 'budget-lib';
 
 import { BudgetService } from '../../budget.service';
 import { CalendarSyncService } from '../../calendar-sync.service';
+import { ConfigArchiveService } from '../../config-archive.service';
 import { DialogService } from '../../dialog.service';
 import { InstallService } from '../../install.service';
 import { SettingsService } from '../../settings.service';
@@ -21,6 +24,11 @@ const rec = (over: Partial<Recurrence> = {}): Recurrence => ({
 
 const settle = async (): Promise<void> => {
   for (let i = 0; i < 20; i += 1) await new Promise<void>((resolve) => setTimeout(resolve, 0));
+};
+
+/** Waits for a dialog to open; key derivation makes the import noticeably asynchronous. */
+const untilDialog = async (dialogs: DialogService): Promise<void> => {
+  for (let i = 0; i < 400 && dialogs.current() === null; i += 1) await new Promise<void>((resolve) => setTimeout(resolve, 5));
 };
 
 const MULTISTATUS = '<?xml version="1.0"?><d:multistatus xmlns:d="DAV:"><d:response><d:href>/cal/</d:href>'
@@ -298,6 +306,150 @@ describe('SettingsPage', () => {
     TestBed.inject(InstallService).canInstall.set(true);
     fixture.detectChanges();
     expect(fixture.nativeElement.textContent).toContain(s.t().install.settingsHelp);
+  });
+
+  describe('encrypted configuration', () => {
+    let archive: ConfigArchiveService;
+
+    beforeEach(() => {
+      archive = TestBed.inject(ConfigArchiveService);
+    });
+
+    it('asks for a matching passphrase of 8 characters before exporting', async () => {
+      const fixture = await page();
+      const c = fixture.componentInstance;
+      const exported = vi.spyOn(archive, 'exportEncrypted').mockResolvedValue();
+      c.exportConfig();
+      fixture.detectChanges();
+      expect(c.passphraseMode()).toBe('export');
+      expect(fixture.nativeElement.querySelector('#config-passphrase-confirm')).not.toBeNull();
+      expect(fixture.nativeElement.textContent).toContain(s.t().config.passphraseHelp);
+
+      c.passphrase.set('short');
+      await c.submitPassphrase();
+      expect(c.passphraseError()).toBe(s.t().config.errors['weak-passphrase']);
+
+      c.passphrase.set('long enough');
+      c.passphraseConfirm.set('long enougH');
+      await c.submitPassphrase();
+      expect(c.passphraseError()).toBe(s.t().config.passphraseMismatch);
+      expect(exported).not.toHaveBeenCalled();
+
+      c.passphraseConfirm.set('long enough');
+      await c.submitPassphrase();
+      expect(exported).toHaveBeenCalledWith('long enough');
+      expect(c.passphraseMode()).toBeNull();
+      expect(c.passphrase()).toBe('');
+      fixture.detectChanges();
+      expect(fixture.nativeElement.querySelector('#config-passphrase')).toBeNull();
+    });
+
+    it('shows the export failure in the sheet and lets the user cancel', async () => {
+      const fixture = await page();
+      const c = fixture.componentInstance;
+      vi.spyOn(archive, 'exportEncrypted').mockRejectedValue(new Error('disk full'));
+      c.exportConfig();
+      c.passphrase.set('long enough');
+      c.passphraseConfirm.set('long enough');
+      await c.submitPassphrase();
+      expect(c.passphraseError()).toBe('disk full');
+      expect(c.passphraseMode()).toBe('export');
+      c.closePassphrase();
+      expect(c.passphraseMode()).toBeNull();
+      expect(c.passphraseError()).toBe('');
+      await c.submitPassphrase();
+    });
+
+    it('ignores submissions and dismissals while busy', async () => {
+      const c = (await page()).componentInstance;
+      let release: () => void = () => undefined;
+      vi.spyOn(archive, 'exportEncrypted').mockReturnValue(new Promise<void>((resolve) => { release = resolve; }));
+      c.exportConfig();
+      c.passphrase.set('long enough');
+      c.passphraseConfirm.set('long enough');
+      const pending = c.submitPassphrase();
+      expect(c.passphraseBusy()).toBe(true);
+      c.closePassphrase();
+      await c.submitPassphrase();
+      expect(c.passphraseMode()).toBe('export');
+      release();
+      await pending;
+      expect(c.passphraseBusy()).toBe(false);
+      expect(c.passphraseMode()).toBeNull();
+    });
+
+    it('imports a configuration file with its passphrase and summarises it', async () => {
+      const fixture = await page();
+      const c = fixture.componentInstance;
+      const calendar = TestBed.inject(CalendarSyncService);
+      vi.spyOn(calendar, 'syncNow').mockResolvedValue();
+      const data: ConfigData = {
+        general: { language: 'en', currency: 'GBP', dateFormat: 'locale', amountFormat: 'locale', theme: 'light' },
+        thresholds: { low: 5, medium: 6, high: 7 },
+        calendar: { enabled: true, calendarUrl: 'https://cal.example.org/cal/', username: 'bob', proxyUrl: 'https://proxy.example.org', password: 'pw' },
+        bank: { config: { applicationId: 'app', bankName: 'Bank', bankCountry: 'FR', bankConsentSeconds: 3600, redirectUrl: 'https://x', importFrom: '2026-01-01' }, privateKey: '' },
+      };
+      const text = await sealConfig(data, 'a long passphrase', webCryptoConfigCipher(crypto as unknown as WebCryptoLike));
+      const { event, input } = fileEvent(text);
+      await c.importConfig(event);
+      expect(input.value).toBe('');
+      expect(c.passphraseMode()).toBe('import');
+      fixture.detectChanges();
+      expect(fixture.nativeElement.querySelector('#config-passphrase-confirm')).toBeNull();
+
+      c.passphrase.set('wrong passphrase');
+      await c.submitPassphrase();
+      expect(c.passphraseError()).toBe(s.t().config.errors.passphrase);
+      expect(b.thresholds().low).toBe(100);
+
+      c.passphrase.set('a long passphrase');
+      const pending = c.submitPassphrase();
+      await untilDialog(dialogs);
+      expect(c.passphraseMode()).toBeNull();
+      const t = s.t().config;
+      expect(dialogs.current()?.message).toBe(`${t.imported} ${t.importedCalendarPassword} ${t.bankIgnored}`);
+      dialogs.close(s.t().common.ok);
+      await pending;
+      expect(s.settings().language).toBe('en');
+      expect(b.thresholds()).toEqual({ low: 5, medium: 6, high: 7 });
+      expect([c.low(), c.medium(), c.high()]).toEqual(['5.00', '6.00', '7.00']);
+      expect(c.calendarEnabled()).toBe(true);
+      expect(c.calendarUrl()).toBe('https://cal.example.org/cal');
+      expect(c.calendarUser()).toBe('bob');
+      expect(c.calendarProxy()).toBe('https://proxy.example.org');
+      expect(calendar.hasPassword()).toBe(true);
+    });
+
+    it('describes a file without calendar access, and an unreadable file', async () => {
+      const c = (await page()).componentInstance;
+      vi.spyOn(archive, 'importEncrypted')
+        .mockResolvedValueOnce({ calendar: false, calendarPassword: false, bankIgnored: false })
+        .mockResolvedValueOnce({ calendar: true, calendarPassword: false, bankIgnored: false });
+      await c.importConfig(fileEvent('x').event);
+      c.passphrase.set('a long passphrase');
+      let pending = c.submitPassphrase();
+      await untilDialog(dialogs);
+      expect(dialogs.current()?.message).toBe(`${s.t().config.imported} ${s.t().config.importedNoCalendar}`);
+      dialogs.close(s.t().common.ok);
+      await pending;
+
+      await c.importConfig(fileEvent('x').event);
+      c.passphrase.set('a long passphrase');
+      pending = c.submitPassphrase();
+      await untilDialog(dialogs);
+      expect(dialogs.current()?.message).toBe(`${s.t().config.imported} ${s.t().config.importedCalendar}`);
+      dialogs.close(s.t().common.ok);
+      await pending;
+
+      await c.importConfig(fileEvent(null).event);
+      expect(c.passphraseMode()).toBeNull();
+
+      const { event, input } = fileEvent('x');
+      Object.defineProperty((input.files as FileList)[0], 'text', { value: () => Promise.reject(new Error('io')) });
+      await c.importConfig(event);
+      expect(c.passphraseMode()).toBeNull();
+      expect(c.backupError()).toBe(s.t().config.unreadable);
+    });
   });
 });
 

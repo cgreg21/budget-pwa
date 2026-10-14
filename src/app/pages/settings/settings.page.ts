@@ -1,16 +1,19 @@
 import { Component, computed, inject, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import {
-  areThresholdsOrdered, createArchive, parseBackupData, type AmountFormat, type AppLanguage, type Currency,
-  type DateFormat, type Theme,
+  areThresholdsOrdered, ConfigFileError, createArchive, isPassphraseAcceptable, parseBackupData, type AmountFormat,
+  type AppLanguage, type Currency, type DateFormat, type Theme,
 } from 'budget-lib';
 
 import { BudgetService } from '../../budget.service';
 import { CalendarSyncService } from '../../calendar-sync.service';
+import { ConfigArchiveService, downloadText } from '../../config-archive.service';
 import { DialogService } from '../../dialog.service';
 import { InstallService } from '../../install.service';
 import { parseAmount, SettingsService } from '../../settings.service';
+import { AutofocusDirective } from '../../shared/autofocus.directive';
 import { HeaderComponent } from '../../shared/header.component';
+import { SheetComponent } from '../../shared/sheet.component';
 
 const LANGUAGES: AppLanguage[] = ['fr', 'en'];
 const CURRENCIES: Currency[] = ['EUR', 'USD', 'GBP', 'CHF'];
@@ -21,7 +24,7 @@ const THEMES: Theme[] = ['system', 'light', 'dark'];
 @Component({
   selector: 'app-settings-page',
   standalone: true,
-  imports: [HeaderComponent],
+  imports: [HeaderComponent, SheetComponent, AutofocusDirective],
   host: { class: 'flex min-h-0 min-w-0 flex-1 flex-col animate-page' },
   templateUrl: './settings.page.html',
 })
@@ -30,6 +33,7 @@ export class SettingsPage {
   readonly s = inject(SettingsService);
   readonly calendar = inject(CalendarSyncService);
   readonly install = inject(InstallService);
+  private readonly configArchive = inject(ConfigArchiveService);
   private readonly dialogs = inject(DialogService);
   private readonly router = inject(Router);
 
@@ -38,6 +42,13 @@ export class SettingsPage {
   readonly high = signal(this.s.formatInput(this.b.thresholds().high));
   readonly message = signal('');
   readonly backupError = signal('');
+  /** The passphrase sheet: exporting the configuration, or importing the file whose text is kept here. */
+  readonly passphraseMode = signal<'export' | 'import' | null>(null);
+  readonly passphrase = signal('');
+  readonly passphraseConfirm = signal('');
+  readonly passphraseError = signal('');
+  readonly passphraseBusy = signal(false);
+  private configText = '';
   readonly calendarEnabled = signal(this.calendar.config().enabled);
   readonly calendarUrl = signal(this.calendar.config().calendarUrl);
   readonly calendarUser = signal(this.calendar.config().username);
@@ -139,13 +150,7 @@ export class SettingsPage {
 
   exportBackup(): void {
     const archive = createArchive(this.b.data());
-    const blob = new Blob([JSON.stringify(archive, null, 2)], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = `budget-${this.b.selectedMonth()}.json`;
-    link.click();
-    URL.revokeObjectURL(url);
+    downloadText(`budget-${this.b.selectedMonth()}.json`, JSON.stringify(archive, null, 2), 'application/json');
   }
 
   async importBackup(event: Event): Promise<void> {
@@ -174,5 +179,98 @@ export class SettingsPage {
     const picked = await this.dialogs.action({ title: t.settings.chooseOption, cancel: t.common.cancel, actions: labels });
     const index = picked === null ? -1 : labels.indexOf(picked);
     if (index >= 0) apply(values[index]);
+  }
+
+  exportConfig(): void {
+    this.openPassphrase('export');
+  }
+
+  async importConfig(event: Event): Promise<void> {
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0];
+    if (!file) return;
+    try {
+      this.configText = await file.text();
+      this.backupError.set('');
+      this.openPassphrase('import');
+    } catch {
+      this.backupError.set(this.s.t().config.unreadable);
+    } finally {
+      input.value = '';
+    }
+  }
+
+  closePassphrase(): void {
+    if (this.passphraseBusy()) return;
+    this.passphraseMode.set(null);
+    this.passphrase.set('');
+    this.passphraseConfirm.set('');
+    this.passphraseError.set('');
+    this.configText = '';
+  }
+
+  /** Runs the pending export or import with the typed passphrase; errors stay in the sheet. */
+  async submitPassphrase(): Promise<void> {
+    const mode = this.passphraseMode();
+    const t = this.s.t().config;
+    const passphrase = this.passphrase();
+    if (mode === null || this.passphraseBusy()) return;
+    if (!isPassphraseAcceptable(passphrase)) {
+      this.passphraseError.set(t.errors['weak-passphrase']);
+      return;
+    }
+    if (mode === 'export' && passphrase !== this.passphraseConfirm()) {
+      this.passphraseError.set(t.passphraseMismatch);
+      return;
+    }
+    this.passphraseBusy.set(true);
+    try {
+      if (mode === 'export') {
+        await this.configArchive.exportEncrypted(passphrase);
+        this.passphraseBusy.set(false);
+        this.closePassphrase();
+        return;
+      }
+      const summary = await this.configArchive.importEncrypted(this.configText, passphrase);
+      this.passphraseBusy.set(false);
+      this.closePassphrase();
+      this.refreshFromServices();
+      // The summary speaks the language that was just imported, like the rest of the screen.
+      const imported = this.s.t().config;
+      const lines = [imported.imported];
+      if (summary.calendar) {
+        lines.push(summary.calendarPassword ? imported.importedCalendarPassword : imported.importedCalendar);
+      } else {
+        lines.push(imported.importedNoCalendar);
+      }
+      if (summary.bankIgnored) lines.push(imported.bankIgnored);
+      await this.dialogs.alert({ message: lines.join(' '), ok: this.s.t().common.ok });
+    } catch (error) {
+      this.passphraseBusy.set(false);
+      this.passphraseError.set(error instanceof ConfigFileError
+        ? t.errors[error.code] : error instanceof Error ? error.message : String(error));
+    }
+  }
+
+  private openPassphrase(mode: 'export' | 'import'): void {
+    this.passphrase.set('');
+    this.passphraseConfirm.set('');
+    this.passphraseError.set('');
+    this.passphraseMode.set(mode);
+  }
+
+  /** Reflects an imported configuration in the form fields. */
+  private refreshFromServices(): void {
+    const thresholds = this.b.thresholds();
+    this.low.set(this.s.formatInput(thresholds.low));
+    this.medium.set(this.s.formatInput(thresholds.medium));
+    this.high.set(this.s.formatInput(thresholds.high));
+    const config = this.calendar.config();
+    this.calendarEnabled.set(config.enabled);
+    this.calendarUrl.set(config.calendarUrl);
+    this.calendarUser.set(config.username);
+    this.calendarProxy.set(this.calendar.proxyUrl());
+    this.calendarPassword.set('');
+    this.message.set('');
   }
 }

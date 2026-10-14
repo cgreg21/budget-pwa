@@ -3,7 +3,7 @@
  * `Strings` is the contract: both dictionaries implement it in full, so a
  * missing translation is a compile error rather than a blank label.
  */
-import type { AppLanguage, CalendarState } from 'budget-lib';
+import type { AppLanguage, CalendarState, ConfigFileErrorCode } from 'budget-lib';
 
 export interface Strings {
   appName: string;
@@ -58,6 +58,12 @@ export interface Strings {
   backup: {
     title: string; help: string; export: string; import: string; confirm: string; invalid: string;
     corrupted: string;
+  };
+  config: {
+    help: string; export: string; import: string; passphrase: string; passphraseConfirm: string;
+    passphraseHelp: string; passphraseMismatch: string; imported: string; importedCalendar: string;
+    importedCalendarPassword: string; importedNoCalendar: string; bankIgnored: string;
+    errors: Record<ConfigFileErrorCode, string>; unreadable: string;
   };
   install: { title: string; body: string; install: string; dismiss: string; settingsHelp: string };
   recurrences: {
@@ -154,6 +160,24 @@ const en: Strings = {
     confirm: 'Replace all the data of this device with this backup?',
     invalid: 'This file is not a recognised Budget backup.',
     corrupted: 'The saved budget could not be read and was set aside. The app starts empty; restore a backup if you have one.',
+  },
+  config: {
+    help: 'Settings, thresholds and calendar access (including its password) can be moved to another device in a file encrypted with a passphrase. Nothing can be recovered without it.',
+    export: 'Export the configuration', import: 'Import a configuration',
+    passphrase: 'Passphrase', passphraseConfirm: 'Confirm the passphrase',
+    passphraseHelp: 'At least 8 characters. Keep it safe: it cannot be recovered.',
+    passphraseMismatch: 'The two passphrases differ.',
+    imported: 'Configuration imported.', importedCalendar: 'Calendar access applied.',
+    importedCalendarPassword: 'Calendar password applied.',
+    importedNoCalendar: 'No calendar access in this file.',
+    bankIgnored: 'The bank configuration of the file was ignored: this app has no bank import.',
+    errors: {
+      format: 'This file is not a Budget configuration, or comes from a newer version.',
+      passphrase: 'Wrong passphrase, or damaged file.',
+      content: 'The content of this file is not a valid configuration.',
+      'weak-passphrase': 'The passphrase must have at least 8 characters.',
+    },
+    unreadable: 'The file could not be read.',
   },
   install: {
     title: 'Install Budget', body: 'Add the app to your home screen to use it full screen and offline.',
@@ -255,6 +279,24 @@ const fr: Strings = {
     confirm: 'Remplacer toutes les données de cet appareil par cette sauvegarde ?',
     invalid: 'Ce fichier n’est pas une sauvegarde Budget reconnue.',
     corrupted: 'Le budget enregistré est illisible et a été mis de côté. L’application démarre vide ; restaurez une sauvegarde si vous en avez une.',
+  },
+  config: {
+    help: 'Les réglages, les seuils et l’accès au calendrier (avec son mot de passe) peuvent passer sur un autre appareil dans un fichier chiffré par une phrase secrète. Rien n’est récupérable sans elle.',
+    export: 'Exporter la configuration', import: 'Importer une configuration',
+    passphrase: 'Phrase secrète', passphraseConfirm: 'Confirmer la phrase secrète',
+    passphraseHelp: 'Au moins 8 caractères. Conservez-la précieusement : elle ne peut pas être retrouvée.',
+    passphraseMismatch: 'Les deux phrases secrètes diffèrent.',
+    imported: 'Configuration importée.', importedCalendar: 'Accès au calendrier appliqué.',
+    importedCalendarPassword: 'Mot de passe du calendrier appliqué.',
+    importedNoCalendar: 'Aucun accès au calendrier dans ce fichier.',
+    bankIgnored: 'La configuration bancaire du fichier a été ignorée : cette application n’a pas d’import bancaire.',
+    errors: {
+      format: 'Ce fichier n’est pas une configuration Budget, ou provient d’une version plus récente.',
+      passphrase: 'Phrase secrète incorrecte, ou fichier endommagé.',
+      content: 'Le contenu de ce fichier n’est pas une configuration valide.',
+      'weak-passphrase': 'La phrase secrète doit compter au moins 8 caractères.',
+    },
+    unreadable: 'Le fichier n’a pas pu être lu.',
   },
   install: {
     title: 'Installer Budget', body: 'Ajoutez l’application à votre écran d’accueil pour l’utiliser en plein écran et hors ligne.',

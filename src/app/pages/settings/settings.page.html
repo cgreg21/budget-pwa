@@ -90,6 +90,12 @@
   @if (backupError()) {
     <p class="error">{{ backupError() }}</p>
   }
+  <p class="row-sub mt-4">{{ s.t().config.help }}</p>
+  <button type="button" class="secondary w-full" (click)="exportConfig()">{{ s.t().config.export }}</button>
+  <label class="secondary flex w-full cursor-pointer items-center justify-center">
+    {{ s.t().config.import }}
+    <input type="file" accept=".budgetcfg,application/json" class="sr-only" (change)="importConfig($event)" />
+  </label>
 
   @if (install.canInstall()) {
     <span class="section-title">{{ s.t().install.title }}</span>
@@ -99,3 +105,28 @@
 </div>
 </div>
 </div>
+
+@if (passphraseMode(); as mode) {
+  <app-sheet (dismiss)="closePassphrase()">
+    <form (submit)="$event.preventDefault(); submitPassphrase()">
+      <h2 class="modal-title">{{ mode === 'export' ? s.t().config.export : s.t().config.import }}</h2>
+      <p class="row-sub">{{ s.t().config.passphraseHelp }}</p>
+      <label class="field-label" for="config-passphrase">{{ s.t().config.passphrase }}</label>
+      <input id="config-passphrase" class="input" type="password" appAutofocus
+             [autocomplete]="mode === 'export' ? 'new-password' : 'current-password'"
+             [value]="passphrase()" (input)="passphrase.set($any($event.target).value)" />
+      @if (mode === 'export') {
+        <label class="field-label" for="config-passphrase-confirm">{{ s.t().config.passphraseConfirm }}</label>
+        <input id="config-passphrase-confirm" class="input" type="password" autocomplete="new-password"
+               [value]="passphraseConfirm()" (input)="passphraseConfirm.set($any($event.target).value)" />
+      }
+      @if (passphraseError()) {
+        <p class="error">{{ passphraseError() }}</p>
+      }
+      <div class="grid grid-cols-2">
+        <button type="button" class="secondary" [disabled]="passphraseBusy()" (click)="closePassphrase()">{{ s.t().common.cancel }}</button>
+        <button type="submit" class="primary ml-2" [disabled]="passphraseBusy()">{{ s.t().common.ok }}</button>
+      </div>
+    </form>
+  </app-sheet>
+}

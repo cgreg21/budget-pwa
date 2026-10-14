@@ -165,6 +165,12 @@ export class CalendarSyncService implements OnDestroy {
     return true;
   }
 
+  /** The password in use, once the saved one has been looked up; '' when none is known. */
+  async readPassword(): Promise<string> {
+    await this.passwordLoaded;
+    return this.password;
+  }
+
   /** Keeps the password for this session and, when the device can, encrypted for later ones. */
   private setPassword(password: string): void {
     this.password = password;

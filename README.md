@@ -12,6 +12,7 @@ Le style utilise Tailwind CSS v4 (`src/styles.css`, thème sombre/clair via vari
 - Catégories, indicateurs de solde, statistiques par catégorie et historique.
 - Réglages de devise, langue de formatage, thème et seuils du solde.
 - Export et restauration de sauvegardes JSON au format commun de `budget-lib`.
+- Export et import de la configuration (réglages, seuils, accès au calendrier et son mot de passe) dans un fichier chiffré par une phrase secrète, pour la reprendre sur un autre appareil.
 - Synchronisation optionnelle des transactions via un calendrier CalDAV.
 - Service worker Angular pour la mise en cache de l’application et son ouverture hors ligne.
 
@@ -48,6 +49,10 @@ Le serveur CalDAV doit autoriser l’origine `https://cgreg21.github.io` (voir [
 ## Stockage et confidentialité
 
 Les transactions, catégories, récurrences et seuils sont conservés dans le `localStorage` du navigateur, sous la clé `budget-pwa:data:v1`. Sans synchronisation activée, les données restent locales. Lorsque le calendrier est activé, seules les transactions sont échangées avec le serveur CalDAV choisi. Les sauvegardes JSON restent exportées et restaurées manuellement depuis les réglages. Le contenu local n’est pas chiffré : protégez l’accès au profil de navigateur et exportez régulièrement une sauvegarde.
+
+### Configuration chiffrée
+
+Dans la section **Sauvegarde** des réglages, **Exporter la configuration** produit un fichier `budget-config-AAAA-MM-JJ.budgetcfg` contenant les réglages généraux, les seuils du solde, l’accès au calendrier (URL, identifiant, **mot de passe**) et l’adresse du proxy CORS. Le fichier est chiffré par `budget-lib` (`config-archive` : PBKDF2-SHA256, AES-256-CBC et HMAC-SHA256 via WebCrypto) avec une phrase secrète d’au moins 8 caractères, demandée et confirmée au moment de l’export ; sans elle, rien n’est récupérable, ni par l’application ni par quiconque. **Importer une configuration** demande la phrase secrète, applique les réglages, les seuils et l’accès au calendrier, et enregistre le mot de passe dans le stockage chiffré de l’appareil (un fichier sans mot de passe conserve celui déjà connu). Le format est commun aux applications bureau et mobile ; la section bancaire d’un fichier venant du bureau est ignorée, la PWA n’ayant pas d’import bancaire. Les transactions ne font pas partie de ce fichier : utilisez la sauvegarde JSON ou la synchronisation CalDAV.
 
 ## Synchronisation avec un calendrier CalDAV
 
