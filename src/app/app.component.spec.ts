@@ -2,6 +2,7 @@ import { provideRouter, Router } from '@angular/router';
 import { TestBed, type ComponentFixture } from '@angular/core/testing';
 
 import { AppComponent } from './app.component';
+import { APP_VERSION } from './app-info';
 import { CalendarSyncService } from './calendar-sync.service';
 import { DialogService } from './dialog.service';
 import { DrawerService } from './drawer.service';
@@ -81,6 +82,12 @@ describe('AppComponent', () => {
     expect(c.isActive('/settings/recurrences')).toBe(true);
     expect(c.isActive('/stats')).toBe(false);
     expect(fixture.nativeElement.querySelector('aside button.bg-tint')).not.toBeNull();
+  });
+
+  it('shows the version at the bottom of the drawer', () => {
+    const fixture = shell();
+    const el = fixture.nativeElement.querySelector('aside [data-testid="app-version"]') as HTMLElement;
+    expect(el.textContent?.trim()).toBe(`v${APP_VERSION}`);
   });
 
   it('navigates and closes the drawer', () => {

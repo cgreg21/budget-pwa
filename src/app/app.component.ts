@@ -8,6 +8,7 @@ import { DialogService } from './dialog.service';
 import { DrawerService } from './drawer.service';
 import { InstallService } from './install.service';
 import { LayoutService } from './layout.service';
+import { UpdateService } from './update.service';
 import { CalendarSyncService } from './calendar-sync.service';
 import { UI_ICONS } from './icons';
 import { SettingsService } from './settings.service';
@@ -28,6 +29,7 @@ export class AppComponent {
   readonly calendar = inject(CalendarSyncService);
   readonly drawer = inject(DrawerService);
   readonly install = inject(InstallService);
+  private readonly updates = inject(UpdateService);
   readonly layout = inject(LayoutService);
   private readonly budget = inject(BudgetService);
   private readonly dialog = inject(DialogService);
