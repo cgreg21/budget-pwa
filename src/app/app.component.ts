@@ -2,6 +2,7 @@ import { Component, computed, ElementRef, inject, signal, viewChild } from '@ang
 import { Router, RouterOutlet } from '@angular/router';
 
 import { DialogHostComponent } from './shared/dialog-host.component';
+import { APP_VERSION } from './app-info';
 import { BudgetService } from './budget.service';
 import { DialogService } from './dialog.service';
 import { DrawerService } from './drawer.service';
@@ -33,6 +34,7 @@ export class AppComponent {
   private readonly router = inject(Router);
   readonly logo = UI_ICONS.logo;
   readonly settingsIcon = UI_ICONS.settings;
+  readonly version = APP_VERSION;
 
   private readonly shell = viewChild.required<ElementRef<HTMLElement>>('shell');
   private readonly edge = viewChild<ElementRef<HTMLElement>>('edge');

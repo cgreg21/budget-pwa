@@ -44,6 +44,7 @@
         <span class="flex-1 text-sm font-medium text-muted" role="status">{{ s.t().calendar.states[calendar.status().state] }}</span>
       </button>
     }
+    <div class="px-5 text-xs text-muted" data-testid="app-version">v{{ version }}</div>
   </aside>
 
   @if (install.banner()) {
