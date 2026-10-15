@@ -21,6 +21,8 @@ const CURRENCIES: Currency[] = ['EUR', 'USD', 'GBP', 'CHF'];
 const DATE_FORMATS: DateFormat[] = ['locale', 'dd-mm-yyyy', 'mm-dd-yyyy', 'yyyy-mm-dd'];
 const AMOUNT_FORMATS: AmountFormat[] = ['locale', 'space-comma', 'comma-dot'];
 const THEMES: Theme[] = ['system', 'light', 'dark'];
+const SETTINGS_TABS = ['general', 'budget', 'calendar', 'data'] as const;
+type SettingsTab = (typeof SETTINGS_TABS)[number];
 
 @Component({
   selector: 'app-settings-page',
@@ -39,6 +41,11 @@ export class SettingsPage {
   private readonly dialogs = inject(DialogService);
   private readonly router = inject(Router);
 
+  readonly tab = signal<SettingsTab>('general');
+  readonly tabs = computed(() => {
+    const t = this.s.t().settings.tabs;
+    return SETTINGS_TABS.map((id) => ({ id, label: t[id] }));
+  });
   readonly low = signal(this.s.formatInput(this.b.thresholds().low));
   readonly medium = signal(this.s.formatInput(this.b.thresholds().medium));
   readonly high = signal(this.s.formatInput(this.b.thresholds().high));

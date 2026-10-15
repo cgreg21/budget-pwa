@@ -302,10 +302,26 @@ describe('SettingsPage', () => {
 
   it('shows the install section when the app can be installed', async () => {
     const fixture = await page();
+    fixture.componentInstance.tab.set('data');
+    fixture.detectChanges();
     expect(fixture.nativeElement.textContent).not.toContain(s.t().install.settingsHelp);
     TestBed.inject(InstallService).canInstall.set(true);
     fixture.detectChanges();
     expect(fixture.nativeElement.textContent).toContain(s.t().install.settingsHelp);
+  });
+
+  it('organises the options in tabs, opening on General', async () => {
+    const fixture = await page();
+    const el: HTMLElement = fixture.nativeElement;
+    const tabs = [...el.querySelectorAll<HTMLElement>('[role="tab"]')];
+    expect(tabs.map((tab) => tab.textContent?.trim())).toEqual(Object.values(s.t().settings.tabs));
+    expect(el.querySelector('#calendar-url')).toBeNull();
+
+    tabs[2].click();
+    fixture.detectChanges();
+    expect(el.querySelector('#calendar-url')).not.toBeNull();
+    expect(el.querySelector('#threshold-low')).toBeNull();
+    expect(tabs[2].getAttribute('aria-selected')).toBe('true');
   });
 
   describe('encrypted configuration', () => {

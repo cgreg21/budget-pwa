@@ -1,8 +1,8 @@
 <app-header [title]="s.t().settings.title" />
 
-<div class="min-h-0 flex-1 overflow-y-auto px-4 pb-8 pt-3 md:px-6">
-<div class="md:grid md:grid-cols-2 md:gap-x-8">
-<div class="min-w-0">
+<div class="min-h-0 flex-1 overflow-y-auto px-4 pb-8 pt-3 md:px-6" role="tabpanel">
+<div class="min-w-0 md:max-w-xl">
+@if (tab() === 'general') {
   <span class="section-title mt-0">{{ s.t().settings.general }}</span>
   <button type="button" class="setting" (click)="pickLanguage()">
     <span>{{ s.t().settings.language }}</span><span class="setting-value">{{ languageName(s.settings().language) }}</span>
@@ -19,8 +19,10 @@
   <button type="button" class="setting" (click)="pickTheme()">
     <span>{{ s.t().settings.theme }}</span><span class="setting-value">{{ themeName(s.settings().theme) }}</span>
   </button>
+}
 
-  <span class="section-title">{{ s.t().settings.manage }}</span>
+@if (tab() === 'budget') {
+  <span class="section-title mt-0">{{ s.t().settings.manage }}</span>
   <button type="button" class="setting" (click)="openRecurrences()">
     <span>{{ s.t().settings.recurrences }}</span><span class="setting-value">&#x203A;</span>
   </button>
@@ -43,9 +45,10 @@
     <p class="error">{{ message() }}</p>
   }
   <button type="button" class="primary w-full" (click)="saveThresholds()">{{ s.t().common.save }}</button>
-</div>
-<div class="min-w-0">
-  <span class="section-title md:mt-0">{{ s.t().calendar.title }}</span>
+}
+
+@if (tab() === 'calendar') {
+  <span class="section-title mt-0">{{ s.t().calendar.title }}</span>
   <p class="row-sub">{{ s.t().calendar.help }}</p>
   <div class="setting">
     <span id="calendar-enable-label">{{ s.t().calendar.enable }}</span>
@@ -86,8 +89,10 @@
   <button type="button" class="primary w-full" (click)="saveCalendar()">{{ s.t().calendar.save }}</button>
   <button type="button" class="secondary w-full" [disabled]="calendar.busy()" (click)="saveCalendar('check')">{{ s.t().calendar.check }}</button>
   <button type="button" class="secondary w-full" [disabled]="!calendarEnabled() || calendar.busy()" (click)="saveCalendar('sync')">{{ s.t().calendar.syncNow }}</button>
+  }
 
-  <span class="section-title">{{ s.t().backup.title }}</span>
+  @if (tab() === 'data') {
+    <span class="section-title mt-0">{{ s.t().backup.title }}</span>
   <p class="row-sub">{{ s.t().backup.help }}</p>
   <button type="button" class="secondary w-full" (click)="exportBackup()">{{ s.t().backup.export }}</button>
   <label class="secondary flex w-full cursor-pointer items-center justify-center">
@@ -109,8 +114,19 @@
     <p class="row-sub">{{ s.t().install.settingsHelp }}</p>
     <button type="button" class="secondary w-full" (click)="install.install()">{{ s.t().install.install }}</button>
   }
+}
 </div>
 </div>
+
+<div class="grid shrink-0 grid-flow-col auto-cols-fr border-t border-line bg-surface pb-[env(safe-area-inset-bottom)]" role="tablist" [attr.aria-label]="s.t().settings.title">
+  @for (item of tabs(); track item.id) {
+    <button type="button" role="tab" class="relative h-14 px-2 text-sm font-medium transition-colors active:scale-95"
+            [class]="tab() === item.id ? 'text-green' : 'text-muted'"
+            [attr.aria-selected]="tab() === item.id" (click)="tab.set(item.id)">
+      <span class="absolute inset-x-4 top-0 h-0.5 rounded-b-sm" [class]="tab() === item.id ? 'bg-green' : 'bg-transparent'"></span>
+      {{ item.label }}
+    </button>
+  }
 </div>
 
 @if (passphraseMode(); as mode) {

@@ -43,6 +43,7 @@ export interface Strings {
     themeDark: string; formatLocale: string; thresholds: string; thresholdsHelp: string;
     low: string; medium: string; high: string; thresholdsOrder: string; thresholdsSaved: string;
     manage: string; recurrences: string; chooseOption: string;
+    tabs: { general: string; budget: string; calendar: string; data: string };
   };
   calendar: {
     title: string; help: string; enable: string; url: string; username: string; password: string;
@@ -130,6 +131,7 @@ const en: Strings = {
     thresholdsOrder: 'Thresholds must satisfy x < y < z.', thresholdsSaved: 'Thresholds saved',
     manage: 'Manage', recurrences: 'Recurring transactions',
     chooseOption: 'Choose',
+    tabs: { general: 'General', budget: 'Budget', calendar: 'Calendar', data: 'Data' },
   },
   calendar: {
     title: 'Calendar synchronisation',
@@ -261,6 +263,7 @@ const fr: Strings = {
     thresholdsOrder: 'Les seuils doivent respecter x < y < z.', thresholdsSaved: 'Seuils enregistrés',
     manage: 'Gérer', recurrences: 'Transactions récurrentes',
     chooseOption: 'Choisir',
+    tabs: { general: 'Général', budget: 'Budget', calendar: 'Agenda', data: 'Données' },
   },
   calendar: {
     title: 'Synchronisation du calendrier',
