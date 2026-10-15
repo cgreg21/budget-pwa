@@ -1,6 +1,6 @@
 <app-header [title]="s.t().settings.title" />
 
-<div class="min-h-0 flex-1 overflow-y-auto px-4 pb-8 pt-3 md:px-6" role="tabpanel">
+<div class="min-h-0 flex-1 overflow-y-auto px-4 pb-4 pt-3 md:px-6" role="tabpanel">
 <div class="min-w-0 md:max-w-xl">
 @if (tab() === 'general') {
   <span class="section-title mt-0">{{ s.t().settings.general }}</span>
@@ -120,7 +120,7 @@
 
 <div class="grid shrink-0 grid-flow-col auto-cols-fr border-t border-line bg-surface pb-[env(safe-area-inset-bottom)]" role="tablist" [attr.aria-label]="s.t().settings.title">
   @for (item of tabs(); track item.id) {
-    <button type="button" role="tab" class="relative h-14 px-2 text-sm font-medium transition-colors active:scale-95"
+    <button type="button" role="tab" class="relative h-10 px-2 text-sm font-medium transition-colors active:scale-95"
             [class]="tab() === item.id ? 'text-green' : 'text-muted'"
             [attr.aria-selected]="tab() === item.id" (click)="tab.set(item.id)">
       <span class="absolute inset-x-4 top-0 h-0.5 rounded-b-sm" [class]="tab() === item.id ? 'bg-green' : 'bg-transparent'"></span>
