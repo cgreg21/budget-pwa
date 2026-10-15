@@ -111,7 +111,7 @@ const en: Strings = {
     occurrenceOnly: 'This occurrence only', seriesToo: 'The whole series',
   },
   stats: {
-    title: 'Statistics', expensesByCategory: 'Expenses by category',
+    title: 'Statistics', expensesByCategory: 'Other expenses by category',
     fromMonth: 'From', toMonth: 'To',
     recurringExpensesByCategory: 'Recurring expenses by category',
     history: 'History', noData: 'Nothing to show yet.',
@@ -231,7 +231,7 @@ const fr: Strings = {
     occurrenceOnly: 'Cette occurrence uniquement', seriesToo: 'Toute la série',
   },
   stats: {
-    title: 'Statistiques', expensesByCategory: 'Dépenses par catégorie',
+    title: 'Statistiques', expensesByCategory: 'Autres dépenses par catégorie',
     fromMonth: 'Du', toMonth: 'Au',
     recurringExpensesByCategory: 'Dépenses récurrentes par catégorie',
     history: 'Historique', noData: 'Rien à afficher pour le moment.',

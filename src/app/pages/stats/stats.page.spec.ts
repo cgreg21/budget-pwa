@@ -49,7 +49,7 @@ describe('StatsPage', () => {
     const c = fixture.componentInstance;
     expect(c.month()).toBe('2026-10');
     expect(c.transactions()).toHaveLength(4);
-    expect(c.expenseSlices().map((s) => [s.label, s.amount])).toEqual([['Logement', 700], ['Alimentation', 80]]);
+    expect(c.expenseSlices().map((s) => [s.label, s.amount])).    toEqual([['Alimentation', 80]]);
     expect(c.expenseSlices().every((s) => s.icon !== '')).toBe(true);
     expect(c.recurringSlices().map((s) => s.label)).toEqual(['Logement']);
     expect(fixture.nativeElement.querySelectorAll('app-category-pie')).toHaveLength(2);

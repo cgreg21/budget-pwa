@@ -35,7 +35,7 @@ export class StatsPage {
   /** Starts on the month being edited; browsing here leaves the budget page's month alone. */
   readonly month = signal<MonthKey>(this.b.selectedMonth());
   readonly transactions = computed(() => this.b.transactionsOf(this.month()));
-  readonly expenseSlices = computed(() => this.slices(this.transactions()));
+  readonly expenseSlices = computed(() => this.slices(this.transactions().filter((t) => t.recurrenceId === undefined)));
   readonly recurringSlices = computed(() => this.slices(this.transactions().filter((t) => t.recurrenceId !== undefined)));
 
   chooseMonth(month: MonthKey): void {
