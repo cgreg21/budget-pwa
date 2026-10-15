@@ -79,7 +79,7 @@ describe('ConfigArchiveService', () => {
     expect(data).toEqual({
       general: { ...settings.settings(), currency: 'CHF' },
       thresholds: { low: 100, medium: 500, high: 1000 },
-      calendar: { enabled: true, calendarUrl: 'https://cal.example.org/cal', username: 'me', proxyUrl: 'https://proxy.example.org', password: 'pw' },
+      calendar: { enabled: true, calendarUrl: 'https://cal.example.org/cal', username: 'me', syncIntervalMinutes: 0, proxyUrl: 'https://proxy.example.org', password: 'pw' },
       bank: null,
     });
   });
@@ -116,7 +116,7 @@ describe('ConfigArchiveService', () => {
     expect(TestBed.inject(SettingsService).settings()).toMatchObject({ language: 'en', theme: 'light' });
     expect(TestBed.inject(BudgetService).thresholds()).toEqual({ low: 1, medium: 2, high: 3 });
     const imported = TestBed.inject(CalendarSyncService);
-    expect(imported.config()).toEqual({ enabled: true, calendarUrl: 'https://cal.example.org/cal', username: 'me' });
+    expect(imported.config()).toEqual({ enabled: true, calendarUrl: 'https://cal.example.org/cal', username: 'me', syncIntervalMinutes: 0 });
     expect(imported.proxyUrl()).toBe('https://proxy.example.org');
     expect(imported.hasPassword()).toBe(true);
     await settle();

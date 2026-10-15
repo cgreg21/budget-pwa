@@ -1,4 +1,5 @@
-<app-header [title]="s.t().appName" [filterActive]="hasFilters()" (filtersTap)="filtersOpen.set(true)" />
+<app-header [title]="s.t().appName" [filterActive]="hasFilters()" (filtersTap)="filtersOpen.set(true)"
+            [syncing]="calendar.active() ? calendar.busy() : null" (syncTap)="calendar.syncNow()" />
 
 <app-month-bar [month]="b.selectedMonth()" (monthChange)="b.selectMonth($event)" (labelTap)="monthPickerOpen.set(true)" />
 

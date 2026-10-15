@@ -2,6 +2,13 @@
   <button type="button" class="flex size-11 items-center justify-center rounded-full bg-card text-[22px] text-ink font-mdi transition-transform active:scale-90 md:hidden"
           (click)="drawer.show()">{{ ui.menu }}</button>
   <h1 class="ml-3 flex-1 truncate text-[22px] font-bold md:ml-0">{{ title() }}</h1>
+  @if (syncing() !== null) {
+    <button type="button"
+            class="mr-2 flex size-11 items-center justify-center rounded-full bg-card text-[22px] text-ink font-mdi transition-transform active:scale-90 disabled:opacity-50"
+            [class.animate-spin]="syncing()" [disabled]="syncing()"
+            [attr.aria-label]="syncLabel()"
+            (click)="syncTap.emit()">{{ ui.syncing }}</button>
+  }
   @if (filterActive() !== null) {
     <button type="button"
             class="flex size-11 items-center justify-center rounded-full text-[22px] font-mdi transition-transform active:scale-90"

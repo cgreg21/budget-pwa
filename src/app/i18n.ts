@@ -47,6 +47,7 @@ export interface Strings {
   calendar: {
     title: string; help: string; enable: string; url: string; username: string; password: string;
     passwordKept: string; passwordSession: string; passwordStored: string; proxy: string; proxyHelp: string; save: string; check: string; syncNow: string;
+    syncInterval: string; syncIntervalHelp: string;
     states: Record<CalendarState, string>; never: string; lastSync(date: string): string;
     invalidConfig: string; passwordRequired: string; connected: string; connectedDisabled: string; authError: string;
     networkError: string; serverError(message: string): string; conflicts(count: number): string;
@@ -136,6 +137,7 @@ const en: Strings = {
     proxy: 'CORS proxy (optional)',
     proxyHelp: 'Address of a budget-caldav-proxy deployment, needed when the calendar server does not allow web apps (most hosted providers). Leave empty for direct access.',
     save: 'Save settings', check: 'Test connection', syncNow: 'Synchronise now',
+    syncInterval: 'Automatic synchronisation (minutes)', syncIntervalHelp: 'Synchronise every N minutes while the app is open. 0 turns it off.',
     states: { disabled: 'Synchronisation off', syncing: 'Synchronising...', online: 'Connected', offline: 'Offline', error: 'Error' },
     never: 'never', lastSync: (date) => 'Last synchronisation: ' + date,
     invalidConfig: 'Enter an HTTP(S) calendar URL and a username.',
@@ -255,6 +257,7 @@ const fr: Strings = {
     proxy: 'Proxy CORS (optionnel)',
     proxyHelp: 'Adresse d\u2019un d\u00e9ploiement de budget-caldav-proxy, n\u00e9cessaire quand le serveur de calendrier n\u2019autorise pas les applications web (la plupart des h\u00e9bergeurs). Laisser vide pour un acc\u00e8s direct.',
     save: 'Enregistrer les r\u00e9glages', check: 'Tester la connexion', syncNow: 'Synchroniser maintenant',
+    syncInterval: 'Synchronisation automatique (minutes)', syncIntervalHelp: 'Synchronise toutes les N minutes tant que l\'application est ouverte. 0 la d\u00e9sactive.',
     states: { disabled: 'Synchronisation d\u00e9sactiv\u00e9e', syncing: 'Synchronisation...', online: 'Connect\u00e9', offline: 'Hors ligne', error: 'Erreur' },
     never: 'jamais', lastSync: (date) => 'Derni\u00e8re synchronisation : ' + date,
     invalidConfig: 'Saisissez une URL de calendrier HTTP(S) et un identifiant.',

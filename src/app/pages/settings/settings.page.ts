@@ -53,6 +53,7 @@ export class SettingsPage {
   readonly calendarUrl = signal(this.calendar.config().calendarUrl);
   readonly calendarUser = signal(this.calendar.config().username);
   readonly calendarProxy = signal(this.calendar.proxyUrl());
+  readonly calendarInterval = signal(String(this.calendar.config().syncIntervalMinutes ?? 0));
   readonly calendarPassword = signal('');
   readonly calendarStatusText = computed(() => {
     const strings = this.s.t().calendar;
@@ -70,13 +71,15 @@ export class SettingsPage {
   async saveCalendar(action: 'save' | 'check' | 'sync' = 'save'): Promise<void> {
     const saved = this.calendar.configure({
       enabled: this.calendarEnabled(), calendarUrl: this.calendarUrl(), username: this.calendarUser(),
-    }, this.calendarPassword() === '' ? null : this.calendarPassword(), this.calendarProxy());
+            syncIntervalMinutes: Number(this.calendarInterval()),
+          }, this.calendarPassword() === '' ? null : this.calendarPassword(), this.calendarProxy());
     if (!saved) return;
     this.calendarPassword.set('');
     const config = this.calendar.config();
     this.calendarEnabled.set(config.enabled);
     this.calendarUrl.set(config.calendarUrl);
     this.calendarUser.set(config.username);
+    this.calendarInterval.set(String(config.syncIntervalMinutes ?? 0));
     this.calendarProxy.set(this.calendar.proxyUrl());
     if (action === 'check') await this.calendar.checkConnection();
     else if (config.enabled) await this.calendar.syncNow();
@@ -269,6 +272,7 @@ export class SettingsPage {
     this.calendarEnabled.set(config.enabled);
     this.calendarUrl.set(config.calendarUrl);
     this.calendarUser.set(config.username);
+    this.calendarInterval.set(String(config.syncIntervalMinutes ?? 0));
     this.calendarProxy.set(this.calendar.proxyUrl());
     this.calendarPassword.set('');
     this.message.set('');

@@ -110,6 +110,7 @@ export class CalendarSyncService implements OnDestroy {
   readonly hasPassword = this.hasPasswordState.asReadonly();
   private generation = 0;
   private scheduled: ReturnType<typeof setTimeout> | undefined;
+  private periodic: ReturnType<typeof setInterval> | undefined;
   private running: Promise<void> | undefined;
   private syncRequested = false;
   private checkRequested = false;
@@ -130,6 +131,16 @@ export class CalendarSyncService implements OnDestroy {
       this.hasPasswordState.set(password !== '');
     });
     queueMicrotask(() => { if (!this.destroyed && this.active()) void this.syncNow(); });
+    this.restartPeriodic();
+  }
+
+  /** Automatic synchronisation every `syncIntervalMinutes`; off when the calendar is disabled or the interval is 0. */
+  private restartPeriodic(): void {
+    if (this.periodic !== undefined) clearInterval(this.periodic);
+    this.periodic = undefined;
+    const minutes = this.config().syncIntervalMinutes ?? 0;
+    if (this.destroyed || !this.active() || minutes <= 0) return;
+    this.periodic = setInterval(() => { void this.syncNow(); }, minutes * 60_000);
   }
 
   configure(config: CalendarConfig, password: string | null, proxyUrl?: string): boolean {
@@ -163,6 +174,7 @@ export class CalendarSyncService implements OnDestroy {
     this.statusState.set(next.enabled
       ? { state: 'offline', lastSync: this.saved.lastSync }
       : { ...DISABLED_CALENDAR_STATUS, lastSync: this.saved.lastSync });
+    this.restartPeriodic();
     return true;
   }
 
@@ -292,6 +304,7 @@ export class CalendarSyncService implements OnDestroy {
     this.generation += 1;
     this.password = '';
     this.cancelScheduled();
+    if (this.periodic !== undefined) clearInterval(this.periodic);
     this.subscription.unsubscribe();
     window.removeEventListener('online', this.resumed);
     document.removeEventListener('visibilitychange', this.visible);

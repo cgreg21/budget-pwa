@@ -144,7 +144,7 @@ describe('CalendarSyncService', () => {
   describe('initial state', () => {
     it('starts disabled with the defaults', async () => {
       const c = inject();
-      expect(c.config()).toEqual({ enabled: false, calendarUrl: '', username: '' });
+      expect(c.config()).toEqual({ enabled: false, calendarUrl: '', username: '', syncIntervalMinutes: 0 });
       expect(c.proxyUrl()).toBe('');
       expect(c.active()).toBe(false);
       expect(c.status()).toEqual({ state: 'disabled', lastSync: undefined });
@@ -160,7 +160,7 @@ describe('CalendarSyncService', () => {
       localStorage.setItem(PROXY_KEY, 'https://proxy.example/x/');
       localStorage.setItem(BASELINE_KEY, JSON.stringify({ baseline: { t1: { href: '/cal/t1.ics', etag: '"1"', hash: 'h' } }, lastSync: '2026-10-01T00:00:00.000Z' }));
       const c = inject();
-      expect(c.config()).toEqual({ enabled: true, calendarUrl: 'https://dav.test/cal', username: 'alice' });
+      expect(c.config()).toEqual({ enabled: true, calendarUrl: 'https://dav.test/cal', username: 'alice', syncIntervalMinutes: 0 });
       expect(c.proxyUrl()).toBe('https://proxy.example/x');
       expect(c.status()).toEqual({ state: 'offline', lastSync: '2026-10-01T00:00:00.000Z' });
     });
@@ -168,6 +168,25 @@ describe('CalendarSyncService', () => {
     it('falls back to disabled when the saved settings are unreadable', () => {
       localStorage.setItem(CONFIG_KEY, '{"enabled":true');
       expect(inject().config().enabled).toBe(false);
+    });
+
+    it('synchronises periodically according to the configured interval, and stops when it is 0', async () => {
+      const setIntervalSpy = vi.spyOn(globalThis, 'setInterval');
+      const clearIntervalSpy = vi.spyOn(globalThis, 'clearInterval');
+      const c = await service();
+      c.configure({ ...CONFIG, syncIntervalMinutes: 5 }, 'pw');
+      await settle();
+      const periodic = setIntervalSpy.mock.calls.find(([, delay]) => delay === 5 * 60_000);
+      expect(periodic).toBeDefined();
+      vi.mocked(fetch).mockClear();
+      (periodic![0] as () => void)();
+      await settle();
+      expect(fetch).toHaveBeenCalled();
+      c.configure({ ...CONFIG, syncIntervalMinutes: 0 }, null);
+      expect(clearIntervalSpy).toHaveBeenCalled();
+      setIntervalSpy.mockClear();
+      c.configure({ ...CONFIG, syncIntervalMinutes: 0 }, null);
+      expect(setIntervalSpy).not.toHaveBeenCalled();
     });
 
     it.each([
@@ -223,7 +242,7 @@ describe('CalendarSyncService', () => {
     it('persists the settings, the proxy and the password', async () => {
       const c = await service();
       expect(c.configure(CONFIG, 'pw', ' https://proxy.example/p/ ')).toBe(true);
-      expect(JSON.parse(localStorage.getItem(CONFIG_KEY) ?? '')).toEqual({ enabled: true, calendarUrl: 'https://dav.test/cal', username: 'alice' });
+      expect(JSON.parse(localStorage.getItem(CONFIG_KEY) ?? '')).toEqual({ enabled: true, calendarUrl: 'https://dav.test/cal', username: 'alice', syncIntervalMinutes: 0 });
       expect(localStorage.getItem(PROXY_KEY)).toBe('https://proxy.example/p');
       expect(c.proxyUrl()).toBe('https://proxy.example/p');
       expect(c.status()).toEqual({ state: 'offline', lastSync: undefined });

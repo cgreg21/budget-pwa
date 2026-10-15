@@ -4,6 +4,7 @@ import {
 } from 'budget-lib';
 
 import { BudgetService } from '../../budget.service';
+import { CalendarSyncService } from '../../calendar-sync.service';
 import { DialogService } from '../../dialog.service';
 import { UI_ICONS, categoryGlyph } from '../../icons';
 import { LayoutService } from '../../layout.service';
@@ -47,6 +48,7 @@ export class BudgetPage {
   readonly b = inject(BudgetService);
   readonly s = inject(SettingsService);
   readonly layout = inject(LayoutService);
+  readonly calendar = inject(CalendarSyncService);
   private readonly dialogs = inject(DialogService);
   readonly ui = UI_ICONS;
 
