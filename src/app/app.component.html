@@ -70,5 +70,5 @@
 </div>
 
 @if (lock.locked()) {
-  <app-lock-screen />
+  <app-lock-screen animate.leave="animate-fade-out" />
 }

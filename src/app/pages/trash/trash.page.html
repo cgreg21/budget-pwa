@@ -39,7 +39,7 @@
 </div>
 
 @if (selecting()) {
-  <app-selection-bar [count]="selectedIds().length" (cancel)="toggleSelecting()" (selectAll)="selectAll()">
+  <app-selection-bar animate.leave="animate-slide-down" [count]="selectedIds().length" (cancel)="toggleSelecting()" (selectAll)="selectAll()">
     <button type="button" class="flex size-11 items-center justify-center rounded-full text-[22px] text-ink font-mdi transition-transform active:scale-90" [attr.aria-label]="s.t().selection.restore" [attr.title]="s.t().selection.restore" (click)="bulkRestore()">{{ ui.restore }}</button>
     <button type="button" class="flex size-11 items-center justify-center rounded-full text-[22px] text-bad font-mdi transition-transform active:scale-90" [attr.aria-label]="s.t().selection.deleteForever" [attr.title]="s.t().selection.deleteForever" (click)="bulkDeleteForever()">{{ ui.trash }}</button>
   </app-selection-bar>

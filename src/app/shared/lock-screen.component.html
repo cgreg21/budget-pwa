@@ -1,4 +1,4 @@
-<div class="fixed inset-0 z-[70] flex flex-col items-center justify-center bg-bg px-6 text-ink" role="dialog" aria-modal="true" [attr.aria-label]="s.t().lock.title">
+<div animate.leave="animate-fade-out" class="animate-fade fixed inset-0 z-[70] flex flex-col items-center justify-center bg-bg px-6 text-ink" role="dialog" aria-modal="true" [attr.aria-label]="s.t().lock.title">
   <span class="mb-4 text-5xl text-green font-mdi">{{ icons.lock }}</span>
   <h1 class="mb-6 text-xl font-bold">{{ s.t().appName }}</h1>
   <form class="flex w-full max-w-xs flex-col gap-3" (submit)="$event.preventDefault(); submit()">

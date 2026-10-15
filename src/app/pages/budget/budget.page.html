@@ -71,7 +71,7 @@
 </div>
 
 @if (selecting()) {
-  <app-selection-bar [count]="selectedIds().length" (cancel)="toggleSelecting()" (selectAll)="selectAllVisible()">
+  <app-selection-bar animate.leave="animate-slide-down" [count]="selectedIds().length" (cancel)="toggleSelecting()" (selectAll)="selectAllVisible()">
     <button type="button" class="flex size-11 items-center justify-center rounded-full text-[22px] text-ink font-mdi transition-transform active:scale-90" [attr.aria-label]="s.t().selection.category" [attr.title]="s.t().selection.category" (click)="bulkCategory()">{{ ui.category }}</button>
     <button type="button" class="flex size-11 items-center justify-center rounded-full text-[22px] text-bad font-mdi transition-transform active:scale-90" [attr.aria-label]="s.t().selection.delete" [attr.title]="s.t().selection.delete" (click)="bulkDelete()">{{ ui.trash }}</button>
   </app-selection-bar>

@@ -1,5 +1,5 @@
 @if (snackbar.current(); as message) {
-  <div class="pointer-events-none absolute inset-x-3 bottom-[calc(80px+env(safe-area-inset-bottom))] z-50 flex justify-center md:bottom-6 md:left-auto md:right-6 md:justify-end">
+  <div animate.leave="animate-snack-out" class="pointer-events-none absolute inset-x-3 bottom-[calc(80px+env(safe-area-inset-bottom))] z-50 flex justify-center md:bottom-6 md:left-auto md:right-6 md:justify-end">
     <div class="pointer-events-auto flex max-w-[480px] animate-appear items-center gap-3 rounded-md border bg-card py-2.5 pl-4 pr-2 shadow-pop"
          [class]="message.kind === 'error' ? 'border-bad' : message.kind === 'success' ? 'border-green' : 'border-line'"
          [attr.role]="message.kind === 'error' ? 'alert' : 'status'">

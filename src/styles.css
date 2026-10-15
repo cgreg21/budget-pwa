@@ -134,6 +134,10 @@
   --animate-sheet-in: sheet 0.25s ease-out;
   --animate-fade-in: fade 0.2s ease-out;
   --animate-page: appear 0.25s ease-out both;
+  --animate-fade-out: fade-out 0.2s ease-in both;
+  --animate-slide-up: slide-up 0.25s ease-out both;
+  --animate-slide-down: slide-down 0.2s ease-in both;
+  --animate-snack-out: snack-out 0.2s ease-in both;
 
   @keyframes appear {
     from { opacity: 0; transform: translateY(12px); }
@@ -146,6 +150,22 @@
   @keyframes fade {
     from { opacity: 0; }
     to { opacity: 1; }
+  }
+  @keyframes fade-out {
+    from { opacity: 1; }
+    to { opacity: 0; }
+  }
+  @keyframes slide-up {
+    from { opacity: 0; transform: translateY(100%); }
+    to { opacity: 1; transform: none; }
+  }
+  @keyframes slide-down {
+    from { opacity: 1; transform: none; }
+    to { opacity: 0; transform: translateY(100%); }
+  }
+  @keyframes snack-out {
+    from { opacity: 1; transform: none; }
+    to { opacity: 0; transform: translateY(12px) scale(0.96); }
   }
   @keyframes sheet {
     from { transform: translateY(100%); }
@@ -283,4 +303,12 @@
 /* The numeric keypad of the amount fields hides the spin buttons of the mobile app. */
 input[type="number"]::-webkit-inner-spin-button {
   display: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-delay: 0s !important;
+    transition-duration: 0.01ms !important;
+  }
 }
