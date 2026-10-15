@@ -28,9 +28,9 @@ export interface Strings {
   };
   levels: { critical: string; low: string; medium: string; high: string };
   editor: {
-    newTitle: string; editTitle: string; amount: string; description: string;
+    newTitle: string; editTitle: string; amount: string; date: string; description: string;
     category: string; repeat: string; frequency: string; limited: string;
-    occurrences: string; invalidAmount: string; scopeTitle: string;
+    occurrences: string; invalidAmount: string; invalidDate: string; scopeTitle: string;
     scopeBody: string; occurrenceOnly: string; seriesToo: string;
   };
   stats: {
@@ -102,10 +102,10 @@ const en: Strings = {
   },
   levels: { critical: 'Critical', low: 'Low', medium: 'Medium', high: 'Comfortable' },
   editor: {
-    newTitle: 'New transaction', editTitle: 'Edit transaction', amount: 'Amount',
+    newTitle: 'New transaction', editTitle: 'Edit transaction', amount: 'Amount', date: 'Date',
     description: 'Description', category: 'Category', repeat: 'Repeat',
     frequency: 'Frequency', limited: 'Limit the number of occurrences',
-    occurrences: 'Occurrences', invalidAmount: 'Enter an amount greater than zero.',
+    occurrences: 'Occurrences', invalidAmount: 'Enter an amount greater than zero.', invalidDate: 'Enter a valid date.',
     scopeTitle: 'Apply the change to',
     scopeBody: 'This transaction is part of a recurring series.',
     occurrenceOnly: 'This occurrence only', seriesToo: 'The whole series',
@@ -223,9 +223,9 @@ const fr: Strings = {
   levels: { critical: 'Critique', low: 'Faible', medium: 'Moyen', high: 'Confortable' },
   editor: {
     newTitle: 'Nouvelle transaction', editTitle: 'Modifier la transaction',
-    amount: 'Montant', description: 'Description', category: 'Catégorie',
+    amount: 'Montant', date: 'Date', description: 'Description', category: 'Catégorie',
     repeat: 'Répéter', frequency: 'Fréquence', limited: "Limiter le nombre d'occurrences",
-    occurrences: 'Occurrences', invalidAmount: 'Saisissez un montant supérieur à zéro.',
+    occurrences: 'Occurrences', invalidAmount: 'Saisissez un montant supérieur à zéro.', invalidDate: 'Saisissez une date valide.',
     scopeTitle: 'Appliquer la modification à',
     scopeBody: 'Cette transaction fait partie d’une série récurrente.',
     occurrenceOnly: 'Cette occurrence uniquement', seriesToo: 'Toute la série',

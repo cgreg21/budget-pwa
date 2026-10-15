@@ -268,7 +268,7 @@ export class CalendarSyncService implements OnDestroy {
         } else {
           const snapshot = this.budget.allTransactions().map((item) => ({ ...item }));
           const categories = this.budget.categories();
-          const outcome = await syncCalendar(client, snapshot, this.saved.baseline, categories);
+          const outcome = await syncCalendar(client, snapshot, this.saved.baseline, categories, this.budget.recurrences());
           if (generation !== this.generation || this.destroyed) continue;
           const baseline = { ...outcome.baseline };
           let nextCategories = outcome.categories;

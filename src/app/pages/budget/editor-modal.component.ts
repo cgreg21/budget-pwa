@@ -29,8 +29,8 @@ export class EditorModalComponent implements OnInit {
   readonly closed = output<void>();
 
   existing: Transaction | undefined;
-  private date = '';
 
+  readonly date = signal('');
   readonly kind = signal<TransactionKind>('expense');
   readonly amount = signal('');
   readonly description = signal('');
@@ -46,7 +46,7 @@ export class EditorModalComponent implements OnInit {
     const existing = this.b.transactions().find((t) => t.id === this.id());
     const series = existing && this.b.recurrenceOf(existing);
     this.existing = existing;
-    this.date = existing?.date ?? this.b.defaultTransactionDate;
+    this.date.set(existing?.date ?? this.b.defaultTransactionDate);
     this.kind.set(existing?.kind ?? 'expense');
     this.amount.set(existing ? this.s.formatInput(existing.amount) : '');
     this.description.set(existing?.description ?? '');
@@ -82,11 +82,15 @@ export class EditorModalComponent implements OnInit {
       this.error.set(t.editor.invalidAmount);
       return;
     }
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(this.date())) {
+      this.error.set(t.editor.invalidDate);
+      return;
+    }
     this.error.set('');
 
     const existing = this.existing;
     const input: TransactionInput = {
-      date: this.date,
+      date: this.date(),
       description: this.description().trim(),
       category: this.category(),
       kind: this.kind(),

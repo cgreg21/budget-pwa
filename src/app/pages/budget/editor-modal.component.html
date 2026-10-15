@@ -12,6 +12,10 @@
            [placeholder]="s.formatInput(0)" [value]="amount()"
            (input)="amount.set($any($event.target).value)" (blur)="normalizeAmount()" />
 
+    <label class="field-label" for="editor-date">{{ s.t().editor.date }}</label>
+    <input id="editor-date" class="input" type="date" [value]="date()"
+           (input)="date.set($any($event.target).value)" />
+
     <label class="field-label" for="editor-description">{{ s.t().editor.description }}</label>
     <input id="editor-description" class="input" type="text" autocomplete="off"
            [value]="description()" (input)="description.set($any($event.target).value)" />
