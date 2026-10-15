@@ -565,7 +565,7 @@ describe('CalendarSyncService', () => {
       expect(calls).toHaveLength(0);
       vi.advanceTimersByTime(1);
       await settle();
-      expect(calls.map((call) => call.method)).toEqual(['REPORT']);
+      expect(calls.map((call) => call.method)).toEqual(['REPORT', 'PUT']);
     });
 
     it('does not schedule anything while disabled', async () => {

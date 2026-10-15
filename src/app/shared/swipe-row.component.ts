@@ -1,5 +1,7 @@
 import { ChangeDetectionStrategy, Component, effect, input, output, signal, untracked } from '@angular/core';
 
+import { UI_ICONS } from '../icons';
+
 /** Width of the delete button revealed by swiping a row, and the move needed to pick a direction. */
 const SWIPE_WIDTH = 88;
 const SWIPE_SLOP = 10;
@@ -20,6 +22,7 @@ export class SwipeRowComponent {
   readonly edit = output<void>();
   readonly remove = output<void>();
 
+  protected readonly trashIcon = UI_ICONS.trash;
   protected readonly x = signal(0);
   protected readonly dragging = signal(false);
 

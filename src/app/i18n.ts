@@ -14,6 +14,10 @@ export interface Strings {
     noDescription: string; ok: string;
   };
   frequency: { monthly: string; quarterly: string; yearly: string };
+  trash: {
+    title: string; empty: string; help: string; restore: string; deleteForever: string; emptyAction: string;
+    emptyBody(count: number): string; deleteForeverBody(details: string): string; deletedOn(date: string): string;
+  };
   months: string[];
   budget: {
     balance: string; income: string; expenses: string;
@@ -88,6 +92,14 @@ const en: Strings = {
     noDescription: '(no description)', ok: 'OK',
   },
   frequency: { monthly: 'Monthly', quarterly: 'Quarterly', yearly: 'Yearly' },
+  trash: {
+    title: 'Trash', empty: 'The trash is empty.',
+    help: 'Deleted transactions stay here, and in the calendar, until you restore them or empty the trash.',
+    restore: 'Restore', deleteForever: 'Delete permanently', emptyAction: 'Empty the trash',
+    emptyBody: (count) => `${count} transaction(s) will be permanently deleted, calendar events included.`,
+    deleteForeverBody: (details) => `${details} will be permanently deleted, calendar event included.`,
+    deletedOn: (date) => `Deleted on ${date}`,
+  },
   months: ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August',
     'September', 'October', 'November', 'December'],
   budget: {
@@ -99,7 +111,7 @@ const en: Strings = {
     emptyRecurring: 'No recurring transactions this month.', emptyOneOff: 'No one-off transactions this month.',
     oneOff: 'One-off', recurring: 'Recurring',
     deleteTitle: 'Delete transaction?',
-    deleteBody: (details) => `${details} will be permanently deleted.`,
+    deleteBody: (details) => `${details} will be moved to the trash.`,
     deleteScopeBody: 'This transaction belongs to a recurring series.',
     thisOccurrence: 'This occurrence only', wholeSeries: 'Delete the whole series',
     categoryFilter: 'Category', resetFilters: 'Reset', filters: 'Filters',
@@ -220,6 +232,14 @@ const fr: Strings = {
     noDescription: '(sans description)', ok: 'OK',
   },
   frequency: { monthly: 'Mensuelle', quarterly: 'Trimestrielle', yearly: 'Annuelle' },
+  trash: {
+    title: 'Corbeille', empty: 'La corbeille est vide.',
+    help: 'Les transactions supprimées restent ici, et dans le calendrier, jusqu’à leur restauration ou jusqu’à ce que vous vidiez la corbeille.',
+    restore: 'Restaurer', deleteForever: 'Supprimer définitivement', emptyAction: 'Vider la corbeille',
+    emptyBody: (count) => `${count} transaction(s) seront définitivement supprimées, événements du calendrier compris.`,
+    deleteForeverBody: (details) => `${details} sera définitivement supprimée, événement du calendrier compris.`,
+    deletedOn: (date) => `Supprimée le ${date}`,
+  },
   months: ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 'Juillet', 'Août',
     'Septembre', 'Octobre', 'Novembre', 'Décembre'],
   budget: {
@@ -231,7 +251,7 @@ const fr: Strings = {
     emptyRecurring: 'Aucune transaction récurrente ce mois-ci.', emptyOneOff: 'Aucune transaction ponctuelle ce mois-ci.',
     oneOff: 'Ponctuelles', recurring: 'Récurrentes',
     deleteTitle: 'Supprimer la transaction ?',
-    deleteBody: (details) => `${details} sera définitivement supprimée.`,
+    deleteBody: (details) => `${details} sera déplacée dans la corbeille.`,
     deleteScopeBody: 'Cette transaction fait partie d’une série récurrente.',
     thisOccurrence: 'Cette occurrence uniquement', wholeSeries: 'Supprimer toute la série',
     categoryFilter: 'Catégorie', resetFilters: 'Réinitialiser', filters: 'Filtres',

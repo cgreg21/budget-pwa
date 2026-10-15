@@ -76,7 +76,7 @@ describe('AppComponent', () => {
     const fixture = shell();
     const c = fixture.componentInstance;
     const t = TestBed.inject(SettingsService).t();
-    expect(c.items().map((i) => i.label)).toEqual([t.nav.transactions, t.categories.title, t.stats.title, t.stats.history]);
+    expect(c.items().map((i) => i.label)).toEqual([t.nav.transactions, t.categories.title, t.stats.title, t.stats.history, t.trash.title]);
     expect(c.isActive('/budget')).toBe(false);
     expect(c.isActive('/settings')).toBe(true);
     expect(c.isActive('/settings/recurrences')).toBe(true);

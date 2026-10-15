@@ -61,6 +61,7 @@ export class AppComponent {
       { url: '/categories', icon: UI_ICONS.categories, label: t.categories.title },
       { url: '/stats', icon: UI_ICONS.stats, label: t.stats.title },
       { url: '/history', icon: UI_ICONS.history, label: t.stats.history },
+      { url: '/trash', icon: UI_ICONS.trash, label: t.trash.title },
     ];
   });
 

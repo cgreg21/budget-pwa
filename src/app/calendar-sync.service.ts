@@ -268,7 +268,8 @@ export class CalendarSyncService implements OnDestroy {
         } else {
           const snapshot = this.budget.allTransactions().map((item) => ({ ...item }));
           const categories = this.budget.categories();
-          const outcome = await syncCalendar(client, snapshot, this.saved.baseline, categories, this.budget.recurrences());
+          const trash = this.budget.trash().map((item) => ({ ...item }));
+          const outcome = await syncCalendar(client, snapshot, this.saved.baseline, categories, this.budget.recurrences(), trash);
           if (generation !== this.generation || this.destroyed) continue;
           const baseline = { ...outcome.baseline };
           let nextCategories = outcome.categories;
@@ -278,6 +279,7 @@ export class CalendarSyncService implements OnDestroy {
             delete baseline[CATEGORIES_BASELINE_KEY];
           }
           this.budget.applyCalendarChanges(outcome.upsertLocal, outcome.removeLocal, snapshot, nextCategories);
+          this.budget.applyCalendarTrash(outcome.trashAdded, outcome.trashRemoved);
           const saved = { baseline, lastSync: new Date().toISOString() };
           localStorage.setItem(BASELINE_KEY, JSON.stringify(saved));
           this.saved = saved;

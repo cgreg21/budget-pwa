@@ -10,6 +10,7 @@ export const routes: Routes = [
       { path: 'categories', loadComponent: () => import('./pages/categories/categories.page').then((module) => module.CategoriesPage) },
       { path: 'stats', loadComponent: () => import('./pages/stats/stats.page').then((module) => module.StatsPage) },
       { path: 'history', loadComponent: () => import('./pages/history/history.page').then((module) => module.HistoryPage) },
+      { path: 'trash', loadComponent: () => import('./pages/trash/trash.page').then((module) => module.TrashPage) },
       { path: 'settings', loadComponent: () => import('./pages/settings/settings.page').then((module) => module.SettingsPage) },
       {
         path: 'settings/recurrences',

@@ -118,7 +118,7 @@
 </div>
 </div>
 
-<div class="grid shrink-0 grid-flow-col auto-cols-fr border-t border-line bg-surface pb-[calc(env(safe-area-inset-bottom)/2)]" role="tablist" [attr.aria-label]="s.t().settings.title">
+<div class="grid shrink-0 grid-flow-col auto-cols-fr border-t border-line bg-surface py-[calc(env(safe-area-inset-bottom)/2)]" role="tablist" [attr.aria-label]="s.t().settings.title">
   @for (item of tabs(); track item.id) {
     <button type="button" role="tab" class="relative flex h-10 items-center justify-center text-2xl font-mdi transition-colors active:scale-95"
             [class]="tab() === item.id ? 'text-green' : 'text-muted'"

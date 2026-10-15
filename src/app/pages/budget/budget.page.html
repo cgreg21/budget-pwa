@@ -58,7 +58,7 @@
   </div>
 </div>
 
-<div class="relative bg-surface pb-[env(safe-area-inset-bottom)] md:bg-transparent">
+<div class="relative bg-surface py-[calc(env(safe-area-inset-bottom)/2)] md:bg-transparent">
   <div class="md:hidden">
     <app-tab-bar [tabs]="tabs()" [active]="tab()" (select)="selectTab($event)" />
   </div>

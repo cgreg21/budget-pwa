@@ -16,6 +16,7 @@ import {
   isMonthKey,
   isRecurrenceList,
   isTransactionArray,
+  isTrashedTransactionArray,
   missingOccurrences,
   monthKeyOf,
   recurrenceFromTransaction,
@@ -29,6 +30,7 @@ import {
   type RecurrenceSettings,
   type Transaction,
   type TransactionInput,
+  type TrashedTransaction,
 } from 'budget-lib';
 
 import { readValidJson } from './storage';
@@ -48,6 +50,7 @@ export interface BudgetData {
 }
 
 const DATA_KEY = 'budget-pwa:data:v1';
+const TRASH_KEY = 'budget-pwa:trash:v1';
 
 function newId(): string {
   return typeof crypto.randomUUID === 'function'
@@ -105,6 +108,9 @@ export class BudgetService {
   readonly categories = computed(() => this.dataState().categories);
   readonly recurrences = computed(() => sortRecurrences(this.dataState().recurrences));
   readonly thresholds = computed(() => this.dataState().thresholds);
+  private readonly trashState = signal<TrashedTransaction[]>(readValidJson(TRASH_KEY, isTrashedTransactionArray, () => [], true).value);
+  /** Deleted transactions, the most recently deleted first. */
+  readonly trash = computed(() => [...this.trashState()].sort((a, b) => b.deletedAt.localeCompare(a.deletedAt)));
 
   constructor() {
     this.applyRecurrences(this.selectedMonth());
@@ -257,12 +263,53 @@ export class BudgetService {
 
   remove(id: string): void {
     const month = this.selectedMonth();
+    const trashed = (this.dataState().months[month] ?? []).find((item) => item.id === id);
+    if (trashed !== undefined) {
+      this.setTrash([{ ...trashed, deletedAt: new Date().toISOString() }, ...this.trashState().filter((item) => item.id !== id)]);
+    }
     this.updateData((data) => {
       const months = { ...data.months };
       months[month] = (months[month] ?? []).filter((item) => item.id !== id);
       if (months[month].length === 0) delete months[month];
       return { ...data, months };
     });
+  }
+
+  /** Puts a trashed transaction back in its month. */
+  restore(id: string): void {
+    const item = this.trashState().find((candidate) => candidate.id === id);
+    if (item === undefined) return;
+    const { deletedAt: _deletedAt, ...transaction } = item;
+    const month = monthKeyOf(transaction.date);
+    this.setTrash(this.trashState().filter((candidate) => candidate.id !== id));
+    this.updateData((data) => ({
+      ...data,
+      months: { ...data.months, [month]: [...(data.months[month] ?? []).filter((candidate) => candidate.id !== id), transaction] },
+    }));
+  }
+
+  /** Deletes one trashed transaction for good (the calendar event goes at the next synchronisation). */
+  deleteForever(id: string): void {
+    this.setTrash(this.trashState().filter((item) => item.id !== id));
+    this.transactionChangesSubject.next();
+  }
+
+  emptyTrash(): void {
+    if (this.trashState().length === 0) return;
+    this.setTrash([]);
+    this.transactionChangesSubject.next();
+  }
+
+  /** Calendar writes stay local: they must not schedule another synchronisation. */
+  applyCalendarTrash(added: TrashedTransaction[], removed: string[]): void {
+    if (added.length === 0 && removed.length === 0) return;
+    const gone = new Set([...removed, ...added.map((item) => item.id)]);
+    this.setTrash([...added, ...this.trashState().filter((item) => !gone.has(item.id))]);
+  }
+
+  private setTrash(items: TrashedTransaction[]): void {
+    this.trashState.set(items);
+    localStorage.setItem(TRASH_KEY, JSON.stringify(items));
   }
 
   /** Drops the template and this occurrence; occurrences in other months stay. */
