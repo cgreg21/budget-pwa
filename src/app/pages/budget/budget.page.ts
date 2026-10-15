@@ -137,13 +137,33 @@ export class BudgetPage {
     this.selection.set(new Set(this.panels().flatMap((panel) => panel.items.map((item) => item.id))));
   }
 
-  bulkDelete(): void {
+  async bulkDelete(): Promise<void> {
     const ids = this.selectedIds();
     if (ids.length === 0) return;
-    const t = this.s.t().snackbar;
+    const t = this.s.t();
+    const chosen = new Set(ids);
+    const seriesIds = [...new Set(this.b.transactions()
+      .filter((item) => chosen.has(item.id) && item.recurrenceId !== undefined && this.b.recurrenceOf(item) !== undefined)
+      .map((item) => item.recurrenceId as string))];
+    if (seriesIds.length > 0) {
+      const choice = await this.dialogs.action({
+        title: t.budget.deleteTitle,
+        message: t.budget.deleteScopeBody,
+        cancel: t.common.cancel,
+        actions: [t.budget.thisOccurrence, t.budget.wholeSeries],
+      });
+      if (choice === null) return;
+      if (choice === t.budget.wholeSeries) {
+        this.b.removeMany(ids);
+        for (const id of seriesIds) this.b.removeRecurrence(id);
+        this.toggleSelecting();
+        this.snackbar.show(t.snackbar.seriesDeleted);
+        return;
+      }
+    }
     this.b.removeMany(ids);
     this.toggleSelecting();
-    this.snackbar.show(this.s.t().selection.deleted(ids.length), { action: { label: t.undo, run: () => this.b.restoreMany(ids) } });
+    this.snackbar.show(t.selection.deleted(ids.length), { action: { label: t.snackbar.undo, run: () => this.b.restoreMany(ids) } });
   }
 
   async bulkCategory(): Promise<void> {
