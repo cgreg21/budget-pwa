@@ -354,4 +354,33 @@ describe('BudgetService', () => {
       expect(b.monthKeys()).toEqual([]);
     });
   });
+
+  describe('bulk actions', () => {
+    beforeEach(() => {
+      localStorage.setItem(DATA_KEY, JSON.stringify(data({ months: { '2026-10': [tx({ id: 'a' }), tx({ id: 'b' }), tx({ id: 'c' })] } })));
+    });
+
+    it('moves several transactions to the trash, then restores them', () => {
+      const b = service();
+      b.removeMany(['a', 'b']);
+      expect(b.transactions().map((t) => t.id)).toEqual(['c']);
+      expect(b.trash().map((t) => t.id).sort()).toEqual(['a', 'b']);
+      b.restoreMany(['a', 'b']);
+      expect(b.transactions().map((t) => t.id).sort()).toEqual(['a', 'b', 'c']);
+      expect(b.trash()).toEqual([]);
+    });
+
+    it('changes the category of several transactions', () => {
+      const b = service();
+      b.setCategoryMany(['a', 'c'], 'Loisirs');
+      expect(b.transactions().filter((t) => t.category === 'Loisirs').map((t) => t.id).sort()).toEqual(['a', 'c']);
+    });
+
+    it('deletes several trashed transactions for good', () => {
+      const b = service();
+      b.removeMany(['a', 'b']);
+      b.deleteForeverMany(['a']);
+      expect(b.trash().map((t) => t.id)).toEqual(['b']);
+    });
+  });
 });

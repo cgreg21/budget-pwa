@@ -275,6 +275,55 @@ export class BudgetService {
     });
   }
 
+  /** Moves several transactions of the selected month to the trash in a single change. */
+  removeMany(ids: readonly string[]): void {
+    const month = this.selectedMonth();
+    const wanted = new Set(ids);
+    const moved = (this.dataState().months[month] ?? []).filter((item) => wanted.has(item.id));
+    if (moved.length === 0) return;
+    const deletedAt = new Date().toISOString();
+    this.setTrash([...moved.map((item) => ({ ...item, deletedAt })), ...this.trashState().filter((item) => !wanted.has(item.id))]);
+    this.updateData((data) => {
+      const months = { ...data.months };
+      months[month] = (months[month] ?? []).filter((item) => !wanted.has(item.id));
+      if (months[month].length === 0) delete months[month];
+      return { ...data, months };
+    });
+  }
+
+  /** Changes the category of several transactions of the selected month. */
+  setCategoryMany(ids: readonly string[], category: string): void {
+    const month = this.selectedMonth();
+    const wanted = new Set(ids);
+    this.updateData((data) => ({
+      ...data,
+      months: { ...data.months, [month]: (data.months[month] ?? []).map((item) => (wanted.has(item.id) ? { ...item, category } : item)) },
+    }));
+  }
+
+  /** Puts several trashed transactions back in their months in a single change. */
+  restoreMany(ids: readonly string[]): void {
+    const wanted = new Set(ids);
+    const items = this.trashState().filter((item) => wanted.has(item.id));
+    if (items.length === 0) return;
+    this.setTrash(this.trashState().filter((item) => !wanted.has(item.id)));
+    this.updateData((data) => {
+      const months = { ...data.months };
+      for (const { deletedAt: _deletedAt, ...transaction } of items) {
+        const month = monthKeyOf(transaction.date);
+        months[month] = [...(months[month] ?? []).filter((candidate) => candidate.id !== transaction.id), transaction];
+      }
+      return { ...data, months };
+    });
+  }
+
+  deleteForeverMany(ids: readonly string[]): void {
+    const wanted = new Set(ids);
+    if (!this.trashState().some((item) => wanted.has(item.id))) return;
+    this.setTrash(this.trashState().filter((item) => !wanted.has(item.id)));
+    this.transactionChangesSubject.next();
+  }
+
   /** Puts a trashed transaction back in its month. */
   restore(id: string): void {
     const item = this.trashState().find((candidate) => candidate.id === id);

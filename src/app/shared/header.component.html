@@ -2,6 +2,13 @@
   <button type="button" class="flex size-11 items-center justify-center rounded-full bg-card text-[22px] text-ink font-mdi transition-transform active:scale-90 md:hidden"
           (click)="drawer.show()">{{ ui.menu }}</button>
   <h1 class="ml-3 flex-1 truncate text-[22px] font-bold md:ml-0">{{ title() }}</h1>
+  @if (selectLabel() !== null) {
+    <button type="button"
+            class="mr-2 flex size-11 items-center justify-center rounded-full text-[22px] font-mdi transition-transform active:scale-90"
+            [class]="selecting() ? 'bg-brand text-on-brand' : 'bg-card text-ink'"
+            [attr.aria-label]="selectLabel()" [attr.title]="selectLabel()" [attr.aria-pressed]="selecting()"
+            (click)="selectTap.emit()">{{ ui.select }}</button>
+  }
   @if (syncing() !== null) {
     <button type="button"
             class="mr-2 flex size-11 items-center justify-center rounded-full bg-card text-[22px] text-ink font-mdi transition-transform active:scale-90 disabled:opacity-50"

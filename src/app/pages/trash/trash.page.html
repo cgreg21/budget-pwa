@@ -1,4 +1,4 @@
-<app-header [title]="s.t().trash.title" [actionLabel]="b.trash().length > 0 ? s.t().trash.emptyAction : null" (actionTap)="emptyTrash()" />
+<app-header [title]="s.t().trash.title" [actionLabel]="b.trash().length > 0 ? s.t().trash.emptyAction : null" (actionTap)="emptyTrash()"`r`n            [selectLabel]="b.trash().length > 0 ? s.t().selection.select : null" [selecting]="selecting()" (selectTap)="toggleSelecting()" />
 
 <div class="min-h-0 flex-1 overflow-y-auto overflow-x-hidden">
   @if (b.trash().length === 0) {
@@ -10,6 +10,17 @@
     <p class="row-sub mx-3 mb-1 md:mx-5">{{ s.t().trash.help }}</p>
     <div class="pb-3">
       @for (item of b.trash(); track item.id) {
+        @if (selecting()) {
+          <button type="button" class="row m-0 mx-3 flex w-full items-center text-left" role="checkbox" [attr.aria-checked]="isSelected(item.id)" (click)="toggleItem(item.id)">
+            <span class="mr-3 text-[26px] font-mdi" [class]="isSelected(item.id) ? 'text-green' : 'text-muted'">{{ isSelected(item.id) ? ui.checked : ui.unchecked }}</span>
+            <span class="row-icon">{{ glyphOfCategory(item.category) }}</span>
+            <div class="min-w-0 flex-1">
+              <div class="row-title">{{ item.description || s.t().common.noDescription }}</div>
+              <div class="row-sub">{{ s.t().trash.deletedOn(item.deletedAt.slice(0, 10)) }}</div>
+            </div>
+            <span class="row-amount ml-2 whitespace-nowrap" [class]="item.kind">{{ s.formatSigned(item.kind, item.amount) }}</span>
+          </button>
+        } @else {
         <app-swipe-row [open]="openRow() === item.id ? openSide() : false"
                        [removeLabel]="s.t().trash.deleteForever" [restoreLabel]="s.t().trash.restore"
                        (openChange)="setOpenRow(item.id, $event)" (edit)="openRow.set(null)"
@@ -21,7 +32,15 @@
           </div>
           <span class="row-amount ml-2 whitespace-nowrap" [class]="item.kind">{{ s.formatSigned(item.kind, item.amount) }}</span>
         </app-swipe-row>
+        }
       }
     </div>
   }
 </div>
+
+@if (selecting()) {
+  <app-selection-bar [count]="selectedIds().length" (cancel)="toggleSelecting()" (selectAll)="selectAll()">
+    <button type="button" class="flex size-11 items-center justify-center rounded-full text-[22px] text-ink font-mdi transition-transform active:scale-90" [attr.aria-label]="s.t().selection.restore" [attr.title]="s.t().selection.restore" (click)="bulkRestore()">{{ ui.restore }}</button>
+    <button type="button" class="flex size-11 items-center justify-center rounded-full text-[22px] text-bad font-mdi transition-transform active:scale-90" [attr.aria-label]="s.t().selection.deleteForever" [attr.title]="s.t().selection.deleteForever" (click)="bulkDeleteForever()">{{ ui.trash }}</button>
+  </app-selection-bar>
+}

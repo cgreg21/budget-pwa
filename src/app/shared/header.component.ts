@@ -24,6 +24,10 @@ export class HeaderComponent {
   readonly actionLabel = input<string | null>(null);
   readonly actionIcon = input<string>(UI_ICONS.trash);
   readonly actionTap = output<void>();
+  /** Label of the button entering the multi-selection mode; `null` hides it. */
+  readonly selectLabel = input<string | null>(null);
+  readonly selecting = input(false);
+  readonly selectTap = output<void>();
   readonly syncLabel = computed(() => this.settings.t().calendar.syncNow);
   private readonly settings = inject(SettingsService);
 }

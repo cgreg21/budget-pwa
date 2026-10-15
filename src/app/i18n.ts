@@ -18,6 +18,16 @@ export interface Strings {
     added: string; updated: string; synced: string; backupExported: string; backupImported: string; configExported: string;
     thresholdsSaved: string;
   };
+  lock: {
+    title: string; help: string; enable: string; newPin: string; confirmPin: string; currentPin: string; pinInvalid: string;
+    pinMismatch: string; wrongPin: string; unlock: string; biometric: string; biometricUnlock: string; biometricFailed: string;
+    change: string; disable: string; lockNow: string; saved: string; disabled: string; blocked(seconds: number): string;
+  };
+  selection: {
+    select: string; cancel: string; selectAll: string; none: string; count(n: number): string; delete: string; category: string;
+    restore: string; deleteForever: string; chooseCategory: string; deleted(n: number): string; recategorised(n: number): string;
+    restored(n: number): string; deletedForever(n: number): string; deleteForeverBody(n: number): string;
+  };
   frequency: { monthly: string; quarterly: string; yearly: string };
   trash: {
     title: string; empty: string; help: string; restore: string; deleteForever: string; emptyAction: string;
@@ -101,6 +111,19 @@ const en: Strings = {
     deletedForever: 'Permanently deleted', trashEmptied: 'Trash emptied', added: 'Transaction added', updated: 'Transaction updated',
     synced: 'Calendar synchronised', backupExported: 'Backup exported', backupImported: 'Backup imported',
     configExported: 'Settings exported', thresholdsSaved: 'Thresholds saved',
+  },
+  lock: {
+    title: 'App lock', help: 'Asks for a PIN when the app opens or comes back after a while. It hides the screen; the data stays stored unencrypted on this device.',
+    enable: 'Set a PIN', newPin: 'New PIN (4 to 8 digits)', confirmPin: 'Confirm the PIN', currentPin: 'Current PIN', pinInvalid: 'The PIN must have 4 to 8 digits.',
+    pinMismatch: 'The PINs do not match.', wrongPin: 'Wrong PIN.', unlock: 'Unlock', biometric: 'Unlock with the device (fingerprint, face…)',
+    biometricUnlock: 'Use the device unlock', biometricFailed: 'Device unlock failed or was cancelled.', change: 'Change the PIN', disable: 'Remove the lock',
+    lockNow: 'Lock now', saved: 'Lock saved', disabled: 'Lock removed', blocked: (seconds) => `Too many attempts. Try again in ${seconds} s.`,
+  },
+  selection: {
+    select: 'Select', cancel: 'Cancel', selectAll: 'Select all', none: 'Select transactions', count: (n) => `${n} selected`, delete: 'Delete',
+    category: 'Category', restore: 'Restore', deleteForever: 'Delete forever', chooseCategory: 'Choose a category',
+    deleted: (n) => `${n} moved to the trash`, recategorised: (n) => `${n} updated`, restored: (n) => `${n} restored`,
+    deletedForever: (n) => `${n} permanently deleted`, deleteForeverBody: (n) => `Permanently delete ${n} transaction(s)? This cannot be undone.`,
   },
   frequency: { monthly: 'Monthly', quarterly: 'Quarterly', yearly: 'Yearly' },
   trash: {
@@ -247,6 +270,19 @@ const fr: Strings = {
     deletedForever: 'Supprimée définitivement', trashEmptied: 'Corbeille vidée', added: 'Transaction ajoutée', updated: 'Transaction modifiée',
     synced: 'Calendrier synchronisé', backupExported: 'Sauvegarde exportée', backupImported: 'Sauvegarde importée',
     configExported: 'Réglages exportés', thresholdsSaved: 'Seuils enregistrés',
+  },
+  lock: {
+    title: 'Verrouillage', help: 'Demande un code PIN à l’ouverture de l’application ou à son retour après un moment. Il masque l’écran ; les données restent stockées non chiffrées sur cet appareil.',
+    enable: 'Définir un code PIN', newPin: 'Nouveau PIN (4 à 8 chiffres)', confirmPin: 'Confirmer le PIN', currentPin: 'PIN actuel', pinInvalid: 'Le PIN doit comporter 4 à 8 chiffres.',
+    pinMismatch: 'Les PIN ne correspondent pas.', wrongPin: 'PIN incorrect.', unlock: 'Déverrouiller', biometric: 'Déverrouiller avec l’appareil (empreinte, visage…)',
+    biometricUnlock: 'Utiliser le déverrouillage de l’appareil', biometricFailed: 'Le déverrouillage de l’appareil a échoué ou a été annulé.', change: 'Changer le PIN', disable: 'Retirer le verrouillage',
+    lockNow: 'Verrouiller maintenant', saved: 'Verrouillage enregistré', disabled: 'Verrouillage retiré', blocked: (seconds) => `Trop de tentatives. Réessayez dans ${seconds} s.`,
+  },
+  selection: {
+    select: 'Sélectionner', cancel: 'Annuler', selectAll: 'Tout sélectionner', none: 'Sélectionner des transactions', count: (n) => `${n} sélectionnée(s)`, delete: 'Supprimer',
+    category: 'Catégorie', restore: 'Restaurer', deleteForever: 'Supprimer définitivement', chooseCategory: 'Choisir une catégorie',
+    deleted: (n) => `${n} déplacée(s) dans la corbeille`, recategorised: (n) => `${n} modifiée(s)`, restored: (n) => `${n} restaurée(s)`,
+    deletedForever: (n) => `${n} supprimée(s) définitivement`, deleteForeverBody: (n) => `Supprimer définitivement ${n} transaction(s) ? Cette action est irréversible.`,
   },
   frequency: { monthly: 'Mensuelle', quarterly: 'Trimestrielle', yearly: 'Annuelle' },
   trash: {

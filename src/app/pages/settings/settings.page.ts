@@ -15,6 +15,7 @@ import { glyph, UI_ICONS } from '../../icons';
 import { OnboardingService } from '../../onboarding.service';
 import { parseAmount, SettingsService } from '../../settings.service';
 import { AutofocusDirective } from '../../shared/autofocus.directive';
+import { SecuritySettingsComponent } from './security-settings.component';
 import { HeaderComponent } from '../../shared/header.component';
 import { SheetComponent } from '../../shared/sheet.component';
 
@@ -32,7 +33,7 @@ const TAB_ICONS: Record<SettingsTab, string> = {
 @Component({
   selector: 'app-settings-page',
   standalone: true,
-  imports: [HeaderComponent, SheetComponent, AutofocusDirective],
+  imports: [HeaderComponent, SecuritySettingsComponent, SheetComponent, AutofocusDirective],
   host: { class: 'flex min-h-0 min-w-0 flex-1 flex-col animate-page' },
   templateUrl: './settings.page.html',
 })

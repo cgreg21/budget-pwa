@@ -1,4 +1,4 @@
-<app-header [title]="s.t().appName" [filterActive]="hasFilters()" (filtersTap)="filtersOpen.set(true)"
+<app-header [title]="s.t().appName" [selectLabel]="b.transactions().length > 0 ? s.t().selection.select : null" [selecting]="selecting()" (selectTap)="toggleSelecting()" [filterActive]="hasFilters()" (filtersTap)="filtersOpen.set(true)"
             [syncing]="calendar.active() ? calendar.busy() : null" (syncTap)="calendar.syncNow(true)" />
 
 <app-month-bar [month]="b.selectedMonth()" (monthChange)="b.selectMonth($event)" (labelTap)="monthPickerOpen.set(true)" />
@@ -39,6 +39,17 @@
           <div class="pb-[88px] md:pb-6">
             @for (item of panel.items; track item.id; let index = $index) {
               <div class="animate-appear" [style.animation-delay.ms]="index < 12 ? index * 30 : 0">
+                @if (selecting()) {
+                  <button type="button" class="row m-0 mx-3 flex w-full items-center text-left" role="checkbox" [attr.aria-checked]="isSelected(item.id)" (click)="toggleItem(item.id)">
+                    <span class="mr-3 text-[26px] font-mdi" [class]="isSelected(item.id) ? 'text-green' : 'text-muted'">{{ isSelected(item.id) ? ui.checked : ui.unchecked }}</span>
+                    <span class="row-icon">{{ glyphOfCategory(item.category) }}</span>
+                    <div class="min-w-0 flex-1">
+                      <div class="row-title">{{ item.description || s.t().common.noDescription }}</div>
+                      <div class="row-sub">{{ subtitle(item) }}</div>
+                    </div>
+                    <span class="row-amount ml-2 whitespace-nowrap" [class]="item.kind">{{ s.formatSigned(item.kind, item.amount) }}</span>
+                  </button>
+                } @else {
                 <app-swipe-row [open]="openRow() === item.id" [removeLabel]="s.t().common.delete"
                                (openChange)="setOpenRow(item.id, $event)" (edit)="edit(item)" (remove)="deleteFromSwipe(item)">
                   <span class="row-icon">{{ glyphOfCategory(item.category) }}</span>
@@ -48,6 +59,7 @@
                   </div>
                   <span class="row-amount ml-2 whitespace-nowrap" [class]="item.kind">{{ s.formatSigned(item.kind, item.amount) }}</span>
                 </app-swipe-row>
+                }
               </div>
             }
           </div>
@@ -58,15 +70,22 @@
   </div>
 </div>
 
+@if (selecting()) {
+  <app-selection-bar [count]="selectedIds().length" (cancel)="toggleSelecting()" (selectAll)="selectAllVisible()">
+    <button type="button" class="flex size-11 items-center justify-center rounded-full text-[22px] text-ink font-mdi transition-transform active:scale-90" [attr.aria-label]="s.t().selection.category" [attr.title]="s.t().selection.category" (click)="bulkCategory()">{{ ui.category }}</button>
+    <button type="button" class="flex size-11 items-center justify-center rounded-full text-[22px] text-bad font-mdi transition-transform active:scale-90" [attr.aria-label]="s.t().selection.delete" [attr.title]="s.t().selection.delete" (click)="bulkDelete()">{{ ui.trash }}</button>
+  </app-selection-bar>
+}
+
 <div class="relative bg-surface md:bg-transparent">
   <div class="md:hidden">
     <app-tab-bar [tabs]="tabs()" [active]="tab()" (select)="selectTab($event)" />
   </div>
-  <button type="button"
+  @if (!selecting()) {<button type="button"
           class="absolute top-0 left-1/2 flex size-16 -translate-x-1/2 -translate-y-1/2 animate-pop items-center justify-center rounded-full border-4 border-bg bg-brand text-[32px] text-on-brand font-mdi transition-transform active:scale-90 md:bottom-6 md:top-auto md:left-auto md:right-6 md:size-16 md:translate-x-0 md:translate-y-0 md:shadow-pop"
           style="animation-delay: 350ms"
           [attr.aria-label]="s.t().common.add"
-          (click)="editing.set('')">{{ ui.add }}</button>
+          (click)="editing.set('')">{{ ui.add }}</button>}
 </div>
 
 @if (monthPickerOpen()) {
@@ -76,5 +95,5 @@
   <app-filters-modal [filter]="filter()" (done)="applyFilters($event)" (closed)="filtersOpen.set(false)" />
 }
 @if (editing() !== null) {
-  <app-editor-modal [id]="editing() || null" (closed)="editing.set(null)" />
+  <app-editor-modal [id]="editing() || null" [initialKind]="newKind()" (closed)="editing.set(null)" />
 }

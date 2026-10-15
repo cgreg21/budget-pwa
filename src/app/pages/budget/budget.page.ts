@@ -1,6 +1,7 @@
 import { Component, computed, inject, signal } from '@angular/core';
+import { ActivatedRoute, Router } from '@angular/router';
 import {
-  balanceLevel, dayOf, filterTransactions, isFilterActive, NO_FILTER, type Transaction, type TransactionFilter,
+  balanceLevel, dayOf, filterTransactions, isFilterActive, NO_FILTER, type Transaction, type TransactionFilter, type TransactionKind,
 } from 'budget-lib';
 
 import { BudgetService } from '../../budget.service';
@@ -16,6 +17,7 @@ import { MonthPickerComponent } from '../../shared/month-picker.component';
 import { SwipeRowComponent } from '../../shared/swipe-row.component';
 import { TabBarComponent, type TabItem } from '../../shared/tab-bar.component';
 import { deleteTransaction } from './delete-transaction';
+import { SelectionBarComponent } from '../../shared/selection-bar.component';
 import { EditorModalComponent } from './editor-modal.component';
 import { FiltersModalComponent } from './filters-modal.component';
 
@@ -39,7 +41,7 @@ const LEVEL_TEXT = {
   selector: 'app-budget-page',
   standalone: true,
   imports: [
-    HeaderComponent, MonthBarComponent, MonthPickerComponent, SwipeRowComponent, TabBarComponent,
+    HeaderComponent, MonthBarComponent, MonthPickerComponent, SwipeRowComponent, TabBarComponent, SelectionBarComponent,
     EditorModalComponent, FiltersModalComponent,
   ],
   host: { class: 'flex min-h-0 min-w-0 flex-1 flex-col animate-page' },
@@ -52,7 +54,19 @@ export class BudgetPage {
   readonly calendar = inject(CalendarSyncService);
   private readonly snackbar = inject(SnackbarService);
   private readonly dialogs = inject(DialogService);
+  private readonly route = inject(ActivatedRoute, { optional: true });
+  private readonly router = inject(Router, { optional: true });
   readonly ui = UI_ICONS;
+
+  constructor() {
+    // Home-screen shortcuts open the app on /budget?add=expense or ?add=income.
+    const add = this.route?.snapshot.queryParamMap.get('add');
+    if (add === 'expense' || add === 'income') {
+      this.newKind.set(add);
+      this.editing.set('');
+      void this.router?.navigate([], { queryParams: { add: null }, queryParamsHandling: 'merge', replaceUrl: true });
+    }
+  }
 
   readonly tab = signal<Tab>('oneoff');
   readonly filter = signal<TransactionFilter>(NO_FILTER);
@@ -61,6 +75,8 @@ export class BudgetPage {
   readonly monthPickerOpen = signal(false);
   /** `null` is closed, `''` is a new transaction, otherwise the id of the transaction edited. */
   readonly editing = signal<string | null>(null);
+  /** Kind preselected when a new transaction is opened by a shortcut. */
+  readonly newKind = signal<TransactionKind>('expense');
   /** The row currently swiped open. */
   readonly openRow = signal<string | null>(null);
 
@@ -92,6 +108,54 @@ export class BudgetPage {
   selectTab(key: string): void {
     this.openRow.set(null);
     this.tab.set(key as Tab);
+  }
+
+  readonly selecting = signal(false);
+  private readonly selection = signal<ReadonlySet<string>>(new Set());
+  readonly selectedIds = computed(() => {
+    const chosen = this.selection();
+    return this.b.transactions().filter((item) => chosen.has(item.id)).map((item) => item.id);
+  });
+
+  isSelected(id: string): boolean {
+    return this.selection().has(id);
+  }
+
+  toggleSelecting(): void {
+    this.openRow.set(null);
+    this.selection.set(new Set());
+    this.selecting.update((value) => !value);
+  }
+
+  toggleItem(id: string): void {
+    const next = new Set(this.selection());
+    if (!next.delete(id)) next.add(id);
+    this.selection.set(next);
+  }
+
+  selectAllVisible(): void {
+    this.selection.set(new Set(this.panels().flatMap((panel) => panel.items.map((item) => item.id))));
+  }
+
+  bulkDelete(): void {
+    const ids = this.selectedIds();
+    if (ids.length === 0) return;
+    const t = this.s.t().snackbar;
+    this.b.removeMany(ids);
+    this.toggleSelecting();
+    this.snackbar.show(this.s.t().selection.deleted(ids.length), { action: { label: t.undo, run: () => this.b.restoreMany(ids) } });
+  }
+
+  async bulkCategory(): Promise<void> {
+    const ids = this.selectedIds();
+    if (ids.length === 0) return;
+    const t = this.s.t();
+    const names = this.b.categories().map((category) => category.name);
+    const chosen = await this.dialogs.action({ title: t.selection.chooseCategory, actions: names, cancel: t.common.cancel });
+    if (chosen === null) return;
+    this.b.setCategoryMany(ids, chosen);
+    this.toggleSelecting();
+    this.snackbar.show(t.selection.recategorised(ids.length));
   }
 
   chooseMonth(month: string): void {

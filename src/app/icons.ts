@@ -27,6 +27,7 @@ const MDI_CODE_POINTS = {
   'chevron-right': 0xF0142, 'chevron-double-left': 0xF013D, 'chevron-double-right': 0xF013E,
   history: 0xF02DA, repeat: 0xF0456, 'delete-outline': 0xF09E7, menu: 0xF035C, 'format-list-bulleted': 0xF0279,
   'checkbox-marked': 0xF0132, 'checkbox-blank-outline': 0xF0131, plus: 0xF0415, 'delete-restore': 0xF0819, close: 0xF0156,
+  lock: 0xF033E, fingerprint: 0xF0237, 'checkbox-multiple-marked-outline': 0xF0139, 'select-all': 0xF0486, 'tag-outline': 0xF04FC,
 } as const;
 
 export type IconName = keyof typeof MDI_CODE_POINTS;
@@ -59,6 +60,11 @@ export const UI_ICONS = {
   trash: glyph('trash-can-outline'),
   restore: glyph('delete-restore'),
   close: glyph('close'),
+  lock: glyph('lock'),
+  fingerprint: glyph('fingerprint'),
+  select: glyph('checkbox-multiple-marked-outline'),
+  selectAll: glyph('select-all'),
+  category: glyph('tag-outline'),
   calendar: glyph('calendar'),
   checked: glyph('checkbox-marked'),
   unchecked: glyph('checkbox-blank-outline'),

@@ -28,6 +28,8 @@ export class EditorModalComponent implements OnInit {
 
   /** The transaction to edit, or `null` for a new one. */
   readonly id = input<string | null>(null);
+  /** Kind preselected for a new transaction (home-screen shortcuts). */
+  readonly initialKind = input<TransactionKind>('expense');
   readonly closed = output<void>();
 
   existing: Transaction | undefined;
@@ -49,7 +51,7 @@ export class EditorModalComponent implements OnInit {
     const series = existing && this.b.recurrenceOf(existing);
     this.existing = existing;
     this.date.set(existing?.date ?? this.b.defaultTransactionDate);
-    this.kind.set(existing?.kind ?? 'expense');
+    this.kind.set(existing?.kind ?? this.initialKind());
     this.amount.set(existing ? this.s.formatInput(existing.amount) : '');
     this.description.set(existing?.description ?? '');
     this.category.set(existing?.category ?? this.b.defaultCategory);
