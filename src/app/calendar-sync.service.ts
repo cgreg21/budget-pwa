@@ -9,6 +9,7 @@ import {
 import { BudgetService } from './budget.service';
 import { CALENDAR_PASSWORD_SECRET, isSecretStorageAvailable, readSecret, writeSecret } from './secrets';
 import { SettingsService } from './settings.service';
+import { SnackbarService } from './snackbar.service';
 import { readValidJson } from './storage';
 
 const CONFIG_KEY = 'budget-pwa:calendar:v1';
@@ -114,6 +115,8 @@ export class CalendarSyncService implements OnDestroy {
   private running: Promise<void> | undefined;
   private syncRequested = false;
   private checkRequested = false;
+  /** Set by a user-triggered run, which reports its success; failures are reported whenever the state changes. */
+  private notifyRequested = false;
   private destroyed = false;
   private readonly resumed = (): void => { void this.syncNow(); };
   private readonly visible = (): void => {
@@ -121,7 +124,7 @@ export class CalendarSyncService implements OnDestroy {
   };
   private readonly subscription;
 
-  constructor(private readonly budget: BudgetService, private readonly settings: SettingsService) {
+  constructor(private readonly budget: BudgetService, private readonly settings: SettingsService, private readonly snackbar: SnackbarService) {
     this.subscription = merge(budget.transactionChanges, budget.categoryChanges).subscribe(() => this.schedule());
     window.addEventListener('online', this.resumed);
     document.addEventListener('visibilitychange', this.visible);
@@ -193,16 +196,18 @@ export class CalendarSyncService implements OnDestroy {
     });
   }
 
-  syncNow(): Promise<void> {
+  syncNow(notify = false): Promise<void> {
     if (this.destroyed || !this.active()) return Promise.resolve();
     this.cancelScheduled();
     this.syncRequested = true;
+    if (notify) this.notifyRequested = true;
     return this.start();
   }
 
   checkConnection(): Promise<void> {
     if (this.destroyed) return Promise.resolve();
     this.checkRequested = true;
+    this.notifyRequested = true;
     return this.start();
   }
 
@@ -254,16 +259,18 @@ export class CalendarSyncService implements OnDestroy {
         continue;
       }
       const generation = this.generation;
+      const notify = this.notifyRequested;
+      this.notifyRequested = false;
+      const previousState = this.statusState().state;
       const client = new CalDavClient(config, this.password, this.transport);
       this.statusState.update((status) => ({ ...status, state: 'syncing', message: undefined }));
       try {
         if (check) {
           await client.check();
           if (generation === this.generation) {
-            this.statusState.set({
-              state: config.enabled ? 'online' : 'disabled', lastSync: this.saved.lastSync,
-              message: config.enabled ? strings.connected : strings.connectedDisabled,
-            });
+            const message = config.enabled ? strings.connected : strings.connectedDisabled;
+            this.statusState.set({ state: config.enabled ? 'online' : 'disabled', lastSync: this.saved.lastSync, message });
+            this.snackbar.show(message);
           }
         } else {
           const snapshot = this.budget.allTransactions().map((item) => ({ ...item }));
@@ -287,6 +294,10 @@ export class CalendarSyncService implements OnDestroy {
             state: 'online', lastSync: saved.lastSync,
             message: outcome.skipped > 0 ? strings.conflicts(outcome.skipped) : undefined,
           });
+          if (notify) {
+            if (outcome.skipped > 0) this.snackbar.show(strings.conflicts(outcome.skipped), { kind: 'info' });
+            else this.snackbar.show(this.settings.t().snackbar.synced);
+          }
         }
       } catch (error: unknown) {
         if (generation !== this.generation || this.destroyed) continue;
@@ -296,6 +307,7 @@ export class CalendarSyncService implements OnDestroy {
           ? (error.kind === 'auth' ? strings.authError : strings.serverError(error.message))
           : offline ? strings.networkError : strings.serverError(error instanceof Error ? error.message : String(error));
         this.statusState.set({ state: offline ? 'offline' : 'error', lastSync: this.saved.lastSync, message });
+        if (notify || previousState !== (offline ? 'offline' : 'error')) this.snackbar.error(message);
         // A change received during this run gets one more attempt; otherwise wait for a new trigger.
       }
     }

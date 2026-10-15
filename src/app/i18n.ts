@@ -11,7 +11,12 @@ export interface Strings {
   common: {
     cancel: string; delete: string; save: string; add: string;
     expense: string; income: string; all: string; back: string;
-    noDescription: string; ok: string;
+    noDescription: string; ok: string; close: string;
+  };
+  snackbar: {
+    movedToTrash: string; undo: string; seriesDeleted: string; restored: string; deletedForever: string; trashEmptied: string;
+    added: string; updated: string; synced: string; backupExported: string; backupImported: string; configExported: string;
+    thresholdsSaved: string;
   };
   frequency: { monthly: string; quarterly: string; yearly: string };
   trash: {
@@ -89,7 +94,13 @@ const en: Strings = {
   common: {
     cancel: 'Cancel', delete: 'Delete', save: 'Save', add: 'Add',
     expense: 'Expense', income: 'Income', all: 'All', back: 'Back',
-    noDescription: '(no description)', ok: 'OK',
+    noDescription: '(no description)', ok: 'OK', close: 'Close',
+  },
+  snackbar: {
+    movedToTrash: 'Moved to the trash', undo: 'Undo', seriesDeleted: 'Series deleted', restored: 'Transaction restored',
+    deletedForever: 'Permanently deleted', trashEmptied: 'Trash emptied', added: 'Transaction added', updated: 'Transaction updated',
+    synced: 'Calendar synchronised', backupExported: 'Backup exported', backupImported: 'Backup imported',
+    configExported: 'Settings exported', thresholdsSaved: 'Thresholds saved',
   },
   frequency: { monthly: 'Monthly', quarterly: 'Quarterly', yearly: 'Yearly' },
   trash: {
@@ -229,7 +240,13 @@ const fr: Strings = {
   common: {
     cancel: 'Annuler', delete: 'Supprimer', save: 'Enregistrer', add: 'Ajouter',
     expense: 'Dépense', income: 'Revenu', all: 'Tout', back: 'Retour',
-    noDescription: '(sans description)', ok: 'OK',
+    noDescription: '(sans description)', ok: 'OK', close: 'Fermer',
+  },
+  snackbar: {
+    movedToTrash: 'Déplacée dans la corbeille', undo: 'Annuler', seriesDeleted: 'Série supprimée', restored: 'Transaction restaurée',
+    deletedForever: 'Supprimée définitivement', trashEmptied: 'Corbeille vidée', added: 'Transaction ajoutée', updated: 'Transaction modifiée',
+    synced: 'Calendrier synchronisé', backupExported: 'Sauvegarde exportée', backupImported: 'Sauvegarde importée',
+    configExported: 'Réglages exportés', thresholdsSaved: 'Seuils enregistrés',
   },
   frequency: { monthly: 'Mensuelle', quarterly: 'Trimestrielle', yearly: 'Annuelle' },
   trash: {

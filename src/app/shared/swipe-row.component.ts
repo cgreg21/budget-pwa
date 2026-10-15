@@ -6,6 +6,8 @@ import { UI_ICONS } from '../icons';
 const SWIPE_WIDTH = 88;
 const SWIPE_SLOP = 10;
 
+export type SwipeState = boolean | 'restore';
+
 /**
  * A list row that reveals a delete button when swiped to the left. `open` is controlled by the
  * parent so that only one row stays open at a time.
@@ -16,13 +18,18 @@ const SWIPE_SLOP = 10;
   templateUrl: './swipe-row.component.html',
 })
 export class SwipeRowComponent {
-  readonly open = input(false);
+  /** `true` shows the delete button (swiped left); `'restore'` shows the restore button (swiped right). */
+  readonly open = input<SwipeState>(false);
   readonly removeLabel = input.required<string>();
-  readonly openChange = output<boolean>();
+  /** Enables the swipe to the right, which reveals a restore button. */
+  readonly restoreLabel = input<string | null>(null);
+  readonly openChange = output<SwipeState>();
+  readonly restore = output<void>();
   readonly edit = output<void>();
   readonly remove = output<void>();
 
   protected readonly trashIcon = UI_ICONS.trash;
+  protected readonly restoreIcon = UI_ICONS.restore;
   protected readonly x = signal(0);
   protected readonly dragging = signal(false);
 
@@ -32,7 +39,7 @@ export class SwipeRowComponent {
   constructor() {
     effect(() => {
       const open = this.open();
-      untracked(() => this.x.set(open ? -SWIPE_WIDTH : 0));
+      untracked(() => this.x.set(open === true ? -SWIPE_WIDTH : open === 'restore' ? SWIPE_WIDTH : 0));
     });
   }
 
@@ -56,7 +63,7 @@ export class SwipeRowComponent {
     }
     if (start.direction === 'horizontal') {
       this.moved = true;
-      this.x.set(Math.min(0, Math.max(-SWIPE_WIDTH, start.origin + dx)));
+      this.x.set(Math.min(this.restoreLabel() === null ? 0 : SWIPE_WIDTH, Math.max(-SWIPE_WIDTH, start.origin + dx)));
     }
   }
 
@@ -65,8 +72,8 @@ export class SwipeRowComponent {
     this.start = null;
     if (!start || start.direction !== 'horizontal') return;
     this.dragging.set(false);
-    const open = this.x() < -SWIPE_WIDTH / 2;
-    this.x.set(open ? -SWIPE_WIDTH : 0);
+    const open: SwipeState = this.x() < -SWIPE_WIDTH / 2 ? true : this.x() > SWIPE_WIDTH / 2 ? 'restore' : false;
+    this.x.set(open === true ? -SWIPE_WIDTH : open === 'restore' ? SWIPE_WIDTH : 0);
     (event.currentTarget as HTMLElement).releasePointerCapture?.(event.pointerId);
     if (open !== this.open()) this.openChange.emit(open);
   }

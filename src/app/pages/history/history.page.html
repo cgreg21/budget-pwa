@@ -1,12 +1,12 @@
 <app-header [title]="s.t().stats.history" />
 
 <div class="min-h-0 flex-1 overflow-y-auto">
-  <div class="mx-3 grid grid-cols-2 md:mx-5">
-    <button type="button" class="select mx-1 text-left" (click)="choosing.set('start')">
+  <div class="mx-3 grid grid-cols-2 gap-3 md:mx-5">
+    <button type="button" class="select text-left" (click)="choosing.set('start')">
       <span class="row-sub mr-2">{{ s.t().stats.fromMonth }}</span>
       <span>{{ s.monthLabel(start()) }}</span>
     </button>
-    <button type="button" class="select mx-1 text-left" (click)="choosing.set('end')">
+    <button type="button" class="select text-left" (click)="choosing.set('end')">
       <span class="row-sub mr-2">{{ s.t().stats.toMonth }}</span>
       <span>{{ s.monthLabel(end()) }}</span>
     </button>

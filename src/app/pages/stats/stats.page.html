@@ -13,7 +13,7 @@
   </div>
 </div>
 
-<div class="bg-surface py-[calc(env(safe-area-inset-bottom)/2)] md:hidden">
+<div class="bg-surface md:hidden">
   <app-tab-bar [tabs]="tabs" [active]="tab()" (select)="tab.set($any($event))" />
 </div>
 

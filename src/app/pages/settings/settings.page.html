@@ -118,12 +118,12 @@
 </div>
 </div>
 
-<div class="grid shrink-0 grid-flow-col auto-cols-fr border-t border-line bg-surface py-[calc(env(safe-area-inset-bottom)/2)]" role="tablist" [attr.aria-label]="s.t().settings.title">
+<div class="grid shrink-0 grid-flow-col auto-cols-fr border-t border-line bg-surface" role="tablist" [attr.aria-label]="s.t().settings.title">
   @for (item of tabs(); track item.id) {
-    <button type="button" role="tab" class="relative flex h-10 items-center justify-center text-2xl font-mdi transition-colors active:scale-95"
+    <button type="button" role="tab" class="relative flex h-14 items-center justify-center text-[28px] font-mdi transition-colors active:scale-95"
             [class]="tab() === item.id ? 'text-green' : 'text-muted'"
             [attr.aria-selected]="tab() === item.id" [attr.aria-label]="item.label" [attr.title]="item.label" (click)="tab.set(item.id)">
-      <span class="absolute inset-x-4 top-0 h-0.5 rounded-b-sm" [class]="tab() === item.id ? 'bg-green' : 'bg-transparent'"></span>
+      <span class="absolute inset-x-0 -top-px h-[3px]" [class]="tab() === item.id ? 'bg-green' : 'bg-transparent'"></span>
       {{ item.icon }}
     </button>
   }

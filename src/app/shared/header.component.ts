@@ -20,6 +20,10 @@ export class HeaderComponent {
   /** `null` hides the synchronise button; otherwise whether a synchronisation is running. */
   readonly syncing = input<boolean | null>(null);
   readonly syncTap = output<void>();
+  /** Label of an extra action button (page specific); `null` hides it. */
+  readonly actionLabel = input<string | null>(null);
+  readonly actionIcon = input<string>(UI_ICONS.trash);
+  readonly actionTap = output<void>();
   readonly syncLabel = computed(() => this.settings.t().calendar.syncNow);
   private readonly settings = inject(SettingsService);
 }

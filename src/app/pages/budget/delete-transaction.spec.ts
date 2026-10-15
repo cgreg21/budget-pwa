@@ -4,6 +4,7 @@ import type { Transaction } from 'budget-lib';
 import { BudgetService } from '../../budget.service';
 import { DialogService } from '../../dialog.service';
 import { SettingsService } from '../../settings.service';
+import { SnackbarService } from '../../snackbar.service';
 import { deleteTransaction } from './delete-transaction';
 
 const DATA_KEY = 'budget-pwa:data:v1';

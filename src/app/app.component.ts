@@ -2,6 +2,7 @@ import { Component, computed, ElementRef, inject, signal, viewChild } from '@ang
 import { Router, RouterOutlet } from '@angular/router';
 
 import { DialogHostComponent } from './shared/dialog-host.component';
+import { SnackbarComponent } from './shared/snackbar.component';
 import { OnboardingComponent } from './shared/onboarding.component';
 import { OnboardingService } from './onboarding.service';
 import { APP_VERSION } from './app-info';
@@ -23,7 +24,7 @@ const EDGE_WIDTH = 24;
 @Component({
   selector: 'budget-shell',
   standalone: true,
-  imports: [RouterOutlet, DialogHostComponent, OnboardingComponent],
+  imports: [RouterOutlet, DialogHostComponent, SnackbarComponent, OnboardingComponent],
   templateUrl: './app.component.html',
 })
 export class AppComponent {
@@ -79,7 +80,7 @@ export class AppComponent {
     if (this.calendar.status().state === 'error' || !this.calendar.hasPassword()) {
       void this.router.navigateByUrl('/settings');
     } else {
-      void this.calendar.syncNow();
+      void this.calendar.syncNow(true);
     }
   }
 

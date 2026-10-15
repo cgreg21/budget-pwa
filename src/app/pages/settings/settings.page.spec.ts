@@ -10,6 +10,7 @@ import { ConfigArchiveService } from '../../config-archive.service';
 import { DialogService } from '../../dialog.service';
 import { InstallService } from '../../install.service';
 import { SettingsService } from '../../settings.service';
+import { SnackbarService } from '../../snackbar.service';
 import { RecurrencesPage } from './recurrences.page';
 import { SettingsPage } from './settings.page';
 
@@ -150,12 +151,10 @@ describe('SettingsPage', () => {
     c.low.set('50');
     c.medium.set('200');
     c.high.set('900');
-    const pending = c.saveThresholds();
+    await c.saveThresholds();
     expect(c.message()).toBe('');
     expect(b.thresholds()).toEqual({ low: 50, medium: 200, high: 900 });
-    expect(dialogs.current()?.message).toBe(s.t().settings.thresholdsSaved);
-    dialogs.close(s.t().common.ok);
-    await pending;
+    expect(TestBed.inject(SnackbarService).current()?.text).toBe(s.t().snackbar.thresholdsSaved);
   });
 
   it('navigates to the recurrences', async () => {

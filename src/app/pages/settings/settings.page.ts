@@ -9,6 +9,7 @@ import { BudgetService } from '../../budget.service';
 import { CalendarSyncService } from '../../calendar-sync.service';
 import { ConfigArchiveService, downloadText } from '../../config-archive.service';
 import { DialogService } from '../../dialog.service';
+import { SnackbarService } from '../../snackbar.service';
 import { InstallService } from '../../install.service';
 import { glyph, UI_ICONS } from '../../icons';
 import { OnboardingService } from '../../onboarding.service';
@@ -43,6 +44,7 @@ export class SettingsPage {
   readonly onboarding = inject(OnboardingService);
   private readonly configArchive = inject(ConfigArchiveService);
   private readonly dialogs = inject(DialogService);
+  private readonly snackbar = inject(SnackbarService);
   private readonly router = inject(Router);
 
   readonly tab = signal<SettingsTab>('general');
@@ -95,7 +97,7 @@ export class SettingsPage {
     this.calendarInterval.set(String(config.syncIntervalMinutes ?? 0));
     this.calendarProxy.set(this.calendar.proxyUrl());
     if (action === 'check') await this.calendar.checkConnection();
-    else if (config.enabled) await this.calendar.syncNow();
+    else if (config.enabled) await this.calendar.syncNow(action === 'sync');
   }
 
   async toggleCalendar(): Promise<void> {
@@ -161,12 +163,13 @@ export class SettingsPage {
     }
     this.message.set('');
     this.b.setThresholds(thresholds);
-    await this.dialogs.alert({ message: this.s.t().settings.thresholdsSaved, ok: this.s.t().common.ok });
+    this.snackbar.show(this.s.t().snackbar.thresholdsSaved);
   }
 
   exportBackup(): void {
     const archive = createArchive(this.b.data());
     downloadText(`budget-${this.b.selectedMonth()}.json`, JSON.stringify(archive, null, 2), 'application/json');
+    this.snackbar.show(this.s.t().snackbar.backupExported);
   }
 
   async importBackup(event: Event): Promise<void> {
@@ -180,10 +183,15 @@ export class SettingsPage {
       const ok = await this.dialogs.confirm({
         title: t.backup.import, message: t.backup.confirm, ok: t.common.save, cancel: t.common.cancel,
       });
-      if (ok) this.b.replaceData(imported);
+      if (ok) {
+        this.b.replaceData(imported);
+        this.snackbar.show(t.snackbar.backupImported);
+      }
       this.backupError.set('');
     } catch (error) {
-      this.backupError.set(error instanceof Error ? error.message : String(error));
+      const message = error instanceof Error ? error.message : String(error);
+      this.backupError.set(message);
+      this.snackbar.error(message);
     } finally {
       input.value = '';
     }
@@ -245,6 +253,7 @@ export class SettingsPage {
         await this.configArchive.exportEncrypted(passphrase);
         this.passphraseBusy.set(false);
         this.closePassphrase();
+        this.snackbar.show(this.s.t().snackbar.configExported);
         return;
       }
       const summary = await this.configArchive.importEncrypted(this.configText, passphrase);

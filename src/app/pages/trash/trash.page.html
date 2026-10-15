@@ -1,36 +1,26 @@
-<app-header [title]="s.t().trash.title" />
+<app-header [title]="s.t().trash.title" [actionLabel]="b.trash().length > 0 ? s.t().trash.emptyAction : null" (actionTap)="emptyTrash()" />
 
-<div class="min-h-0 flex-1 overflow-y-auto">
+<div class="min-h-0 flex-1 overflow-y-auto overflow-x-hidden">
   @if (b.trash().length === 0) {
     <div class="px-6 py-16 text-center text-muted">
       <div class="mb-3 text-5xl font-mdi">{{ ui.trash }}</div>
       <p>{{ s.t().trash.empty }}</p>
     </div>
   } @else {
-    <div class="mx-3 flex items-center md:mx-5">
-      <p class="row-sub m-0 flex-1">{{ s.t().trash.help }}</p>
-      <button type="button" class="ml-3 shrink-0 rounded-lg bg-danger px-3 py-2 text-sm font-bold text-on-brand" (click)="emptyTrash()">
-        {{ s.t().trash.emptyAction }}
-      </button>
-    </div>
-    <div class="pb-3 md:grid md:grid-cols-2">
+    <p class="row-sub mx-3 mb-1 md:mx-5">{{ s.t().trash.help }}</p>
+    <div class="pb-3">
       @for (item of b.trash(); track item.id) {
-        <div class="row block w-[calc(100%-24px)]">
-          <div class="flex items-center">
-            <span class="row-icon">{{ glyphOfCategory(item.category) }}</span>
-            <div class="min-w-0 flex-1">
-              <div class="row-title">{{ item.description || s.t().common.noDescription }}</div>
-              <div class="row-sub">{{ s.t().trash.deletedOn(item.deletedAt.slice(0, 10)) }}</div>
-            </div>
-            <span class="row-amount ml-2 whitespace-nowrap" [class]="item.kind">{{ s.formatSigned(item.kind, item.amount) }}</span>
+        <app-swipe-row [open]="openRow() === item.id ? openSide() : false"
+                       [removeLabel]="s.t().trash.deleteForever" [restoreLabel]="s.t().trash.restore"
+                       (openChange)="setOpenRow(item.id, $event)" (edit)="openRow.set(null)"
+                       (restore)="restore(item)" (remove)="deleteForever(item)">
+          <span class="row-icon">{{ glyphOfCategory(item.category) }}</span>
+          <div class="min-w-0 flex-1">
+            <div class="row-title">{{ item.description || s.t().common.noDescription }}</div>
+            <div class="row-sub">{{ s.t().trash.deletedOn(item.deletedAt.slice(0, 10)) }}</div>
           </div>
-          <div class="mt-2 flex justify-end">
-            <button type="button" class="flex size-11 items-center justify-center rounded-full text-[24px] text-green font-mdi"
-                    [attr.aria-label]="s.t().trash.restore" [attr.title]="s.t().trash.restore" (click)="b.restore(item.id)">{{ ui.restore }}</button>
-            <button type="button" class="flex size-11 items-center justify-center rounded-full text-[24px] text-bad font-mdi"
-                    [attr.aria-label]="s.t().trash.deleteForever" [attr.title]="s.t().trash.deleteForever" (click)="deleteForever(item)">{{ ui.trash }}</button>
-          </div>
-        </div>
+          <span class="row-amount ml-2 whitespace-nowrap" [class]="item.kind">{{ s.formatSigned(item.kind, item.amount) }}</span>
+        </app-swipe-row>
       }
     </div>
   }

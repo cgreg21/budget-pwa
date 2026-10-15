@@ -319,7 +319,7 @@ describe('SwipeRowComponent', () => {
     template: '<app-swipe-row [open]="open()" removeLabel="Del" (openChange)="open.set($event)" (edit)="edits = edits + 1" (remove)="removes = removes + 1"><span>row</span></app-swipe-row>',
   })
   class HostComponent {
-    readonly open = signal(false);
+    readonly open = signal<boolean | 'restore'>(false);
     edits = 0;
     removes = 0;
   }
@@ -358,6 +358,29 @@ describe('SwipeRowComponent', () => {
     expect(fixture.nativeElement.querySelector('button').tabIndex).toBe(0);
     (fixture.nativeElement.querySelector('button') as HTMLElement).click();
     expect(host.removes).toBe(1);
+  });
+
+  it('reveals a restore button when swiped right and a restore label is given', () => {
+    @Component({
+      imports: [SwipeRowComponent],
+      template: '<app-swipe-row [open]="open()" removeLabel="Del" restoreLabel="Back" (openChange)="open.set($event)" (restore)="restores = restores + 1"><span>row</span></app-swipe-row>',
+    })
+    class RestoreHost {
+      readonly open = signal<boolean | 'restore'>(false);
+      restores = 0;
+    }
+    const fixture = TestBed.createComponent(RestoreHost);
+    fixture.detectChanges();
+    const row = fixture.nativeElement.querySelector('.row') as HTMLElement;
+    pointer(row, 'pointerdown', { clientX: 0 });
+    pointer(row, 'pointermove', { clientX: 100 });
+    pointer(row, 'pointermove', { clientX: 150 });
+    pointer(row, 'pointerup', { clientX: 150 });
+    fixture.detectChanges();
+    expect(row.style.transform).toBe('translateX(88px)');
+    expect(fixture.componentInstance.open()).toBe('restore');
+    (fixture.nativeElement.querySelector('button[aria-label="Back"]') as HTMLElement).click();
+    expect(fixture.componentInstance.restores).toBe(1);
   });
 
   it('closes a row swiped back and follows the parent state', () => {

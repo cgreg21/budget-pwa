@@ -6,6 +6,7 @@ import {
 import { BudgetService } from '../../budget.service';
 import { CalendarSyncService } from '../../calendar-sync.service';
 import { DialogService } from '../../dialog.service';
+import { SnackbarService } from '../../snackbar.service';
 import { UI_ICONS, categoryGlyph } from '../../icons';
 import { LayoutService } from '../../layout.service';
 import { SettingsService } from '../../settings.service';
@@ -49,6 +50,7 @@ export class BudgetPage {
   readonly s = inject(SettingsService);
   readonly layout = inject(LayoutService);
   readonly calendar = inject(CalendarSyncService);
+  private readonly snackbar = inject(SnackbarService);
   private readonly dialogs = inject(DialogService);
   readonly ui = UI_ICONS;
 
@@ -105,11 +107,11 @@ export class BudgetPage {
 
   async deleteFromSwipe(transaction: Transaction): Promise<void> {
     this.openRow.set(null);
-    await deleteTransaction(this.b, this.s, this.dialogs, transaction);
+    await deleteTransaction(this.b, this.s, this.dialogs, transaction, this.snackbar);
   }
 
-  setOpenRow(id: string, open: boolean): void {
-    if (open) this.openRow.set(id);
+  setOpenRow(id: string, open: boolean | 'restore'): void {
+    if (open !== false) this.openRow.set(id);
     else if (this.openRow() === id) this.openRow.set(null);
   }
 

@@ -1,8 +1,15 @@
-<div class="relative py-[3px]">
+<div class="relative overflow-hidden py-[3px]">
+  @if (restoreLabel(); as label) {
+    <button type="button"
+            class="absolute bottom-[3px] left-3 top-[3px] w-[88px] rounded-lg bg-brand text-[28px] text-on-brand font-mdi"
+            [attr.aria-label]="label" [attr.title]="label"
+            [attr.tabindex]="open() === 'restore' ? 0 : -1"
+            (click)="restore.emit()">{{ restoreIcon }}</button>
+  }
   <button type="button"
           class="absolute bottom-[3px] right-3 top-[3px] w-[88px] rounded-lg bg-danger text-[28px] text-on-brand font-mdi"
           [attr.aria-label]="removeLabel()" [attr.title]="removeLabel()"
-          [attr.tabindex]="open() ? 0 : -1"
+          [attr.tabindex]="open() === true ? 0 : -1"
           (click)="remove.emit()">{{ trashIcon }}</button>
   <div class="row relative m-0 mx-3 flex cursor-pointer touch-pan-y select-none items-center"
        [class.transition-transform]="!dragging()"

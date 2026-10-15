@@ -6,6 +6,7 @@ import {
 
 import { BudgetService } from '../../budget.service';
 import { DialogService } from '../../dialog.service';
+import { SnackbarService } from '../../snackbar.service';
 import { categoryGlyph } from '../../icons';
 import { parseAmount, SettingsService } from '../../settings.service';
 import { SheetComponent } from '../../shared/sheet.component';
@@ -22,6 +23,7 @@ export class EditorModalComponent implements OnInit {
   readonly s = inject(SettingsService);
   readonly b = inject(BudgetService);
   private readonly dialogs = inject(DialogService);
+  private readonly snackbar = inject(SnackbarService);
   readonly frequencies = RECURRENCE_FREQUENCIES;
 
   /** The transaction to edit, or `null` for a new one. */
@@ -116,11 +118,12 @@ export class EditorModalComponent implements OnInit {
     } else {
       this.b.update(existing.id, input);
     }
+    this.snackbar.show(existing ? t.snackbar.updated : t.snackbar.added);
     this.closed.emit();
   }
 
   async remove(): Promise<void> {
-    if (this.existing && await deleteTransaction(this.b, this.s, this.dialogs, this.existing)) this.closed.emit();
+    if (this.existing && await deleteTransaction(this.b, this.s, this.dialogs, this.existing, this.snackbar)) this.closed.emit();
   }
 
   normalizeAmount(): void {

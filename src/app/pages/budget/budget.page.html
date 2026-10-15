@@ -1,5 +1,5 @@
 <app-header [title]="s.t().appName" [filterActive]="hasFilters()" (filtersTap)="filtersOpen.set(true)"
-            [syncing]="calendar.active() ? calendar.busy() : null" (syncTap)="calendar.syncNow()" />
+            [syncing]="calendar.active() ? calendar.busy() : null" (syncTap)="calendar.syncNow(true)" />
 
 <app-month-bar [month]="b.selectedMonth()" (monthChange)="b.selectMonth($event)" (labelTap)="monthPickerOpen.set(true)" />
 
@@ -58,12 +58,12 @@
   </div>
 </div>
 
-<div class="relative bg-surface py-[calc(env(safe-area-inset-bottom)/2)] md:bg-transparent">
+<div class="relative bg-surface md:bg-transparent">
   <div class="md:hidden">
     <app-tab-bar [tabs]="tabs()" [active]="tab()" (select)="selectTab($event)" />
   </div>
   <button type="button"
-          class="absolute bottom-[calc(32px+env(safe-area-inset-bottom))] left-1/2 flex size-20 -translate-x-1/2 animate-pop items-center justify-center rounded-full border-[5px] border-bg bg-brand text-[38px] text-on-brand font-mdi transition-transform active:scale-90 md:bottom-6 md:left-auto md:right-6 md:size-16 md:translate-x-0 md:shadow-pop"
+          class="absolute top-0 left-1/2 flex size-16 -translate-x-1/2 -translate-y-1/2 animate-pop items-center justify-center rounded-full border-4 border-bg bg-brand text-[32px] text-on-brand font-mdi transition-transform active:scale-90 md:bottom-6 md:top-auto md:left-auto md:right-6 md:size-16 md:translate-x-0 md:translate-y-0 md:shadow-pop"
           style="animation-delay: 350ms"
           [attr.aria-label]="s.t().common.add"
           (click)="editing.set('')">{{ ui.add }}</button>

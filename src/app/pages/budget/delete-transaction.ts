@@ -3,13 +3,14 @@ import type { Transaction } from 'budget-lib';
 import type { BudgetService } from '../../budget.service';
 import type { DialogService } from '../../dialog.service';
 import type { SettingsService } from '../../settings.service';
+import type { SnackbarService } from '../../snackbar.service';
 
 /**
  * Deletes a transaction once confirmed; an occurrence of a recurring series can go alone or
  * with its series. Resolves to whether something was deleted.
  */
 export async function deleteTransaction(
-  b: BudgetService, s: SettingsService, dialogs: DialogService, transaction: Transaction,
+  b: BudgetService, s: SettingsService, dialogs: DialogService, transaction: Transaction, snackbar?: SnackbarService,
 ): Promise<boolean> {
   const t = s.t();
   const { id, recurrenceId } = transaction;
@@ -21,9 +22,13 @@ export async function deleteTransaction(
       cancel: t.common.cancel,
       actions: [t.budget.thisOccurrence, t.budget.wholeSeries],
     });
-    if (choice === t.budget.thisOccurrence) b.remove(id);
-    else if (choice === t.budget.wholeSeries) b.removeSeries(id, recurrenceId);
-    else return false;
+    if (choice === t.budget.thisOccurrence) {
+      b.remove(id);
+      notifyTrashed(b, t, snackbar, id);
+    } else if (choice === t.budget.wholeSeries) {
+      b.removeSeries(id, recurrenceId);
+      snackbar?.show(t.snackbar.seriesDeleted);
+    } else return false;
     return true;
   }
 
@@ -34,6 +39,13 @@ export async function deleteTransaction(
     ok: t.common.delete,
     cancel: t.common.cancel,
   });
-  if (ok) b.remove(id);
+  if (ok) {
+    b.remove(id);
+    notifyTrashed(b, t, snackbar, id);
+  }
   return ok;
+}
+
+function notifyTrashed(b: BudgetService, t: ReturnType<SettingsService['t']>, snackbar: SnackbarService | undefined, id: string): void {
+  snackbar?.show(t.snackbar.movedToTrash, { action: { label: t.snackbar.undo, run: () => b.restore(id) } });
 }
