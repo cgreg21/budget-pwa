@@ -62,4 +62,8 @@
   }
 
   <app-dialog-host />
+
+  @if (onboarding.visible()) {
+    <app-onboarding />
+  }
 </div>

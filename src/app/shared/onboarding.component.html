@@ -1,0 +1,36 @@
+<div class="absolute inset-0 z-40 flex touch-pan-y flex-col bg-bg pb-[env(safe-area-inset-bottom)] pt-[env(safe-area-inset-top)]"
+     role="dialog" aria-modal="true" [attr.aria-label]="s.t().onboarding.label"
+     (pointerdown)="onDown($event)" (pointerup)="onUp($event)" (pointercancel)="startX = null">
+  <div class="flex h-14 shrink-0 items-center justify-end px-4">
+    @if (!last()) {
+      <button type="button" class="rounded-md px-3 py-2 text-sm font-medium text-muted transition-transform active:scale-95"
+              (click)="close()">{{ s.t().onboarding.skip }}</button>
+    }
+  </div>
+
+  <div class="min-h-0 flex-1 overflow-hidden">
+    <div class="flex h-full transition-transform duration-300 ease-out" [style.transform]="'translateX(-' + index() * 100 + '%)'">
+      @for (slide of slides(); track $index) {
+        <section class="flex h-full w-full shrink-0 flex-col items-center justify-center px-8 text-center"
+                 [attr.aria-hidden]="$index !== index()" [attr.inert]="$index !== index() ? '' : null">
+          <span class="mb-8 flex size-28 items-center justify-center rounded-full bg-tint text-6xl text-green font-mdi">{{ slide.icon }}</span>
+          <h2 class="mb-3 text-2xl font-bold">{{ slide.title }}</h2>
+          <p class="max-w-md text-base text-muted">{{ slide.body }}</p>
+        </section>
+      }
+    </div>
+  </div>
+
+  <div class="flex shrink-0 flex-col items-center gap-5 px-6 pb-8 pt-4">
+    <div class="flex gap-2">
+      @for (slide of slides(); track $index) {
+        <button type="button" class="h-2 rounded-full transition-all"
+                [class]="$index === index() ? 'w-6 bg-green' : 'w-2 bg-line'"
+                [attr.aria-label]="slide.title" [attr.aria-current]="$index === index()" (click)="go($index)"></button>
+      }
+    </div>
+    <button type="button" class="primary w-full max-w-sm" (click)="next()">
+      {{ last() ? s.t().onboarding.start : s.t().onboarding.next }}
+    </button>
+  </div>
+</div>

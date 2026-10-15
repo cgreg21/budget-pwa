@@ -2,6 +2,8 @@ import { Component, computed, ElementRef, inject, signal, viewChild } from '@ang
 import { Router, RouterOutlet } from '@angular/router';
 
 import { DialogHostComponent } from './shared/dialog-host.component';
+import { OnboardingComponent } from './shared/onboarding.component';
+import { OnboardingService } from './onboarding.service';
 import { APP_VERSION } from './app-info';
 import { BudgetService } from './budget.service';
 import { DialogService } from './dialog.service';
@@ -21,7 +23,7 @@ const EDGE_WIDTH = 24;
 @Component({
   selector: 'budget-shell',
   standalone: true,
-  imports: [RouterOutlet, DialogHostComponent],
+  imports: [RouterOutlet, DialogHostComponent, OnboardingComponent],
   templateUrl: './app.component.html',
 })
 export class AppComponent {
@@ -29,6 +31,7 @@ export class AppComponent {
   readonly calendar = inject(CalendarSyncService);
   readonly drawer = inject(DrawerService);
   readonly install = inject(InstallService);
+  readonly onboarding = inject(OnboardingService);
   private readonly updates = inject(UpdateService);
   readonly layout = inject(LayoutService);
   private readonly budget = inject(BudgetService);

@@ -67,6 +67,10 @@ export interface Strings {
     errors: Record<ConfigFileErrorCode, string>; unreadable: string;
   };
   install: { title: string; body: string; install: string; dismiss: string; settingsHelp: string };
+  onboarding: {
+    label: string; skip: string; next: string; start: string; replayTitle: string; replayHelp: string; replay: string;
+    slides: { title: string; body: string }[];
+  };
   recurrences: {
     title: string; empty: string; deleteBody(name: string): string;
     from(month: string): string; range(start: string, end: string, count: number): string;
@@ -185,6 +189,17 @@ const en: Strings = {
     title: 'Install Budget', body: 'Add the app to your home screen to use it full screen and offline.',
     install: 'Install', dismiss: 'No thanks',
     settingsHelp: 'Install the app on this device to use it full screen and offline.',
+  },
+  onboarding: {
+    label: 'Welcome tour', skip: 'Skip', next: 'Next', start: 'Get started',
+    replayTitle: 'Introduction', replayHelp: 'Replay the presentation of the app.', replay: 'Show the tour',
+    slides: [
+      { title: 'Welcome to Budget', body: 'Track your income and expenses month by month, simply and privately.' },
+      { title: 'Add transactions', body: 'Tap the plus button to record an expense or an income, with its date, amount and category.' },
+      { title: 'Recurring transactions', body: 'Turn on "Repeat" for rent, salary or subscriptions: they come back automatically every month, quarter or year.' },
+      { title: 'Stats and history', body: 'See where your money goes by category and follow your balance over the months.' },
+      { title: 'Sync with your calendar', body: 'Connect an online calendar in Settings to keep your transactions on all your devices.' },
+    ],
   },
   recurrences: {
     title: 'Recurring transactions', empty: 'No recurring transaction yet. Enable "Repeat" when adding a transaction.',
@@ -305,6 +320,17 @@ const fr: Strings = {
     title: 'Installer Budget', body: 'Ajoutez l’application à votre écran d’accueil pour l’utiliser en plein écran et hors ligne.',
     install: 'Installer', dismiss: 'Non merci',
     settingsHelp: 'Installez l’application sur cet appareil pour l’utiliser en plein écran et hors ligne.',
+  },
+  onboarding: {
+    label: 'Présentation', skip: 'Passer', next: 'Suivant', start: 'Commencer',
+    replayTitle: 'Présentation', replayHelp: 'Revoir la présentation de l’application.', replay: 'Afficher la présentation',
+    slides: [
+      { title: 'Bienvenue dans Budget', body: 'Suivez vos revenus et vos dépenses mois par mois, simplement et en toute confidentialité.' },
+      { title: 'Ajouter des transactions', body: 'Touchez le bouton plus pour saisir une dépense ou un revenu, avec sa date, son montant et sa catégorie.' },
+      { title: 'Transactions récurrentes', body: 'Activez « Répéter » pour le loyer, le salaire ou les abonnements : ils reviennent automatiquement chaque mois, trimestre ou année.' },
+      { title: 'Stats et historique', body: 'Voyez où va votre argent par catégorie et suivez votre solde au fil des mois.' },
+      { title: 'Synchronisation avec votre agenda', body: 'Connectez un agenda en ligne dans les réglages pour retrouver vos transactions sur tous vos appareils.' },
+    ],
   },
   recurrences: {
     title: 'Transactions récurrentes', empty: 'Aucune transaction récurrente. Activez « Répéter » en ajoutant une transaction.',
