@@ -314,7 +314,7 @@ describe('SettingsPage', () => {
     const fixture = await page();
     const el: HTMLElement = fixture.nativeElement;
     const tabs = [...el.querySelectorAll<HTMLElement>('[role="tab"]')];
-    expect(tabs.map((tab) => tab.textContent?.trim())).toEqual(Object.values(s.t().settings.tabs));
+    expect(tabs.map((tab) => tab.getAttribute('aria-label'))).toEqual(Object.values(s.t().settings.tabs));
     expect(el.querySelector('#calendar-url')).toBeNull();
 
     tabs[2].click();

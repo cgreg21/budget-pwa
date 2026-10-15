@@ -10,6 +10,7 @@ import { CalendarSyncService } from '../../calendar-sync.service';
 import { ConfigArchiveService, downloadText } from '../../config-archive.service';
 import { DialogService } from '../../dialog.service';
 import { InstallService } from '../../install.service';
+import { glyph, UI_ICONS } from '../../icons';
 import { OnboardingService } from '../../onboarding.service';
 import { parseAmount, SettingsService } from '../../settings.service';
 import { AutofocusDirective } from '../../shared/autofocus.directive';
@@ -23,6 +24,9 @@ const AMOUNT_FORMATS: AmountFormat[] = ['locale', 'space-comma', 'comma-dot'];
 const THEMES: Theme[] = ['system', 'light', 'dark'];
 const SETTINGS_TABS = ['general', 'budget', 'calendar', 'data'] as const;
 type SettingsTab = (typeof SETTINGS_TABS)[number];
+const TAB_ICONS: Record<SettingsTab, string> = {
+  general: UI_ICONS.settings, budget: UI_ICONS.logo, calendar: UI_ICONS.calendar, data: glyph('folder'),
+};
 
 @Component({
   selector: 'app-settings-page',
@@ -44,7 +48,7 @@ export class SettingsPage {
   readonly tab = signal<SettingsTab>('general');
   readonly tabs = computed(() => {
     const t = this.s.t().settings.tabs;
-    return SETTINGS_TABS.map((id) => ({ id, label: t[id] }));
+    return SETTINGS_TABS.map((id) => ({ id, label: t[id], icon: TAB_ICONS[id] }));
   });
   readonly low = signal(this.s.formatInput(this.b.thresholds().low));
   readonly medium = signal(this.s.formatInput(this.b.thresholds().medium));
