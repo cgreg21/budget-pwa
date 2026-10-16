@@ -40,7 +40,7 @@
             @for (item of panel.items; track item.id; let index = $index) {
               <div class="animate-appear" [style.animation-delay.ms]="index < 12 ? index * 30 : 0">
                 @if (selecting()) {
-                  <button type="button" class="row m-0 mx-3 flex w-full items-center text-left" role="checkbox" [attr.aria-checked]="isSelected(item.id)" (click)="toggleItem(item.id)">
+                  <button type="button" class="row m-0 mx-3 flex w-[calc(100%-1.5rem)] items-center text-left" role="checkbox" [attr.aria-checked]="isSelected(item.id)" (click)="toggleItem(item.id)">
                     <span class="mr-3 text-[26px] font-mdi" [class]="isSelected(item.id) ? 'text-green' : 'text-muted'">{{ isSelected(item.id) ? ui.checked : ui.unchecked }}</span>
                     <span class="row-icon">{{ glyphOfCategory(item.category) }}</span>
                     <div class="min-w-0 flex-1">
