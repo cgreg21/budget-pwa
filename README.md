@@ -6,6 +6,12 @@ La navigation utilise Angular Router : la coque est partagée entre les pages, e
 
 Le style utilise Tailwind CSS v4 (`src/styles.css`, thème sombre/clair via variables `--c-*`) et reproduit à l’identique l’UX/UI de `budget-mobile` : tiroir, barre de mois, feuilles modales, onglets avec bouton flottant, lignes à balayer, graphiques SVG. L’import bancaire n’est volontairement pas repris. Les composants réutilisables sont dans `src/app/shared/` et les écrans dans `src/app/pages/`.
 
+## Aperçu
+
+| Bureau | Tablette | Mobile |
+| --- | --- | --- |
+| ![Bureau](docs/screenshots/desktop.png) | ![Tablette](docs/screenshots/tablet.png) | ![Mobile](docs/screenshots/mobile.png) |
+
 ## Fonctionnalités
 
 - Transactions par mois : création, modification, suppression, recherche, filtre revenu/dépense et récurrences mensuelles, trimestrielles ou annuelles.
