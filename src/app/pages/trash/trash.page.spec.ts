@@ -2,8 +2,8 @@ import { provideRouter } from '@angular/router';
 import { TestBed } from '@angular/core/testing';
 import type { Transaction } from 'budget-lib';
 
-import { BudgetService } from '../../budget.service';
-import { DialogService } from '../../dialog.service';
+import { BudgetService } from '../../data/budget.service';
+import { DialogService } from '../../ui/dialog.service';
 import { TrashPage } from './trash.page';
 
 const DATA_KEY = 'budget-pwa:data:v1';

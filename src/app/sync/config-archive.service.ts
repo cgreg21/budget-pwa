@@ -4,9 +4,9 @@ import {
   type WebCryptoLike,
 } from 'budget-lib';
 
-import { BudgetService } from './budget.service';
+import { BudgetService } from '../data/budget.service';
 import { CalendarSyncService } from './calendar-sync.service';
-import { SettingsService } from './settings.service';
+import { SettingsService } from '../preferences/settings.service';
 
 /** Which sections of an imported configuration were found, and the one the PWA cannot use. */
 export interface ConfigImportSummary {

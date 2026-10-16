@@ -6,16 +6,18 @@ import {
   type CalendarConfig, type CalendarStatus, type HttpRequest, type HttpTransport, type SyncBaseline,
 } from 'budget-lib';
 
-import { BudgetService } from './budget.service';
-import { CALENDAR_PASSWORD_SECRET, isSecretStorageAvailable, readSecret, writeSecret } from './secrets';
-import { SettingsService } from './settings.service';
-import { SnackbarService } from './snackbar.service';
-import { profileKey } from './profiles';
-import { readValidJson } from './storage';
+import { BudgetService } from '../data/budget.service';
+import { CALENDAR_PASSWORD_SECRET, isSecretStorageAvailable, readSecret, writeSecret } from '../security/secrets';
+import { SettingsService } from '../preferences/settings.service';
+import { SnackbarService } from '../ui/snackbar.service';
+import { profileKey } from '../data/profiles';
+import { readValidJson } from '../data/storage';
 
 const CONFIG_KEY = profileKey('budget-pwa:calendar:v1');
 const BASELINE_KEY = profileKey('budget-pwa:calendar-baseline:v1');
 const PROXY_KEY = profileKey('budget-pwa:calendar-proxy:v1');
+
+type CalendarStrings = ReturnType<SettingsService['t']>['calendar'];
 
 /** A proxy address reduced to what the transport needs: `https://host[/prefix]`, no trailing slash. */
 export function normalizeProxyUrl(value: string): string {
@@ -266,52 +268,65 @@ export class CalendarSyncService implements OnDestroy {
       const client = new CalDavClient(config, this.password, this.transport);
       this.statusState.update((status) => ({ ...status, state: 'syncing', message: undefined }));
       try {
-        if (check) {
-          await client.check();
-          if (generation === this.generation) {
-            const message = config.enabled ? strings.connected : strings.connectedDisabled;
-            this.statusState.set({ state: config.enabled ? 'online' : 'disabled', lastSync: this.saved.lastSync, message });
-            this.snackbar.show(message);
-          }
-        } else {
-          const snapshot = this.budget.allTransactions().map((item) => ({ ...item }));
-          const categories = this.budget.categories();
-          const trash = this.budget.trash().map((item) => ({ ...item }));
-          const outcome = await syncCalendar(client, snapshot, this.saved.baseline, categories, this.budget.recurrences(), trash);
-          if (generation !== this.generation || this.destroyed) continue;
-          const baseline = { ...outcome.baseline };
-          let nextCategories = outcome.categories;
-          if (nextCategories !== null && this.budget.categories() !== categories) {
-            // A local edit made meanwhile must not be overwritten; forgetting the category baseline makes the next run merge.
-            nextCategories = null;
-            delete baseline[CATEGORIES_BASELINE_KEY];
-          }
-          this.budget.applyCalendarChanges(outcome.upsertLocal, outcome.removeLocal, snapshot, nextCategories);
-          this.budget.applyCalendarTrash(outcome.trashAdded, outcome.trashRemoved);
-          const saved = { baseline, lastSync: new Date().toISOString() };
-          localStorage.setItem(BASELINE_KEY, JSON.stringify(saved));
-          this.saved = saved;
-          this.statusState.set({
-            state: 'online', lastSync: saved.lastSync,
-            message: outcome.skipped > 0 ? strings.conflicts(outcome.skipped) : undefined,
-          });
-          if (notify) {
-            if (outcome.skipped > 0) this.snackbar.show(strings.conflicts(outcome.skipped), { kind: 'info' });
-            else this.snackbar.show(this.settings.t().snackbar.synced);
-          }
-        }
+        if (check) await this.runCheck(client, config, generation, strings);
+        else await this.runSync(client, generation, strings, notify);
       } catch (error: unknown) {
-        if (generation !== this.generation || this.destroyed) continue;
-        const offline = error instanceof TypeError
-          || (error instanceof DOMException && (error.name === 'AbortError' || error.name === 'TimeoutError'));
-        const message = error instanceof CalendarError
-          ? (error.kind === 'auth' ? strings.authError : strings.serverError(error.message))
-          : offline ? strings.networkError : strings.serverError(error instanceof Error ? error.message : String(error));
-        this.statusState.set({ state: offline ? 'offline' : 'error', lastSync: this.saved.lastSync, message });
-        if (notify || previousState !== (offline ? 'offline' : 'error')) this.snackbar.error(message);
+        if (this.isStale(generation)) continue;
+        this.reportFailure(error, strings, notify, previousState);
         // A change received during this run gets one more attempt; otherwise wait for a new trigger.
       }
     }
+  }
+
+  /** The configuration changed or the service was destroyed since the run started: its result is moot. */
+  private isStale(generation: number): boolean {
+    return generation !== this.generation || this.destroyed;
+  }
+
+  private async runCheck(client: CalDavClient, config: CalendarConfig, generation: number, strings: CalendarStrings): Promise<void> {
+    await client.check();
+    if (this.isStale(generation)) return;
+    const message = config.enabled ? strings.connected : strings.connectedDisabled;
+    this.statusState.set({ state: config.enabled ? 'online' : 'disabled', lastSync: this.saved.lastSync, message });
+    this.snackbar.show(message);
+  }
+
+  private async runSync(client: CalDavClient, generation: number, strings: CalendarStrings, notify: boolean): Promise<void> {
+    const snapshot = this.budget.allTransactions().map((item) => ({ ...item }));
+    const categories = this.budget.categories();
+    const trash = this.budget.trash().map((item) => ({ ...item }));
+    const outcome = await syncCalendar(client, snapshot, this.saved.baseline, categories, this.budget.recurrences(), trash);
+    if (this.isStale(generation)) return;
+    const baseline = { ...outcome.baseline };
+    let nextCategories = outcome.categories;
+    if (nextCategories !== null && this.budget.categories() !== categories) {
+      // A local edit made meanwhile must not be overwritten; forgetting the category baseline makes the next run merge.
+      nextCategories = null;
+      delete baseline[CATEGORIES_BASELINE_KEY];
+    }
+    this.budget.applyCalendarChanges(outcome.upsertLocal, outcome.removeLocal, snapshot, nextCategories);
+    this.budget.applyCalendarTrash(outcome.trashAdded, outcome.trashRemoved);
+    const saved = { baseline, lastSync: new Date().toISOString() };
+    localStorage.setItem(BASELINE_KEY, JSON.stringify(saved));
+    this.saved = saved;
+    this.statusState.set({
+      state: 'online', lastSync: saved.lastSync,
+      message: outcome.skipped > 0 ? strings.conflicts(outcome.skipped) : undefined,
+    });
+    if (notify) {
+      if (outcome.skipped > 0) this.snackbar.show(strings.conflicts(outcome.skipped), { kind: 'info' });
+      else this.snackbar.show(this.settings.t().snackbar.synced);
+    }
+  }
+
+  private reportFailure(error: unknown, strings: CalendarStrings, notify: boolean, previousState: CalendarStatus['state']): void {
+    const offline = error instanceof TypeError
+      || (error instanceof DOMException && (error.name === 'AbortError' || error.name === 'TimeoutError'));
+    const message = error instanceof CalendarError
+      ? (error.kind === 'auth' ? strings.authError : strings.serverError(error.message))
+      : offline ? strings.networkError : strings.serverError(error instanceof Error ? error.message : String(error));
+    this.statusState.set({ state: offline ? 'offline' : 'error', lastSync: this.saved.lastSync, message });
+    if (notify || previousState !== (offline ? 'offline' : 'error')) this.snackbar.error(message);
   }
 
   ngOnDestroy(): void {

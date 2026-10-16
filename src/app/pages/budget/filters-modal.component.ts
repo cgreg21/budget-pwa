@@ -1,10 +1,10 @@
 import { Component, OnInit, computed, inject, input, output, signal } from '@angular/core';
 import { isFilterActive, NO_FILTER, type TransactionFilter } from 'budget-lib';
 
-import { BudgetService } from '../../budget.service';
-import { UI_ICONS, categoryGlyph } from '../../icons';
-import { SettingsService } from '../../settings.service';
-import { SheetComponent } from '../../shared/sheet.component';
+import { BudgetService } from '../../data/budget.service';
+import { UI_ICONS, categoryGlyph } from '../../ui/icons';
+import { SettingsService } from '../../preferences/settings.service';
+import { SheetComponent } from '../../shared/overlays/sheet.component';
 
 /** The transaction filters. Emits the filter to apply, or `closed` when dismissed. */
 @Component({

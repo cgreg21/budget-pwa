@@ -5,8 +5,8 @@ import {
 } from 'budget-lib';
 
 import { STRINGS, type Strings } from './i18n';
-import { profileKey } from './profiles';
-import { readValidJson } from './storage';
+import { profileKey } from '../data/profiles';
+import { readValidJson } from '../data/storage';
 
 const SETTINGS_KEY = profileKey('budget-pwa:settings:v1');
 

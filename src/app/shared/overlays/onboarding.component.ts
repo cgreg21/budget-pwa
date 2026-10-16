@@ -1,8 +1,8 @@
 import { Component, HostListener, computed, inject, signal } from '@angular/core';
 
-import { UI_ICONS } from '../icons';
-import { OnboardingService } from '../onboarding.service';
-import { SettingsService } from '../settings.service';
+import { UI_ICONS } from '../../ui/icons';
+import { OnboardingService } from '../../ui/onboarding.service';
+import { SettingsService } from '../../preferences/settings.service';
 
 /** Horizontal distance, in px, beyond which a swipe changes the slide. */
 const SWIPE_DISTANCE = 50;

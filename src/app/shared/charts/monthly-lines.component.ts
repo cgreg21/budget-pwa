@@ -3,8 +3,8 @@ import {
 } from '@angular/core';
 import { monthNumberOf, yearOf, type MonthKey } from 'budget-lib';
 
-import type { MonthlyTotals } from '../budget.service';
-import { SettingsService } from '../settings.service';
+import type { MonthlyTotals } from '../../data/budget.service';
+import { SettingsService } from '../../preferences/settings.service';
 
 const INCOME_COLOR = '#00E5A0';
 const EXPENSE_COLOR = '#FF6B6B';

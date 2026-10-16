@@ -1,8 +1,8 @@
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 
-import { UI_ICONS } from '../icons';
-import { SettingsService } from '../settings.service';
-import { SnackbarService } from '../snackbar.service';
+import { UI_ICONS } from '../../ui/icons';
+import { SettingsService } from '../../preferences/settings.service';
+import { SnackbarService } from '../../ui/snackbar.service';
 
 @Component({
   selector: 'app-snackbar',

@@ -4,20 +4,20 @@ import {
   balanceLevel, dayOf, filterTransactions, isFilterActive, NO_FILTER, type Transaction, type TransactionFilter, type TransactionKind,
 } from 'budget-lib';
 
-import { BudgetService } from '../../budget.service';
-import { CalendarSyncService } from '../../calendar-sync.service';
-import { DialogService } from '../../dialog.service';
-import { SnackbarService } from '../../snackbar.service';
-import { UI_ICONS, categoryGlyph } from '../../icons';
-import { LayoutService } from '../../layout.service';
-import { SettingsService } from '../../settings.service';
-import { HeaderComponent } from '../../shared/header.component';
-import { MonthBarComponent } from '../../shared/month-bar.component';
-import { MonthPickerComponent } from '../../shared/month-picker.component';
-import { SwipeRowComponent } from '../../shared/swipe-row.component';
-import { TabBarComponent, type TabItem } from '../../shared/tab-bar.component';
+import { BudgetService } from '../../data/budget.service';
+import { CalendarSyncService } from '../../sync/calendar-sync.service';
+import { DialogService } from '../../ui/dialog.service';
+import { SnackbarService } from '../../ui/snackbar.service';
+import { UI_ICONS, categoryGlyph } from '../../ui/icons';
+import { LayoutService } from '../../ui/layout.service';
+import { SettingsService } from '../../preferences/settings.service';
+import { HeaderComponent } from '../../shared/chrome/header.component';
+import { MonthBarComponent } from '../../shared/chrome/month-bar.component';
+import { MonthPickerComponent } from '../../shared/chrome/month-picker.component';
+import { SwipeRowComponent } from '../../shared/controls/swipe-row.component';
+import { TabBarComponent, type TabItem } from '../../shared/chrome/tab-bar.component';
 import { deleteTransaction } from './delete-transaction';
-import { SelectionBarComponent } from '../../shared/selection-bar.component';
+import { SelectionBarComponent } from '../../shared/chrome/selection-bar.component';
 import { EditorModalComponent } from './editor-modal.component';
 import { FiltersModalComponent } from './filters-modal.component';
 

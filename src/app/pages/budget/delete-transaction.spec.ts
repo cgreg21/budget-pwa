@@ -1,10 +1,10 @@
 import { TestBed } from '@angular/core/testing';
 import type { Transaction } from 'budget-lib';
 
-import { BudgetService } from '../../budget.service';
-import { DialogService } from '../../dialog.service';
-import { SettingsService } from '../../settings.service';
-import { SnackbarService } from '../../snackbar.service';
+import { BudgetService } from '../../data/budget.service';
+import { DialogService } from '../../ui/dialog.service';
+import { SettingsService } from '../../preferences/settings.service';
+import { SnackbarService } from '../../ui/snackbar.service';
 import { deleteTransaction } from './delete-transaction';
 
 const DATA_KEY = 'budget-pwa:data:v1';

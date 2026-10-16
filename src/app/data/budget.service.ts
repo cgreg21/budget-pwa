@@ -65,6 +65,26 @@ function isTrashedCategoryArray(value: unknown): value is TrashedCategory[] {
     && typeof (item as TrashedCategory).icon === 'string' && typeof (item as TrashedCategory).deletedAt === 'string');
 }
 
+/** The months without the ones holding no transaction. */
+function nonEmptyMonths(months: Record<string, Transaction[]>): Record<string, Transaction[]> {
+  return Object.fromEntries(Object.entries(months).filter(([, items]) => items.length > 0));
+}
+
+/** A copy of `months` where the transactions of `month` matching `shouldRemove` are gone. */
+function removeFromMonth(
+  months: Record<string, Transaction[]>, month: string, shouldRemove: (item: Transaction) => boolean,
+): Record<string, Transaction[]> {
+  const next = { ...months };
+  const remaining = (next[month] ?? []).filter((item) => !shouldRemove(item));
+  if (remaining.length > 0) next[month] = remaining;
+  else delete next[month];
+  return next;
+}
+
+function newestFirst<T extends { deletedAt: string }>(items: readonly T[]): T[] {
+  return [...items].sort((a, b) => b.deletedAt.localeCompare(a.deletedAt));
+}
+
 function newId(): string {
   return typeof crypto.randomUUID === 'function'
     ? crypto.randomUUID()
@@ -95,11 +115,7 @@ function isBudgetData(value: unknown): value is BudgetData {
  */
 function readData(): { value: BudgetData; corrupted: boolean } {
   const { value, corrupted } = readValidJson(DATA_KEY, isBudgetData, defaultData, true);
-  const validMonths: Record<string, Transaction[]> = {};
-  for (const [month, transactions] of Object.entries(value.months)) {
-    if (transactions.length > 0) validMonths[month] = transactions;
-  }
-  return { value: { ...value, months: validMonths }, corrupted };
+  return { value: { ...value, months: nonEmptyMonths(value.months) }, corrupted };
 }
 
 @Injectable({ providedIn: 'root' })
@@ -123,11 +139,11 @@ export class BudgetService {
   readonly thresholds = computed(() => this.dataState().thresholds);
   private readonly trashState = signal<TrashedTransaction[]>(readValidJson(TRASH_KEY, isTrashedTransactionArray, () => [], true).value);
   /** Deleted transactions, the most recently deleted first. */
-  readonly trash = computed(() => [...this.trashState()].sort((a, b) => b.deletedAt.localeCompare(a.deletedAt)));
+  readonly trash = computed(() => newestFirst(this.trashState()));
   private readonly trashedCategoryState = signal<TrashedCategory[]>(
     readValidJson(TRASH_CATEGORIES_KEY, isTrashedCategoryArray, () => [], true).value);
   /** Deleted categories, the most recently deleted first. */
-  readonly trashedCategories = computed(() => [...this.trashedCategoryState()].sort((a, b) => b.deletedAt.localeCompare(a.deletedAt)));
+  readonly trashedCategories = computed(() => newestFirst(this.trashedCategoryState()));
 
   constructor() {
     this.applyRecurrences(this.selectedMonth());
@@ -166,11 +182,9 @@ export class BudgetService {
     if (accepted.length === 0 && removed.length === 0 && categoryList === null) return;
     const replaced = new Set([...accepted.map((item) => item.id), ...removed]);
     const data = this.dataState();
-    const months: Record<string, Transaction[]> = {};
-    for (const [month, items] of Object.entries(data.months)) {
-      const remaining = items.filter((item) => !replaced.has(item.id));
-      if (remaining.length > 0) months[month] = remaining;
-    }
+    const months = nonEmptyMonths(Object.fromEntries(
+      Object.entries(data.months).map(([month, items]) => [month, items.filter((item) => !replaced.has(item.id))]),
+    ));
     const categories = [...data.categories];
     const names = new Set(categories.map((category) => category.name));
     for (const item of accepted) {
@@ -216,9 +230,7 @@ export class BudgetService {
     const oldMonth = this.selectedMonth();
     const nextMonth = monthKeyOf(input.date);
     this.updateData((data) => {
-      const months = { ...data.months };
-      months[oldMonth] = (months[oldMonth] ?? []).filter((item) => item.id !== id);
-      if (months[oldMonth].length === 0) delete months[oldMonth];
+      const months = removeFromMonth(data.months, oldMonth, (item) => item.id === id);
       months[nextMonth] = [...(months[nextMonth] ?? []), { id, ...input }];
       return { ...data, months };
     });
@@ -279,17 +291,7 @@ export class BudgetService {
   }
 
   remove(id: string): void {
-    const month = this.selectedMonth();
-    const trashed = (this.dataState().months[month] ?? []).find((item) => item.id === id);
-    if (trashed !== undefined) {
-      this.setTrash([{ ...trashed, deletedAt: new Date().toISOString() }, ...this.trashState().filter((item) => item.id !== id)]);
-    }
-    this.updateData((data) => {
-      const months = { ...data.months };
-      months[month] = (months[month] ?? []).filter((item) => item.id !== id);
-      if (months[month].length === 0) delete months[month];
-      return { ...data, months };
-    });
+    this.removeMany([id]);
   }
 
   /** Moves several transactions of the selected month to the trash in a single change. */
@@ -300,12 +302,7 @@ export class BudgetService {
     if (moved.length === 0) return;
     const deletedAt = new Date().toISOString();
     this.setTrash([...moved.map((item) => ({ ...item, deletedAt })), ...this.trashState().filter((item) => !wanted.has(item.id))]);
-    this.updateData((data) => {
-      const months = { ...data.months };
-      months[month] = (months[month] ?? []).filter((item) => !wanted.has(item.id));
-      if (months[month].length === 0) delete months[month];
-      return { ...data, months };
-    });
+    this.updateData((data) => ({ ...data, months: removeFromMonth(data.months, month, (item) => wanted.has(item.id)) }));
   }
 
   /** Changes the category of several transactions of the selected month. */
@@ -343,21 +340,12 @@ export class BudgetService {
 
   /** Puts a trashed transaction back in its month. */
   restore(id: string): void {
-    const item = this.trashState().find((candidate) => candidate.id === id);
-    if (item === undefined) return;
-    const { deletedAt: _deletedAt, ...transaction } = item;
-    const month = monthKeyOf(transaction.date);
-    this.setTrash(this.trashState().filter((candidate) => candidate.id !== id));
-    this.updateData((data) => ({
-      ...data,
-      months: { ...data.months, [month]: [...(data.months[month] ?? []).filter((candidate) => candidate.id !== id), transaction] },
-    }));
+    this.restoreMany([id]);
   }
 
   /** Deletes one trashed transaction for good (the calendar event goes at the next synchronisation). */
   deleteForever(id: string): void {
-    this.setTrash(this.trashState().filter((item) => item.id !== id));
-    this.transactionChangesSubject.next();
+    this.deleteForeverMany([id]);
   }
 
   emptyTrash(): void {

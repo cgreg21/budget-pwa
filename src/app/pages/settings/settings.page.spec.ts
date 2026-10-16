@@ -4,13 +4,13 @@ import {
   createArchive, DEFAULT_CATEGORIES, sealConfig, webCryptoConfigCipher, type ConfigData, type Recurrence, type WebCryptoLike,
 } from 'budget-lib';
 
-import { BudgetService } from '../../budget.service';
-import { CalendarSyncService } from '../../calendar-sync.service';
-import { ConfigArchiveService } from '../../config-archive.service';
-import { DialogService } from '../../dialog.service';
-import { InstallService } from '../../install.service';
-import { SettingsService } from '../../settings.service';
-import { SnackbarService } from '../../snackbar.service';
+import { BudgetService } from '../../data/budget.service';
+import { CalendarSyncService } from '../../sync/calendar-sync.service';
+import { ConfigArchiveService } from '../../sync/config-archive.service';
+import { DialogService } from '../../ui/dialog.service';
+import { InstallService } from '../../pwa/install.service';
+import { SettingsService } from '../../preferences/settings.service';
+import { SnackbarService } from '../../ui/snackbar.service';
 import { SettingsPage } from './settings.page';
 
 const DATA_KEY = 'budget-pwa:data:v1';

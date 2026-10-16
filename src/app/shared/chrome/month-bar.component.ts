@@ -3,8 +3,8 @@ import {
   FIRST_MONTH, LAST_MONTH, monthKeyFrom, monthNumberOf, shiftMonth, yearOf, type MonthKey,
 } from 'budget-lib';
 
-import { UI_ICONS } from '../icons';
-import { SettingsService } from '../settings.service';
+import { UI_ICONS } from '../../ui/icons';
+import { SettingsService } from '../../preferences/settings.service';
 
 /** Previous/next month and year buttons around the month label, which opens the month picker. */
 @Component({

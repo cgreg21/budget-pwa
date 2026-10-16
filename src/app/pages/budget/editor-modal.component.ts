@@ -4,12 +4,12 @@ import {
   type RecurrenceSettings, type Transaction, type TransactionInput, type TransactionKind,
 } from 'budget-lib';
 
-import { BudgetService } from '../../budget.service';
-import { DialogService } from '../../dialog.service';
-import { SnackbarService } from '../../snackbar.service';
-import { UI_ICONS, categoryGlyph } from '../../icons';
-import { parseAmount, SettingsService } from '../../settings.service';
-import { SheetComponent } from '../../shared/sheet.component';
+import { BudgetService } from '../../data/budget.service';
+import { DialogService } from '../../ui/dialog.service';
+import { SnackbarService } from '../../ui/snackbar.service';
+import { UI_ICONS, categoryGlyph } from '../../ui/icons';
+import { parseAmount, SettingsService } from '../../preferences/settings.service';
+import { SheetComponent } from '../../shared/overlays/sheet.component';
 import { deleteTransaction } from './delete-transaction';
 
 /** The transaction form, a full-screen modal. It closes itself once the transaction is saved or deleted. */

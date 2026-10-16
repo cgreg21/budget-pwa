@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, effect, input, output, signal, untracked } from '@angular/core';
 
-import { UI_ICONS } from '../icons';
+import { UI_ICONS } from '../../ui/icons';
 
 /** Width of the delete button revealed by swiping a row, and the move needed to pick a direction. */
 const SWIPE_WIDTH = 88;

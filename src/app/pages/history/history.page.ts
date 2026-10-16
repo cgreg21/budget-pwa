@@ -2,12 +2,12 @@ import { Component, computed, inject, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { clampMonth, monthsBetween, shiftMonth, type MonthKey } from 'budget-lib';
 
-import { BudgetService, type MonthlyTotals } from '../../budget.service';
-import { UI_ICONS } from '../../icons';
-import { SettingsService } from '../../settings.service';
-import { HeaderComponent } from '../../shared/header.component';
-import { MonthPickerComponent } from '../../shared/month-picker.component';
-import { MonthlyLinesComponent } from '../../shared/monthly-lines.component';
+import { BudgetService, type MonthlyTotals } from '../../data/budget.service';
+import { UI_ICONS } from '../../ui/icons';
+import { SettingsService } from '../../preferences/settings.service';
+import { HeaderComponent } from '../../shared/chrome/header.component';
+import { MonthPickerComponent } from '../../shared/chrome/month-picker.component';
+import { MonthlyLinesComponent } from '../../shared/charts/monthly-lines.component';
 
 /** Longest interval shown, so the chart stays readable. */
 const MAX_MONTHS = 24;

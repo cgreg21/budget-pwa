@@ -1,11 +1,11 @@
 import { TestBed, type ComponentFixture } from '@angular/core/testing';
 import { NO_FILTER, type Transaction } from 'budget-lib';
 
-import { BudgetService } from '../../budget.service';
-import { DialogService } from '../../dialog.service';
-import { UI_ICONS } from '../../icons';
-import { LayoutService } from '../../layout.service';
-import { SettingsService } from '../../settings.service';
+import { BudgetService } from '../../data/budget.service';
+import { DialogService } from '../../ui/dialog.service';
+import { UI_ICONS } from '../../ui/icons';
+import { LayoutService } from '../../ui/layout.service';
+import { SettingsService } from '../../preferences/settings.service';
 import { BudgetPage } from './budget.page';
 import { EditorModalComponent } from './editor-modal.component';
 import { FiltersModalComponent } from './filters-modal.component';

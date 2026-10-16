@@ -2,20 +2,20 @@ import { ApplicationRef, Component, signal } from '@angular/core';
 import { TestBed, type ComponentFixture } from '@angular/core/testing';
 import { buildPieSlices } from 'budget-lib';
 
-import { DialogService } from '../dialog.service';
-import { DrawerService } from '../drawer.service';
-import { UI_ICONS } from '../icons';
-import { SettingsService } from '../settings.service';
-import { AutofocusDirective } from './autofocus.directive';
-import { CategoryPieComponent } from './category-pie.component';
-import { DialogHostComponent } from './dialog-host.component';
-import { HeaderComponent } from './header.component';
-import { MonthBarComponent } from './month-bar.component';
-import { MonthPickerComponent } from './month-picker.component';
-import { MonthlyLinesComponent } from './monthly-lines.component';
-import { SheetComponent } from './sheet.component';
-import { SwipeRowComponent } from './swipe-row.component';
-import { TabBarComponent } from './tab-bar.component';
+import { DialogService } from '../ui/dialog.service';
+import { DrawerService } from '../ui/drawer.service';
+import { UI_ICONS } from '../ui/icons';
+import { SettingsService } from '../preferences/settings.service';
+import { AutofocusDirective } from './controls/autofocus.directive';
+import { CategoryPieComponent } from './charts/category-pie.component';
+import { DialogHostComponent } from './overlays/dialog-host.component';
+import { HeaderComponent } from './chrome/header.component';
+import { MonthBarComponent } from './chrome/month-bar.component';
+import { MonthPickerComponent } from './chrome/month-picker.component';
+import { MonthlyLinesComponent } from './charts/monthly-lines.component';
+import { SheetComponent } from './overlays/sheet.component';
+import { SwipeRowComponent } from './controls/swipe-row.component';
+import { TabBarComponent } from './chrome/tab-bar.component';
 
 const DATA_KEY = 'budget-pwa:data:v1';
 

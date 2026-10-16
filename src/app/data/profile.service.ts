@@ -4,7 +4,7 @@ import {
   DEFAULT_PROFILE_ID, MAX_PROFILE_NAME_LENGTH, PROFILE_KEYS, newProfileId, profileKeyOf, readRegistry, secretNameOf,
   writeRegistry, type Profile, type ProfileRegistry,
 } from './profiles';
-import { CALENDAR_PASSWORD_BASE_NAME, writeSecret } from './secrets';
+import { CALENDAR_PASSWORD_BASE_NAME, writeSecret } from '../security/secrets';
 
 /** The profiles of this device and the active one. Switching reloads the app on the other profile's data. */
 @Injectable({ providedIn: 'root' })

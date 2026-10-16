@@ -2,7 +2,7 @@ import { provideRouter, Router } from '@angular/router';
 import { TestBed, type ComponentFixture } from '@angular/core/testing';
 import type { Transaction } from 'budget-lib';
 
-import { BudgetService } from '../../budget.service';
+import { BudgetService } from '../../data/budget.service';
 import { HistoryPage } from './history.page';
 
 const DATA_KEY = 'budget-pwa:data:v1';

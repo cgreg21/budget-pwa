@@ -1,9 +1,9 @@
 import { TestBed, type ComponentFixture } from '@angular/core/testing';
 import { DEFAULT_CATEGORY_ICON } from 'budget-lib';
 
-import { BudgetService } from '../../budget.service';
-import { DialogService } from '../../dialog.service';
-import { SettingsService } from '../../settings.service';
+import { BudgetService } from '../../data/budget.service';
+import { DialogService } from '../../ui/dialog.service';
+import { SettingsService } from '../../preferences/settings.service';
 import { CategoriesPage } from './categories.page';
 
 const DATA_KEY = 'budget-pwa:data:v1';

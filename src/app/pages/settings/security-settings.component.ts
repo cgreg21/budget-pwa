@@ -1,9 +1,9 @@
 import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
 
-import { DialogService } from '../../dialog.service';
-import { LockService } from '../../lock.service';
-import { SettingsService } from '../../settings.service';
-import { SnackbarService } from '../../snackbar.service';
+import { DialogService } from '../../ui/dialog.service';
+import { LockService } from '../../security/lock.service';
+import { SettingsService } from '../../preferences/settings.service';
+import { SnackbarService } from '../../ui/snackbar.service';
 
 type Mode = 'none' | 'set' | 'change';
 

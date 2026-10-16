@@ -1,15 +1,15 @@
 import { Component, computed, inject, signal } from '@angular/core';
 import { todayIsoDate, type Recurrence } from 'budget-lib';
 
-import { BudgetService } from '../../budget.service';
-import { DialogService } from '../../dialog.service';
-import { UI_ICONS, categoryGlyph } from '../../icons';
-import { groupByMonth, scheduleOccurrences } from '../../schedule';
-import { SettingsService } from '../../settings.service';
+import { BudgetService } from '../../data/budget.service';
+import { DialogService } from '../../ui/dialog.service';
+import { UI_ICONS, categoryGlyph } from '../../ui/icons';
+import { groupByMonth, scheduleOccurrences } from '../../data/schedule';
+import { SettingsService } from '../../preferences/settings.service';
 import { EditorModalComponent } from '../budget/editor-modal.component';
-import { HeaderComponent } from '../../shared/header.component';
-import { SnackbarService } from '../../snackbar.service';
-import { SwipeRowComponent } from '../../shared/swipe-row.component';
+import { HeaderComponent } from '../../shared/chrome/header.component';
+import { SnackbarService } from '../../ui/snackbar.service';
+import { SwipeRowComponent } from '../../shared/controls/swipe-row.component';
 
 export const SCHEDULE_HORIZONS = [1, 3, 6, 12] as const;
 

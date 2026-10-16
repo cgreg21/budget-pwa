@@ -2,11 +2,11 @@ import { Component, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 
-import { DialogService } from '../../dialog.service';
-import { UI_ICONS } from '../../icons';
-import { MAX_PROFILE_NAME_LENGTH, type Profile } from '../../profiles';
-import { ProfileService } from '../../profile.service';
-import { SettingsService } from '../../settings.service';
+import { DialogService } from '../../ui/dialog.service';
+import { UI_ICONS } from '../../ui/icons';
+import { MAX_PROFILE_NAME_LENGTH, type Profile } from '../../data/profiles';
+import { ProfileService } from '../../data/profile.service';
+import { SettingsService } from '../../preferences/settings.service';
 
 /** Create, rename, delete and switch between the profiles. */
 @Component({

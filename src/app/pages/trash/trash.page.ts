@@ -1,14 +1,14 @@
 import { Component, computed, inject, signal } from '@angular/core';
 import type { TrashedTransaction } from 'budget-lib';
 
-import { BudgetService, type TrashedCategory } from '../../budget.service';
-import { DialogService } from '../../dialog.service';
-import { SnackbarService } from '../../snackbar.service';
-import { UI_ICONS, categoryGlyph } from '../../icons';
-import { SettingsService } from '../../settings.service';
-import { HeaderComponent } from '../../shared/header.component';
-import { SelectionBarComponent } from '../../shared/selection-bar.component';
-import { SwipeRowComponent, type SwipeState } from '../../shared/swipe-row.component';
+import { BudgetService, type TrashedCategory } from '../../data/budget.service';
+import { DialogService } from '../../ui/dialog.service';
+import { SnackbarService } from '../../ui/snackbar.service';
+import { UI_ICONS, categoryGlyph } from '../../ui/icons';
+import { SettingsService } from '../../preferences/settings.service';
+import { HeaderComponent } from '../../shared/chrome/header.component';
+import { SelectionBarComponent } from '../../shared/chrome/selection-bar.component';
+import { SwipeRowComponent, type SwipeState } from '../../shared/controls/swipe-row.component';
 
 /** The deleted transactions: restore one, delete it for good, or empty the whole trash. */
 @Component({

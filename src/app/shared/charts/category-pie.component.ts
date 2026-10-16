@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, computed, inject, input } from '@angular/core';
 import type { PieSlice } from 'budget-lib';
 
-import { SettingsService } from '../settings.service';
+import { SettingsService } from '../../preferences/settings.service';
 
 /** Slices thinner than this get no percentage written on them. */
 const MIN_LABELLED_FRACTION = 0.06;

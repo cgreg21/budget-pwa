@@ -1,6 +1,6 @@
 import { Component, HostListener, inject } from '@angular/core';
 
-import { DialogService } from '../dialog.service';
+import { DialogService } from '../../ui/dialog.service';
 
 /** Renders the pending dialog of the DialogService above the whole app. */
 @Component({

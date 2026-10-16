@@ -1,9 +1,9 @@
 import type { Transaction } from 'budget-lib';
 
-import type { BudgetService } from '../../budget.service';
-import type { DialogService } from '../../dialog.service';
-import type { SettingsService } from '../../settings.service';
-import type { SnackbarService } from '../../snackbar.service';
+import type { BudgetService } from '../../data/budget.service';
+import type { DialogService } from '../../ui/dialog.service';
+import type { SettingsService } from '../../preferences/settings.service';
+import type { SnackbarService } from '../../ui/snackbar.service';
 
 /**
  * Deletes a transaction once confirmed; an occurrence of a recurring series can go alone or

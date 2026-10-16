@@ -1,8 +1,8 @@
 import { ChangeDetectionStrategy, Component, effect, inject, signal } from '@angular/core';
 
-import { UI_ICONS } from '../icons';
-import { LockService } from '../lock.service';
-import { SettingsService } from '../settings.service';
+import { UI_ICONS } from '../../ui/icons';
+import { LockService } from '../../security/lock.service';
+import { SettingsService } from '../../preferences/settings.service';
 
 @Component({
   selector: 'app-lock-screen',

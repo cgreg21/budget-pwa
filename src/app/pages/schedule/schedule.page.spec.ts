@@ -2,9 +2,9 @@ import { provideRouter } from '@angular/router';
 import { TestBed } from '@angular/core/testing';
 import { DEFAULT_CATEGORIES, type Recurrence } from 'budget-lib';
 
-import { BudgetService } from '../../budget.service';
-import { DialogService } from '../../dialog.service';
-import { SettingsService } from '../../settings.service';
+import { BudgetService } from '../../data/budget.service';
+import { DialogService } from '../../ui/dialog.service';
+import { SettingsService } from '../../preferences/settings.service';
 import { SchedulePage } from './schedule.page';
 
 const DATA_KEY = 'budget-pwa:data:v1';

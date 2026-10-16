@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, inject, input, output } from '@angular/core';
 
-import { UI_ICONS } from '../icons';
-import { SettingsService } from '../settings.service';
+import { UI_ICONS } from '../../ui/icons';
+import { SettingsService } from '../../preferences/settings.service';
 
 /** Bar shown during a multi-selection: cancel, count, select all, then the page's own actions. */
 @Component({

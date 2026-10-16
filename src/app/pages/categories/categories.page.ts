@@ -3,13 +3,13 @@ import {
   CATEGORY_ICON_CHOICES, categoryIcon, DEFAULT_CATEGORY_ICON, normalizeCategoryName, type Category,
 } from 'budget-lib';
 
-import { BudgetService } from '../../budget.service';
-import { DialogService } from '../../dialog.service';
-import { UI_ICONS, categoryGlyph } from '../../icons';
-import { SettingsService } from '../../settings.service';
-import { HeaderComponent } from '../../shared/header.component';
-import { AutofocusDirective } from '../../shared/autofocus.directive';
-import { SwipeRowComponent, type SwipeState } from '../../shared/swipe-row.component';
+import { BudgetService } from '../../data/budget.service';
+import { DialogService } from '../../ui/dialog.service';
+import { UI_ICONS, categoryGlyph } from '../../ui/icons';
+import { SettingsService } from '../../preferences/settings.service';
+import { HeaderComponent } from '../../shared/chrome/header.component';
+import { AutofocusDirective } from '../../shared/controls/autofocus.directive';
+import { SwipeRowComponent, type SwipeState } from '../../shared/controls/swipe-row.component';
 
 /** Picker target standing for the category about to be added (a name can never be empty). */
 const NEW_CATEGORY = '';

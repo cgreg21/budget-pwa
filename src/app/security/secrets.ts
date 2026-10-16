@@ -8,7 +8,7 @@
  * the caller then asks the user again rather than failing.
  */
 
-import { activeSecretName } from './profiles';
+import { activeSecretName } from '../data/profiles';
 
 const DB_NAME = 'budget-pwa-secrets';
 const DB_VERSION = 1;

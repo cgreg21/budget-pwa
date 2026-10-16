@@ -2,15 +2,15 @@ import { provideRouter, Router } from '@angular/router';
 import { TestBed, type ComponentFixture } from '@angular/core/testing';
 
 import { AppComponent } from './app.component';
-import { APP_VERSION } from './app-info';
-import { CalendarSyncService } from './calendar-sync.service';
-import { DialogService } from './dialog.service';
-import { DrawerService } from './drawer.service';
-import { UI_ICONS } from './icons';
-import { InstallService } from './install.service';
-import { LayoutService } from './layout.service';
+import { APP_VERSION } from './pwa/app-info';
+import { CalendarSyncService } from './sync/calendar-sync.service';
+import { DialogService } from './ui/dialog.service';
+import { DrawerService } from './ui/drawer.service';
+import { UI_ICONS } from './ui/icons';
+import { InstallService } from './pwa/install.service';
+import { LayoutService } from './ui/layout.service';
 import { RootComponent } from './root.component';
-import { SettingsService } from './settings.service';
+import { SettingsService } from './preferences/settings.service';
 
 const DATA_KEY = 'budget-pwa:data:v1';
 

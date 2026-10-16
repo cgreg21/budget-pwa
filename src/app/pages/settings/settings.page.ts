@@ -5,20 +5,20 @@ import {
   type AppLanguage, type Currency, type DateFormat, type Theme,
 } from 'budget-lib';
 
-import { BudgetService } from '../../budget.service';
-import { CalendarSyncService } from '../../calendar-sync.service';
-import { ConfigArchiveService, downloadText } from '../../config-archive.service';
-import { DialogService } from '../../dialog.service';
-import { SnackbarService } from '../../snackbar.service';
-import { InstallService } from '../../install.service';
-import { glyph, UI_ICONS } from '../../icons';
-import { OnboardingService } from '../../onboarding.service';
-import { ProfileService } from '../../profile.service';
-import { parseAmount, SettingsService } from '../../settings.service';
-import { AutofocusDirective } from '../../shared/autofocus.directive';
+import { BudgetService } from '../../data/budget.service';
+import { CalendarSyncService } from '../../sync/calendar-sync.service';
+import { ConfigArchiveService, downloadText } from '../../sync/config-archive.service';
+import { DialogService } from '../../ui/dialog.service';
+import { SnackbarService } from '../../ui/snackbar.service';
+import { InstallService } from '../../pwa/install.service';
+import { glyph, UI_ICONS } from '../../ui/icons';
+import { OnboardingService } from '../../ui/onboarding.service';
+import { ProfileService } from '../../data/profile.service';
+import { parseAmount, SettingsService } from '../../preferences/settings.service';
+import { AutofocusDirective } from '../../shared/controls/autofocus.directive';
 import { SecuritySettingsComponent } from './security-settings.component';
-import { HeaderComponent } from '../../shared/header.component';
-import { SheetComponent } from '../../shared/sheet.component';
+import { HeaderComponent } from '../../shared/chrome/header.component';
+import { SheetComponent } from '../../shared/overlays/sheet.component';
 
 const LANGUAGES: AppLanguage[] = ['fr', 'en'];
 const CURRENCIES: Currency[] = ['EUR', 'USD', 'GBP', 'CHF'];
@@ -89,18 +89,12 @@ export class SettingsPage {
   async saveCalendar(action: 'save' | 'check' | 'sync' = 'save'): Promise<void> {
     const saved = this.calendar.configure({
       enabled: this.calendarEnabled(), calendarUrl: this.calendarUrl(), username: this.calendarUser(),
-            syncIntervalMinutes: Number(this.calendarInterval()),
-          }, this.calendarPassword() === '' ? null : this.calendarPassword(), this.calendarProxy());
+      syncIntervalMinutes: Number(this.calendarInterval()),
+    }, this.calendarPassword() === '' ? null : this.calendarPassword(), this.calendarProxy());
     if (!saved) return;
-    this.calendarPassword.set('');
-    const config = this.calendar.config();
-    this.calendarEnabled.set(config.enabled);
-    this.calendarUrl.set(config.calendarUrl);
-    this.calendarUser.set(config.username);
-    this.calendarInterval.set(String(config.syncIntervalMinutes ?? 0));
-    this.calendarProxy.set(this.calendar.proxyUrl());
+    this.loadCalendarForm();
     if (action === 'check') await this.calendar.checkConnection();
-    else if (config.enabled) await this.calendar.syncNow(action === 'sync');
+    else if (this.calendar.config().enabled) await this.calendar.syncNow(action === 'sync');
   }
 
   async toggleCalendar(): Promise<void> {
@@ -108,7 +102,6 @@ export class SettingsPage {
     await this.saveCalendar();
     this.calendarEnabled.set(this.calendar.active());
   }
-
 
   openProfiles(): void {
     void this.router.navigateByUrl('/settings/profiles');
@@ -235,9 +228,7 @@ export class SettingsPage {
   closePassphrase(): void {
     if (this.passphraseBusy()) return;
     this.passphraseMode.set(null);
-    this.passphrase.set('');
-    this.passphraseConfirm.set('');
-    this.passphraseError.set('');
+    this.resetPassphrase();
     this.configText = '';
   }
 
@@ -286,10 +277,25 @@ export class SettingsPage {
   }
 
   private openPassphrase(mode: 'export' | 'import'): void {
+    this.resetPassphrase();
+    this.passphraseMode.set(mode);
+  }
+
+  private resetPassphrase(): void {
     this.passphrase.set('');
     this.passphraseConfirm.set('');
     this.passphraseError.set('');
-    this.passphraseMode.set(mode);
+  }
+
+  /** Fills the calendar form fields from the saved calendar settings. */
+  private loadCalendarForm(): void {
+    const config = this.calendar.config();
+    this.calendarEnabled.set(config.enabled);
+    this.calendarUrl.set(config.calendarUrl);
+    this.calendarUser.set(config.username);
+    this.calendarInterval.set(String(config.syncIntervalMinutes ?? 0));
+    this.calendarProxy.set(this.calendar.proxyUrl());
+    this.calendarPassword.set('');
   }
 
   /** Reflects an imported configuration in the form fields. */
@@ -298,13 +304,7 @@ export class SettingsPage {
     this.low.set(this.s.formatInput(thresholds.low));
     this.medium.set(this.s.formatInput(thresholds.medium));
     this.high.set(this.s.formatInput(thresholds.high));
-    const config = this.calendar.config();
-    this.calendarEnabled.set(config.enabled);
-    this.calendarUrl.set(config.calendarUrl);
-    this.calendarUser.set(config.username);
-    this.calendarInterval.set(String(config.syncIntervalMinutes ?? 0));
-    this.calendarProxy.set(this.calendar.proxyUrl());
-    this.calendarPassword.set('');
+    this.loadCalendarForm();
     this.message.set('');
   }
 }

@@ -1,8 +1,8 @@
 import { ChangeDetectionStrategy, Component, computed, inject, input, output } from '@angular/core';
 
-import { DrawerService } from '../drawer.service';
-import { UI_ICONS } from '../icons';
-import { SettingsService } from '../settings.service';
+import { DrawerService } from '../../ui/drawer.service';
+import { UI_ICONS } from '../../ui/icons';
+import { SettingsService } from '../../preferences/settings.service';
 
 /** Menu button, title and, on the transactions page, the filters button. */
 @Component({

@@ -1,10 +1,10 @@
 import { TestBed } from '@angular/core/testing';
 
-import { BudgetService } from './budget.service';
+import { BudgetService } from '../data/budget.service';
 import { DialogService } from './dialog.service';
-import { SettingsService } from './settings.service';
+import { SettingsService } from '../preferences/settings.service';
 import { SnackbarService } from './snackbar.service';
-import { deleteTransaction } from './pages/budget/delete-transaction';
+import { deleteTransaction } from '../pages/budget/delete-transaction';
 
 describe('SnackbarService', () => {
   beforeEach(() => vi.useFakeTimers());

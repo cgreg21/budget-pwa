@@ -1,11 +1,11 @@
 import { TestBed } from '@angular/core/testing';
 import { ConfigFileError, DEFAULT_CATEGORIES, sealConfig, webCryptoConfigCipher, type ConfigData, type WebCryptoLike } from 'budget-lib';
 
-import { BudgetService } from './budget.service';
+import { BudgetService } from '../data/budget.service';
 import { CalendarSyncService } from './calendar-sync.service';
 import { ConfigArchiveService, downloadText } from './config-archive.service';
-import { CALENDAR_PASSWORD_SECRET, readSecret, writeSecret } from './secrets';
-import { SettingsService } from './settings.service';
+import { CALENDAR_PASSWORD_SECRET, readSecret, writeSecret } from '../security/secrets';
+import { SettingsService } from '../preferences/settings.service';
 
 const DATA_KEY = 'budget-pwa:data:v1';
 const CONFIG_KEY = 'budget-pwa:calendar:v1';

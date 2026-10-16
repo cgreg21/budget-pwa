@@ -1,10 +1,10 @@
 import { TestBed } from '@angular/core/testing';
 import { DEFAULT_CATEGORIES, base64Utf8, categoriesToIcs, transactionToIcs, type Category, type Transaction } from 'budget-lib';
 
-import { BudgetService } from './budget.service';
+import { BudgetService } from '../data/budget.service';
 import { CalendarSyncService, calendarTransport, normalizeProxyUrl, proxied } from './calendar-sync.service';
-import { CALENDAR_PASSWORD_SECRET, readSecret, writeSecret } from './secrets';
-import { SettingsService } from './settings.service';
+import { CALENDAR_PASSWORD_SECRET, readSecret, writeSecret } from '../security/secrets';
+import { SettingsService } from '../preferences/settings.service';
 
 const CONFIG_KEY = 'budget-pwa:calendar:v1';
 const BASELINE_KEY = 'budget-pwa:calendar-baseline:v1';

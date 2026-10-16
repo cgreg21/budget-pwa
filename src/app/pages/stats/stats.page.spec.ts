@@ -1,8 +1,8 @@
 import { TestBed, type ComponentFixture } from '@angular/core/testing';
 import type { Transaction } from 'budget-lib';
 
-import { BudgetService } from '../../budget.service';
-import { LayoutService } from '../../layout.service';
+import { BudgetService } from '../../data/budget.service';
+import { LayoutService } from '../../ui/layout.service';
 import { StatsPage } from './stats.page';
 
 const DATA_KEY = 'budget-pwa:data:v1';

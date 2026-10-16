@@ -1,10 +1,10 @@
 import { ChangeDetectionStrategy, Component, OnInit, computed, inject, input, output, signal } from '@angular/core';
 import { currentMonthKey, FIRST_MONTH, LAST_MONTH, monthKeyFrom, yearOf, type MonthKey } from 'budget-lib';
 
-import { BudgetService } from '../budget.service';
-import { UI_ICONS } from '../icons';
-import { SettingsService } from '../settings.service';
-import { SheetComponent } from './sheet.component';
+import { BudgetService } from '../../data/budget.service';
+import { UI_ICONS } from '../../ui/icons';
+import { SettingsService } from '../../preferences/settings.service';
+import { SheetComponent } from '../overlays/sheet.component';
 
 /**
  * Month picker: a year selector over a grid of the twelve months. Opened on the selected month,
