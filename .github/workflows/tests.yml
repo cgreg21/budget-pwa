@@ -1,0 +1,66 @@
+name: Tests
+
+on:
+  pull_request:
+  push:
+    branches: [master]
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout budget-pwa
+        uses: actions/checkout@v5
+        with:
+          path: budget-pwa
+
+      # package.json points at "file:../budget-lib": the library has to sit next to the app.
+      - name: Checkout budget-lib
+        uses: actions/checkout@v5
+        with:
+          repository: cgreg21/budget-lib
+          path: budget-lib
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: |
+            budget-lib/package-lock.json
+            budget-pwa/package-lock.json
+
+      - name: Build budget-lib
+        working-directory: budget-lib
+        run: npm ci
+
+      - name: Install budget-pwa
+        working-directory: budget-pwa
+        run: npm ci
+
+      - name: Type check
+        working-directory: budget-pwa
+        run: npm run typecheck
+
+      - name: Unit tests
+        working-directory: budget-pwa
+        run: npm test
+
+      - name: Install Chromium
+        working-directory: budget-pwa
+        run: npx playwright install --with-deps chromium
+
+      - name: End-to-end tests
+        working-directory: budget-pwa
+        run: npm run e2e
+
+      - name: Upload the Playwright report
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: |
+            budget-pwa/playwright-report
+            budget-pwa/e2e-results
+          retention-days: 7

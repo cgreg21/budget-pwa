@@ -36,6 +36,18 @@ npm run build
 
 Les tests unitaires (`src/app/**/*.spec.ts`) s’exécutent avec vitest via `ng test` (environnement jsdom, `localStorage` et IndexedDB simulés dans `src/test-setup.ts`) ; `npm run test:coverage` affiche la couverture.
 
+### Tests de bout en bout
+
+Les tests de bout en bout (`e2e/*.spec.ts`) utilisent [Playwright](https://playwright.dev) : ils lancent le serveur de développement sur le port 4300 puis pilotent l’application dans un vrai navigateur, avec trois tailles d’écran (`desktop` 1280×800, `tablet` 820×1180, `mobile` 390×844). Ils couvrent le premier lancement, la navigation, la création, la modification et la suppression de transactions, la corbeille, la multisélection, les réglages et l’absence de barre de défilement horizontale sur chaque page.
+
+```sh
+npm run e2e                          # tous les projets
+npx playwright test --project=mobile # une seule taille d’écran
+npm run e2e:ui                       # mode interactif
+```
+
+En local, c’est Google Chrome installé sur la machine qui est utilisé ; en CI (`CI=true`), installer Chromium avec `npx playwright install --with-deps chromium`. Chaque test part d’un budget de démonstration injecté dans `localStorage` (voir `e2e/fixtures.ts`). Le workflow `.github/workflows/tests.yml` exécute le contrôle de types, les tests unitaires et les tests de bout en bout à chaque push et pull request.
+
 Pour installer la PWA, publier le build de production sur un hôte HTTPS puis utiliser l’action d’installation du navigateur. Le service worker est désactivé par le serveur de développement.
 
 ## Déploiement sur GitHub Pages
