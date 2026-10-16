@@ -14,7 +14,7 @@
 </form>
 
 <div class="relative min-h-0 flex-1">
-  <div class="h-full overflow-y-auto px-4 pb-6 md:grid md:grid-cols-2 md:content-start md:gap-x-3 md:px-6">
+  <div class="h-full overflow-y-auto px-1 pb-6 md:grid md:grid-cols-2 md:content-start md:px-3">
     @for (category of b.categories(); track category.name; let index = $index) {
       <div class="animate-appear" [style.animation-delay.ms]="index < 12 ? index * 30 : 0">
         <app-swipe-row [open]="openRow() === category.name" [removeLabel]="s.t().common.delete"
@@ -26,7 +26,6 @@
     }
     <div class="h-6 md:col-span-2"></div>
   </div>
-  <div class="pointer-events-none absolute inset-x-0 bottom-0 h-7 bg-linear-to-b from-transparent to-bg"></div>
 </div>
 
 @if (pickerTarget() !== null) {
