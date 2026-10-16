@@ -9,6 +9,7 @@ import { UI_ICONS, categoryGlyph } from '../../icons';
 import { SettingsService } from '../../settings.service';
 import { HeaderComponent } from '../../shared/header.component';
 import { AutofocusDirective } from '../../shared/autofocus.directive';
+import { SwipeRowComponent, type SwipeState } from '../../shared/swipe-row.component';
 
 /** Picker target standing for the category about to be added (a name can never be empty). */
 const NEW_CATEGORY = '';
@@ -16,7 +17,7 @@ const NEW_CATEGORY = '';
 @Component({
   selector: 'app-categories-page',
   standalone: true,
-  imports: [HeaderComponent, AutofocusDirective],
+  imports: [HeaderComponent, AutofocusDirective, SwipeRowComponent],
   host: { class: 'flex min-h-0 min-w-0 flex-1 flex-col animate-page' },
   templateUrl: './categories.page.html',
 })
@@ -30,6 +31,8 @@ export class CategoriesPage {
   readonly glyphOf = categoryGlyph;
 
   readonly newName = signal('');
+  /** The category whose delete button is revealed by a swipe; only one row stays open. */
+  protected readonly openRow = signal<string | null>(null);
   readonly newIcon = signal(DEFAULT_CATEGORY_ICON);
   readonly error = signal('');
   /** The category being renamed in the dialog, and the name typed so far. */
@@ -82,7 +85,12 @@ export class CategoriesPage {
     else if (target !== null) this.b.updateCategory(target, { icon });
   }
 
+  protected setOpenRow(name: string, state: SwipeState): void {
+    this.openRow.set(state === true ? name : null);
+  }
+
   async remove(category: Category): Promise<void> {
+    this.openRow.set(null);
     const t = this.s.t();
     if (this.b.categories().length <= 1) {
       await this.dialogs.alert({ message: t.categories.mustKeepOne, ok: t.common.ok });

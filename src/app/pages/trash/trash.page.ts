@@ -1,7 +1,7 @@
 import { Component, computed, inject, signal } from '@angular/core';
 import type { TrashedTransaction } from 'budget-lib';
 
-import { BudgetService } from '../../budget.service';
+import { BudgetService, type TrashedCategory } from '../../budget.service';
 import { DialogService } from '../../dialog.service';
 import { SnackbarService } from '../../snackbar.service';
 import { UI_ICONS, categoryGlyph } from '../../icons';
@@ -24,6 +24,7 @@ export class TrashPage {
   private readonly dialogs = inject(DialogService);
   private readonly snackbar = inject(SnackbarService);
   readonly ui = UI_ICONS;
+  readonly glyphOf = categoryGlyph;
   protected readonly openRow = signal<string | null>(null);
   protected readonly openSide = signal<SwipeState>(false);
 
@@ -82,6 +83,24 @@ export class TrashPage {
     return categoryGlyph(this.b.iconOf(category));
   }
 
+  readonly itemCount = computed(() => this.b.trash().length + this.b.trashedCategories().length);
+
+  restoreCategory(item: TrashedCategory): void {
+    this.openRow.set(null);
+    this.b.restoreCategory(item.name);
+    this.snackbar.show(this.s.t().snackbar.restored);
+  }
+
+  async deleteCategoryForever(item: TrashedCategory): Promise<void> {
+    const t = this.s.t();
+    const ok = await this.dialogs.confirm({
+      title: t.trash.deleteForever, message: t.trash.categoryForeverBody(item.name), ok: t.common.delete, cancel: t.common.cancel,
+    });
+    if (!ok) return;
+    this.b.deleteCategoryForever(item.name);
+    this.snackbar.show(t.snackbar.deletedForever);
+  }
+
   async deleteForever(item: TrashedTransaction): Promise<boolean> {
     const t = this.s.t();
     const details = `${item.description || t.common.noDescription} (${this.s.formatSigned(item.kind, item.amount)})`;
@@ -100,7 +119,7 @@ export class TrashPage {
 
   async emptyTrash(): Promise<boolean> {
     const t = this.s.t();
-    const count = this.b.trash().length;
+    const count = this.itemCount();
     const ok = await this.dialogs.confirm({ title: t.trash.emptyAction, message: t.trash.emptyBody(count), ok: t.common.delete, cancel: t.common.cancel });
     if (ok) {
       this.b.emptyTrash();

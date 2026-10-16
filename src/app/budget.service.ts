@@ -52,6 +52,18 @@ export interface BudgetData {
 
 const DATA_KEY = profileKey('budget-pwa:data:v1');
 const TRASH_KEY = profileKey('budget-pwa:trash:v1');
+const TRASH_CATEGORIES_KEY = profileKey('budget-pwa:trash-categories:v1');
+
+/** A deleted category, kept in the trash until it is restored or deleted for good. */
+export interface TrashedCategory extends Category {
+  deletedAt: string;
+}
+
+function isTrashedCategoryArray(value: unknown): value is TrashedCategory[] {
+  return Array.isArray(value) && value.every((item) => typeof item === 'object' && item !== null
+    && typeof (item as TrashedCategory).name === 'string' && (item as TrashedCategory).name !== ''
+    && typeof (item as TrashedCategory).icon === 'string' && typeof (item as TrashedCategory).deletedAt === 'string');
+}
 
 function newId(): string {
   return typeof crypto.randomUUID === 'function'
@@ -112,6 +124,10 @@ export class BudgetService {
   private readonly trashState = signal<TrashedTransaction[]>(readValidJson(TRASH_KEY, isTrashedTransactionArray, () => [], true).value);
   /** Deleted transactions, the most recently deleted first. */
   readonly trash = computed(() => [...this.trashState()].sort((a, b) => b.deletedAt.localeCompare(a.deletedAt)));
+  private readonly trashedCategoryState = signal<TrashedCategory[]>(
+    readValidJson(TRASH_CATEGORIES_KEY, isTrashedCategoryArray, () => [], true).value);
+  /** Deleted categories, the most recently deleted first. */
+  readonly trashedCategories = computed(() => [...this.trashedCategoryState()].sort((a, b) => b.deletedAt.localeCompare(a.deletedAt)));
 
   constructor() {
     this.applyRecurrences(this.selectedMonth());
@@ -345,6 +361,7 @@ export class BudgetService {
   }
 
   emptyTrash(): void {
+    if (this.trashedCategoryState().length > 0) this.setTrashedCategories([]);
     if (this.trashState().length === 0) return;
     this.setTrash([]);
     this.transactionChangesSubject.next();
@@ -385,10 +402,34 @@ export class BudgetService {
 
   removeCategory(name: string): void {
     if (this.categories().length <= 1) return;
+    const removed = this.categories().find((category) => category.name === name);
     this.updateData((data) => ({
       ...data,
       categories: data.categories.filter((category) => category.name !== name),
     }));
+    if (removed !== undefined) {
+      this.setTrashedCategories([
+        { ...removed, deletedAt: new Date().toISOString() },
+        ...this.trashedCategoryState().filter((item) => item.name !== name),
+      ]);
+    }
+  }
+
+  /** Puts a trashed category back in the list; nothing is added when a category of that name exists again. */
+  restoreCategory(name: string): void {
+    const item = this.trashedCategoryState().find((candidate) => candidate.name === name);
+    if (item === undefined) return;
+    if (!this.categories().some((category) => category.name === name)) this.addCategory(item.name, item.icon);
+    this.setTrashedCategories(this.trashedCategoryState().filter((candidate) => candidate.name !== name));
+  }
+
+  deleteCategoryForever(name: string): void {
+    this.setTrashedCategories(this.trashedCategoryState().filter((item) => item.name !== name));
+  }
+
+  private setTrashedCategories(items: TrashedCategory[]): void {
+    this.trashedCategoryState.set(items);
+    localStorage.setItem(TRASH_CATEGORIES_KEY, JSON.stringify(items));
   }
 
   setThresholds(thresholds: BalanceThresholds): void {

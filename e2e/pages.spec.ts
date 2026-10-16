@@ -25,6 +25,39 @@ test.describe('categories, statistics and history', () => {
     await open(app, '/trash');
     await expect(page.getByText('La corbeille est vide.')).toBeVisible();
   });
+
+  test('swipes a category away, finds it in the trash and restores it', async ({ app, page }) => {
+    await open(app, '/categories');
+    const row = page.locator('app-swipe-row', { hasText: 'Loisirs' });
+    const box = (await row.locator('.row').boundingBox())!;
+    const y = box.y + box.height / 2;
+    await page.mouse.move(box.x + box.width - 20, y);
+    await page.mouse.down();
+    await page.mouse.move(box.x + box.width - 60, y, { steps: 4 });
+    await page.mouse.move(box.x + box.width - 140, y, { steps: 4 });
+    await page.mouse.up();
+    await row.getByRole('button', { name: 'Supprimer', exact: true }).click();
+    await page.getByRole('dialog').getByRole('button', { name: 'Supprimer', exact: true }).click();
+    await expect(page.getByText('Loisirs', { exact: true })).toHaveCount(0);
+
+    await page.goto('/trash');
+    const trashed = page.getByTestId('trashed-categories');
+    await expect(trashed.getByText('Loisirs', { exact: true })).toBeVisible();
+
+    const trashedRow = trashed.locator('app-swipe-row', { hasText: 'Loisirs' });
+    const trashedBox = (await trashedRow.locator('.row').boundingBox())!;
+    const trashedY = trashedBox.y + trashedBox.height / 2;
+    await page.mouse.move(trashedBox.x + 20, trashedY);
+    await page.mouse.down();
+    await page.mouse.move(trashedBox.x + 60, trashedY, { steps: 4 });
+    await page.mouse.move(trashedBox.x + 140, trashedY, { steps: 4 });
+    await page.mouse.up();
+    await trashedRow.getByRole('button', { name: 'Restaurer', exact: true }).click();
+    await expect(trashed).toHaveCount(0);
+
+    await page.goto('/categories');
+    await expect(page.getByText('Loisirs', { exact: true })).toBeVisible();
+  });
 });
 
 test.describe('settings', () => {

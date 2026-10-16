@@ -1,7 +1,7 @@
-<app-header [title]="s.t().trash.title" [actionLabel]="b.trash().length > 0 ? s.t().trash.emptyAction : null" (actionTap)="emptyTrash()"`r`n            [selectLabel]="b.trash().length > 0 ? s.t().selection.select : null" [selecting]="selecting()" (selectTap)="toggleSelecting()" />
+<app-header [title]="s.t().trash.title" [actionLabel]="itemCount() > 0 ? s.t().trash.emptyAction : null" (actionTap)="emptyTrash()"`r`n            [selectLabel]="b.trash().length > 0 ? s.t().selection.select : null" [selecting]="selecting()" (selectTap)="toggleSelecting()" />
 
 <div class="min-h-0 flex-1 overflow-y-auto overflow-x-hidden">
-  @if (b.trash().length === 0) {
+  @if (itemCount() === 0) {
     <div class="px-6 py-16 text-center text-muted">
       <div class="mb-3 text-5xl font-mdi">{{ ui.trash }}</div>
       <p>{{ s.t().trash.empty }}</p>
@@ -35,6 +35,23 @@
         }
       }
     </div>
+    @if (b.trashedCategories().length > 0) {
+      <span class="section-title mx-3 mt-1 md:mx-5">{{ s.t().trash.categories }}</span>
+      <div class="pb-3" data-testid="trashed-categories">
+        @for (item of b.trashedCategories(); track item.name) {
+          <app-swipe-row [open]="openRow() === 'category:' + item.name ? openSide() : false"
+                         [removeLabel]="s.t().trash.deleteForever" [restoreLabel]="s.t().trash.restore"
+                         (openChange)="setOpenRow('category:' + item.name, $event)" (edit)="openRow.set(null)"
+                         (restore)="restoreCategory(item)" (remove)="deleteCategoryForever(item)">
+            <span class="row-icon">{{ glyphOf(item.icon) }}</span>
+            <div class="min-w-0 flex-1">
+              <div class="row-title">{{ item.name }}</div>
+              <div class="row-sub">{{ s.t().trash.deletedOn(item.deletedAt.slice(0, 10)) }}</div>
+            </div>
+          </app-swipe-row>
+        }
+      </div>
+    }
   }
 </div>
 

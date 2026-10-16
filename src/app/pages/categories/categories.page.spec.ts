@@ -131,6 +131,34 @@ describe('CategoriesPage', () => {
     expect(names()).toEqual(['Alimentation']);
   });
 
+  it('moves a removed category to the trash, restores it or deletes it for good', () => {
+    b.removeCategory('Logement');
+    expect(b.trashedCategories().map((c) => c.name)).toEqual(['Logement']);
+    expect(JSON.parse(localStorage.getItem('budget-pwa:trash-categories:v1') ?? '[]')).toHaveLength(1);
+
+    b.restoreCategory('Logement');
+    expect(names()).toEqual(['Alimentation', 'Logement']);
+    expect(b.categories()[1].icon).toBe('home-symbolic');
+    expect(b.trashedCategories()).toEqual([]);
+
+    b.removeCategory('Logement');
+    b.addCategory('Logement', 'folder-symbolic');
+    b.restoreCategory('Logement');
+    expect(names().filter((name) => name === 'Logement')).toHaveLength(1);
+    expect(b.trashedCategories()).toEqual([]);
+
+    b.removeCategory('Logement');
+    b.deleteCategoryForever('Logement');
+    expect(b.trashedCategories()).toEqual([]);
+    expect(names()).toEqual(['Alimentation']);
+  });
+
+  it('empties the trashed categories with the trash', () => {
+    b.removeCategory('Logement');
+    b.emptyTrash();
+    expect(b.trashedCategories()).toEqual([]);
+  });
+
   it('refuses to remove the last category', async () => {
     seed([{ name: 'Seule', icon: 'folder-symbolic' }]);
     TestBed.resetTestingModule();

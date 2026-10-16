@@ -16,11 +16,12 @@
 <div class="relative min-h-0 flex-1">
   <div class="h-full overflow-y-auto px-4 pb-6 md:grid md:grid-cols-2 md:content-start md:gap-x-3 md:px-6">
     @for (category of b.categories(); track category.name; let index = $index) {
-      <div class="setting animate-appear" [style.animation-delay.ms]="index < 12 ? index * 30 : 0">
-        <button type="button" class="row-icon" [attr.aria-label]="s.t().categories.pickIcon" (click)="pickerTarget.set(category.name)">{{ glyphOf(category.icon) }}</button>
-        <button type="button" class="flex-1 truncate text-left" (click)="rename(category)">{{ category.name }}</button>
-        <button type="button" class="h-12 bg-transparent px-2 text-[22px] text-bad font-mdi" [attr.aria-label]="s.t().common.delete"
-                (click)="remove(category)">{{ ui.remove }}</button>
+      <div class="animate-appear" [style.animation-delay.ms]="index < 12 ? index * 30 : 0">
+        <app-swipe-row [open]="openRow() === category.name" [removeLabel]="s.t().common.delete"
+                       (openChange)="setOpenRow(category.name, $event)" (remove)="remove(category)">
+          <button type="button" class="row-icon" [attr.aria-label]="s.t().categories.pickIcon" (click)="$event.stopPropagation(); pickerTarget.set(category.name)">{{ glyphOf(category.icon) }}</button>
+          <button type="button" class="flex-1 truncate text-left" (click)="$event.stopPropagation(); rename(category)">{{ category.name }}</button>
+        </app-swipe-row>
       </div>
     }
     <div class="h-6 md:col-span-2"></div>

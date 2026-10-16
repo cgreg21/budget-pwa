@@ -14,6 +14,7 @@ export const MAX_PROFILE_NAME_LENGTH = 40;
 export const PROFILE_KEYS = [
   'budget-pwa:data:v1',
   'budget-pwa:trash:v1',
+  'budget-pwa:trash-categories:v1',
   'budget-pwa:settings:v1',
   'budget-pwa:calendar:v1',
   'budget-pwa:calendar-baseline:v1',
