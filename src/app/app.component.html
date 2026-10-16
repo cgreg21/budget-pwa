@@ -47,7 +47,19 @@
     <div class="px-5 text-xs text-muted" data-testid="app-version">v{{ version }}</div>
   </aside>
 
-  @if (install.banner()) {
+  @if (updates.available() && !updates.dismissed()) {
+    <div class="absolute inset-x-3 bottom-[calc(12px+env(safe-area-inset-bottom))] z-20 flex items-center gap-3 rounded-md border border-line bg-card p-3 shadow-pop md:left-auto md:right-6 md:w-[440px]" role="dialog" [attr.aria-label]="s.t().update.title">
+      <img src="icons/icon-192.png" alt="" class="size-11 shrink-0 rounded-md">
+      <div class="min-w-0 flex-1">
+        <div class="text-sm font-bold">{{ s.t().update.title }}</div>
+        <div class="text-xs text-muted">{{ s.t().update.body }}</div>
+      </div>
+      <div class="flex shrink-0 flex-col gap-1">
+        <button type="button" class="rounded-md bg-green px-3 py-1.5 text-sm font-bold text-bg transition-transform active:scale-95" (click)="updates.apply()">{{ s.t().update.apply }}</button>
+        <button type="button" class="rounded-md px-3 py-1.5 text-sm font-medium text-muted transition-transform active:scale-95" (click)="updates.dismiss()">{{ s.t().update.later }}</button>
+      </div>
+    </div>
+  } @else if (install.banner()) {
     <div class="absolute inset-x-3 bottom-[calc(12px+env(safe-area-inset-bottom))] z-20 flex items-center gap-3 rounded-md border border-line bg-card p-3 shadow-pop md:left-auto md:right-6 md:w-[440px]" role="dialog" [attr.aria-label]="s.t().install.title">
       <img src="icons/icon-192.png" alt="" class="size-11 shrink-0 rounded-md">
       <div class="min-w-0 flex-1">

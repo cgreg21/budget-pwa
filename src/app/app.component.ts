@@ -36,7 +36,7 @@ export class AppComponent {
   readonly drawer = inject(DrawerService);
   readonly install = inject(InstallService);
   readonly onboarding = inject(OnboardingService);
-  private readonly updates = inject(UpdateService);
+  private   readonly updates = inject(UpdateService);
   readonly layout = inject(LayoutService);
   private readonly budget = inject(BudgetService);
   private readonly dialog = inject(DialogService);

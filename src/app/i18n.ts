@@ -87,6 +87,7 @@ export interface Strings {
     errors: Record<ConfigFileErrorCode, string>; unreadable: string;
   };
   install: { title: string; body: string; install: string; dismiss: string; settingsHelp: string };
+  update: { title: string; body: string; apply: string; later: string };
   onboarding: {
     label: string; skip: string; next: string; start: string; replayTitle: string; replayHelp: string; replay: string;
     slides: { title: string; body: string }[];
@@ -237,6 +238,10 @@ const en: Strings = {
     title: 'Install Budget', body: 'Add the app to your home screen to use it full screen and offline.',
     install: 'Install', dismiss: 'No thanks',
     settingsHelp: 'Install the app on this device to use it full screen and offline.',
+  },
+  update: {
+    title: 'Update available', body: 'A new version of Budget is ready.',
+    apply: 'Update', later: 'Later',
   },
   onboarding: {
     label: 'Welcome tour', skip: 'Skip', next: 'Next', start: 'Get started',
@@ -396,6 +401,10 @@ const fr: Strings = {
     title: 'Installer Budget', body: 'Ajoutez l’application à votre écran d’accueil pour l’utiliser en plein écran et hors ligne.',
     install: 'Installer', dismiss: 'Non merci',
     settingsHelp: 'Installez l’application sur cet appareil pour l’utiliser en plein écran et hors ligne.',
+  },
+  update: {
+    title: 'Mise à jour disponible', body: 'Une nouvelle version de Budget est prête.',
+    apply: 'Mettre à jour', later: 'Plus tard',
   },
   onboarding: {
     label: 'Présentation', skip: 'Passer', next: 'Suivant', start: 'Commencer',
