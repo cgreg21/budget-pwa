@@ -216,8 +216,11 @@
   }
   /* iOS gives date/month fields an intrinsic width wider than the column: force them to fit. */
   .input[type="date"], .input[type="month"] {
-    @apply block min-w-0 max-w-full appearance-none text-left;
+    @apply flex min-w-0 max-w-full appearance-none items-center py-0 text-left;
     -webkit-appearance: none;
+  }
+  .input[type="date"]::-webkit-date-and-time-value, .input[type="month"]::-webkit-date-and-time-value {
+    @apply m-0 min-h-0 text-left;
   }
   .select {
     @apply my-1 flex items-center text-left;
