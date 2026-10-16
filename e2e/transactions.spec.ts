@@ -106,6 +106,32 @@ test.describe('transactions', () => {
     await expect(page.getByText(/tous les 2 semaines/)).toBeVisible();
   });
 
+  test('adds a monthly series spread over ten months a year', async ({ app, page }) => {
+    await open(app, '/budget');
+    await page.getByRole('button', { name: 'Ajouter', exact: true }).click();
+    await page.getByLabel('Montant').fill('180');
+    await page.getByLabel('Description').fill('EDF test');
+    await page.getByRole('switch').first().click();
+    await page.locator('#editor-partial').click();
+    await page.getByLabel('Mois par an').fill('10');
+    await page.getByRole('button', { name: 'Enregistrer' }).click();
+
+    await expect(page.getByText('Transaction ajoutée')).toBeVisible();
+    await page.goto('/settings/recurrences');
+    await expect(page.getByText(/10 mois par an/)).toBeVisible();
+  });
+
+  test('rejects a number of months per year out of range', async ({ app, page }) => {
+    await open(app, '/budget');
+    await page.getByRole('button', { name: 'Ajouter', exact: true }).click();
+    await page.getByLabel('Montant').fill('180');
+    await page.getByRole('switch').first().click();
+    await page.locator('#editor-partial').click();
+    await page.getByLabel('Mois par an').fill('12');
+    await page.getByRole('button', { name: 'Enregistrer' }).click();
+    await expect(page.getByText('Saisissez un nombre entre 1 et 11.')).toBeVisible();
+  });
+
   test('rejects an invalid custom interval', async ({ app, page }) => {
     await open(app, '/budget');
     await page.getByRole('button', { name: 'Ajouter', exact: true }).click();

@@ -1,6 +1,6 @@
 import { Component, inject } from '@angular/core';
 import { RouterLink } from '@angular/router';
-import { endMonth, type Recurrence } from 'budget-lib';
+import { cycleOf, endMonth, type Recurrence } from 'budget-lib';
 
 import { BudgetService } from '../../budget.service';
 import { DialogService } from '../../dialog.service';
@@ -31,7 +31,8 @@ export class RecurrencesPage {
         : t.recurrences.rangeUntil(start, this.s.monthLabel(end));
     }
     const rhythm = r.interval === undefined ? t.frequency[r.frequency] : t.recurrences.everyUnits(r.interval, r.frequency);
-    return `${rhythm} \u00B7 ${t.recurrences.dayOf(r.day)} \u00B7 ${r.category} \u00B7 ${range}`;
+    const cycle = cycleOf(r);
+    return `${cycle === undefined ? rhythm : `${rhythm} ${t.recurrences.perYear(cycle)}`} \u00B7 ${t.recurrences.dayOf(r.day)} \u00B7 ${r.category} \u00B7 ${range}`;
   }
 
   async remove(r: Recurrence): Promise<void> {

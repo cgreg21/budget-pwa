@@ -14,6 +14,7 @@ Le style utilise Tailwind CSS v4 (`src/styles.css`, thème sombre/clair via vari
 
 ## Fonctionnalités
 
+- **Échelonnement annuel** : une récurrence mensuelle peut n'être due que N mois par an (« EDF 180 € sur 10 mois, tous les ans ») : N mois consécutifs à partir de la date de départ, puis une pause jusqu'au même mois l'année suivante. Les applications bureau et mobile ne le proposent pas et le perdent si la série y est modifiée.
 - **Échéancier** (`/schedule`) : les prochaines occurrences des transactions récurrentes, regroupées par mois avec revenus, dépenses et solde, sur 1, 3, 6 ou 12 mois.
 - **Profils** (Réglages > Général > Profils, `/settings/profiles`) : plusieurs jeux de données indépendants (transactions, catégories, récurrences, réglages, synchronisation du calendrier et son mot de passe). Changer de profil recharge l'application ; le profil actif ne peut pas être supprimé.
 - Transactions par mois : création, modification, suppression, recherche, filtre revenu/dépense et récurrences quotidiennes, hebdomadaires (plusieurs occurrences par mois, à partir du jour de la transaction), mensuelles, bimestrielles, trimestrielles, semestrielles, annuelles ou personnalisées (tous les N jours, semaines, mois, bimestres, trimestres, semestres ou années, de 1 à 60), avec une durée limitée par un nombre d'occurrences et/ou un dernier mois.

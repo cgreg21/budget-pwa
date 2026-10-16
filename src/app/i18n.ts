@@ -53,6 +53,7 @@ export interface Strings {
     customFrequency: string; interval: string; invalidInterval: string; unit: string;
     units: Record<RecurrenceFrequency, string>;
     ended: string; until: string; invalidUntil: string;
+    partial: string; activeMonths: string; partialHelp: string; invalidActiveMonths: string;
     scopeBody: string; occurrenceOnly: string; seriesToo: string;
   };
   stats: {
@@ -99,7 +100,7 @@ export interface Strings {
     title: string; empty: string; deleteBody(name: string): string;
     from(month: string): string; range(start: string, end: string, count: number): string;
     rangeUntil(start: string, end: string): string; everyUnits(count: number, unit: RecurrenceFrequency): string;
-    dayOf(day: number): string;
+    dayOf(day: number): string; perYear(months: number): string;
   };
   schedule: {
     title: string; empty: string; horizon: string; months(count: number): string;
@@ -174,6 +175,9 @@ const en: Strings = {
     customFrequency: 'Custom', interval: 'Repeat every', invalidInterval: 'Enter a number between 1 and 60.',
     unit: 'Unit', units: { daily: 'Days', weekly: 'Weeks', monthly: 'Months', bimonthly: 'Two-month periods', quarterly: 'Quarters', semiannual: 'Half-years', yearly: 'Years' },
     ended: 'End on a given month', until: 'Last month', invalidUntil: 'The last month cannot be before the first one.',
+    partial: 'Spread over part of the year', activeMonths: 'Months per year',
+    partialHelp: 'Due every month from the first date for this many months, then paused until the same month next year.',
+    invalidActiveMonths: 'Enter a number between 1 and 11.',
     scopeTitle: 'Apply the change to',
     scopeBody: 'This transaction is part of a recurring series.',
     occurrenceOnly: 'This occurrence only', seriesToo: 'The whole series',
@@ -281,7 +285,7 @@ const en: Strings = {
       }[unit];
       return count === 1 ? `every ${one}` : `every ${count} ${many}`;
     },
-    dayOf: (day) => `day ${day}`,
+    dayOf: (day) => `day ${day}`, perYear: (months) => `(${months} months a year)`,
   },
   schedule: {
     title: 'Schedule', empty: 'No upcoming occurrence. Recurring transactions you create appear here.',
@@ -359,6 +363,9 @@ const fr: Strings = {
     customFrequency: 'Personnalisée', interval: 'Répéter tous les', invalidInterval: 'Saisissez un nombre entre 1 et 60.',
     unit: 'Unité', units: { daily: 'Jours', weekly: 'Semaines', monthly: 'Mois', bimonthly: 'Bimestres', quarterly: 'Trimestres', semiannual: 'Semestres', yearly: 'Années' },
     ended: 'Terminer à un mois donné', until: 'Dernier mois', invalidUntil: 'Le dernier mois ne peut pas précéder le premier.',
+    partial: 'Échelonner sur une partie de l’année', activeMonths: 'Mois par an',
+    partialHelp: 'Dû chaque mois à partir de la première date pendant ce nombre de mois, puis en pause jusqu’au même mois l’année suivante.',
+    invalidActiveMonths: 'Saisissez un nombre entre 1 et 11.',
     scopeTitle: 'Appliquer la modification à',
     scopeBody: 'Cette transaction fait partie d’une série récurrente.',
     occurrenceOnly: 'Cette occurrence uniquement', seriesToo: 'Toute la série',
@@ -466,7 +473,7 @@ const fr: Strings = {
       }[unit];
       return count === 1 ? `chaque ${one}` : `tous les ${count} ${many}`;
     },
-    dayOf: (day) => `le ${day}`,
+    dayOf: (day) => `le ${day}`, perYear: (months) => `(${months} mois par an)`,
   },
   schedule: {
     title: 'Échéancier', empty: 'Aucune échéance à venir. Les transactions récurrentes que vous créez apparaissent ici.',

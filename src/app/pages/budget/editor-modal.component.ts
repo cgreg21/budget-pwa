@@ -1,6 +1,6 @@
 import { Component, OnInit, computed, inject, input, output, signal } from '@angular/core';
 import {
-  RECURRENCE_FREQUENCIES, MAX_INTERVAL, MAX_OCCURRENCES, MIN_INTERVAL, MIN_OCCURRENCES, isMonthKey, type RecurrenceFrequency,
+  RECURRENCE_FREQUENCIES, MAX_ACTIVE_MONTHS, MAX_INTERVAL, MAX_OCCURRENCES, MIN_ACTIVE_MONTHS, MIN_INTERVAL, MIN_OCCURRENCES, isMonthKey, type RecurrenceFrequency,
   type RecurrenceSettings, type Transaction, type TransactionInput, type TransactionKind,
 } from 'budget-lib';
 
@@ -47,6 +47,10 @@ export class EditorModalComponent implements OnInit {
   readonly interval = signal('2');
   readonly ended = signal(false);
   readonly until = signal('');
+  readonly partial = signal(false);
+  readonly activeMonths = signal('10');
+  /** Spreading a monthly series over part of the year only makes sense at a plain monthly rhythm. */
+  readonly canBePartial = computed(() => this.repeat() && !this.custom() && this.frequency() === 'monthly');
   readonly error = signal('');
   readonly categoryGlyph = computed(() => categoryGlyph(this.b.iconOf(this.category())));
 
@@ -67,6 +71,8 @@ export class EditorModalComponent implements OnInit {
     this.interval.set(String(series?.interval ?? 2));
     this.ended.set(series?.until !== undefined);
     this.until.set(series?.until ?? '');
+    this.partial.set(series?.activeMonths !== undefined);
+    this.activeMonths.set(String(series?.activeMonths ?? 10));
   }
 
   async pickCategory(): Promise<void> {
@@ -168,6 +174,10 @@ export class EditorModalComponent implements OnInit {
       const interval = Number(this.interval());
       if (!Number.isInteger(interval) || interval < MIN_INTERVAL || interval > MAX_INTERVAL) return t.editor.invalidInterval;
     }
+    if (this.canBePartial() && this.partial()) {
+      const months = Number(this.activeMonths());
+      if (!Number.isInteger(months) || months < MIN_ACTIVE_MONTHS || months > MAX_ACTIVE_MONTHS) return t.editor.invalidActiveMonths;
+    }
     if (this.ended()) {
       const series = this.existing && this.b.recurrenceOf(this.existing);
       const start = series?.startMonth ?? this.date().slice(0, 7);
@@ -181,6 +191,7 @@ export class EditorModalComponent implements OnInit {
     const settings: RecurrenceSettings = { frequency: this.frequency() };
     if (this.custom()) settings.interval = Number(this.interval());
     if (this.ended()) settings.until = this.until();
+    if (this.canBePartial() && this.partial()) settings.activeMonths = Number(this.activeMonths());
     if (!this.limited()) return settings;
     const count = Math.round(Number(this.occurrences()));
     settings.occurrences = Number.isFinite(count)
