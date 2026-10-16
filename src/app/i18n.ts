@@ -28,7 +28,7 @@ export interface Strings {
     restore: string; deleteForever: string; chooseCategory: string; deleted(n: number): string; recategorised(n: number): string;
     restored(n: number): string; deletedForever(n: number): string; deleteForeverBody(n: number): string;
   };
-  frequency: { monthly: string; quarterly: string; yearly: string };
+  frequency: { monthly: string; bimonthly: string; quarterly: string; semiannual: string; yearly: string };
   trash: {
     title: string; empty: string; help: string; restore: string; deleteForever: string; emptyAction: string;
     emptyBody(count: number): string; deleteForeverBody(details: string): string; deletedOn(date: string): string;
@@ -50,6 +50,8 @@ export interface Strings {
     newTitle: string; editTitle: string; amount: string; date: string; description: string;
     category: string; repeat: string; frequency: string; limited: string;
     occurrences: string; invalidAmount: string; invalidDate: string; scopeTitle: string;
+    customFrequency: string; interval: string; invalidInterval: string;
+    ended: string; until: string; invalidUntil: string;
     scopeBody: string; occurrenceOnly: string; seriesToo: string;
   };
   stats: {
@@ -95,6 +97,7 @@ export interface Strings {
   recurrences: {
     title: string; empty: string; deleteBody(name: string): string;
     from(month: string): string; range(start: string, end: string, count: number): string;
+    rangeUntil(start: string, end: string): string; everyMonths(count: number): string;
     dayOf(day: number): string;
   };
 }
@@ -126,7 +129,7 @@ const en: Strings = {
     deleted: (n) => `${n} moved to the trash`, recategorised: (n) => `${n} updated`, restored: (n) => `${n} restored`,
     deletedForever: (n) => `${n} permanently deleted`, deleteForeverBody: (n) => `Permanently delete ${n} transaction(s)? This cannot be undone.`,
   },
-  frequency: { monthly: 'Monthly', quarterly: 'Quarterly', yearly: 'Yearly' },
+  frequency: { monthly: 'Monthly', bimonthly: 'Every 2 months', quarterly: 'Quarterly', semiannual: 'Every 6 months', yearly: 'Yearly' },
   trash: {
     title: 'Trash', empty: 'The trash is empty.',
     help: 'Deleted transactions stay here, and in the calendar, until you restore them or empty the trash.',
@@ -158,6 +161,8 @@ const en: Strings = {
     description: 'Description', category: 'Category', repeat: 'Repeat',
     frequency: 'Frequency', limited: 'Limit the number of occurrences',
     occurrences: 'Occurrences', invalidAmount: 'Enter an amount greater than zero.', invalidDate: 'Enter a valid date.',
+    customFrequency: 'Custom', interval: 'Every how many months', invalidInterval: 'Enter a number of months between 1 and 60.',
+    ended: 'End on a given month', until: 'Last month', invalidUntil: 'The last month cannot be before the first one.',
     scopeTitle: 'Apply the change to',
     scopeBody: 'This transaction is part of a recurring series.',
     occurrenceOnly: 'This occurrence only', seriesToo: 'The whole series',
@@ -258,6 +263,7 @@ const en: Strings = {
     title: 'Recurring transactions', empty: 'No recurring transaction yet. Enable "Repeat" when adding a transaction.',
     deleteBody: (name) => `Stop "${name}"? Occurrences already created stay in their months.`,
     from: (month) => `from ${month}`, range: (start, end, count) => `${start} - ${end} (${count} times)`,
+    rangeUntil: (start, end) => `${start} - ${end}`, everyMonths: (count) => `every ${count} months`,
     dayOf: (day) => `day ${day}`,
   },
 };
@@ -289,7 +295,7 @@ const fr: Strings = {
     deleted: (n) => `${n} déplacée(s) dans la corbeille`, recategorised: (n) => `${n} modifiée(s)`, restored: (n) => `${n} restaurée(s)`,
     deletedForever: (n) => `${n} supprimée(s) définitivement`, deleteForeverBody: (n) => `Supprimer définitivement ${n} transaction(s) ? Cette action est irréversible.`,
   },
-  frequency: { monthly: 'Mensuelle', quarterly: 'Trimestrielle', yearly: 'Annuelle' },
+  frequency: { monthly: 'Mensuelle', bimonthly: 'Bimestrielle', quarterly: 'Trimestrielle', semiannual: 'Semestrielle', yearly: 'Annuelle' },
   trash: {
     title: 'Corbeille', empty: 'La corbeille est vide.',
     help: 'Les transactions supprimées restent ici, et dans le calendrier, jusqu’à leur restauration ou jusqu’à ce que vous vidiez la corbeille.',
@@ -321,6 +327,8 @@ const fr: Strings = {
     amount: 'Montant', date: 'Date', description: 'Description', category: 'Catégorie',
     repeat: 'Répéter', frequency: 'Fréquence', limited: "Limiter le nombre d'occurrences",
     occurrences: 'Occurrences', invalidAmount: 'Saisissez un montant supérieur à zéro.', invalidDate: 'Saisissez une date valide.',
+    customFrequency: 'Personnalisée', interval: 'Tous les combien de mois', invalidInterval: 'Saisissez un nombre de mois entre 1 et 60.',
+    ended: 'Terminer à un mois donné', until: 'Dernier mois', invalidUntil: 'Le dernier mois ne peut pas précéder le premier.',
     scopeTitle: 'Appliquer la modification à',
     scopeBody: 'Cette transaction fait partie d’une série récurrente.',
     occurrenceOnly: 'Cette occurrence uniquement', seriesToo: 'Toute la série',
@@ -421,6 +429,7 @@ const fr: Strings = {
     title: 'Transactions récurrentes', empty: 'Aucune transaction récurrente. Activez « Répéter » en ajoutant une transaction.',
     deleteBody: (name) => `Arrêter « ${name} » ? Les occurrences déjà créées restent dans leurs mois.`,
     from: (month) => `à partir de ${month}`, range: (start, end, count) => `${start} - ${end} (${count} fois)`,
+    rangeUntil: (start, end) => `${start} - ${end}`, everyMonths: (count) => `tous les ${count} mois`,
     dayOf: (day) => `le ${day}`,
   },
 };

@@ -294,6 +294,67 @@ describe('EditorModalComponent', () => {
     expect(series?.occurrences).toBeUndefined();
   });
 
+  it('adds a series with a custom interval and an end month', async () => {
+    const { c } = editor(null);
+    c.amount.set('20');
+    c.repeat.set(true);
+    c.custom.set(true);
+    c.interval.set('5');
+    c.toggleEnded();
+    expect(c.until()).toBe('2026-10');
+    c.until.set('2027-10');
+    await c.save();
+    const series = b.recurrences().find((r) => r.amount === 20);
+    expect(series).toMatchObject({ frequency: 'monthly', interval: 5, until: '2027-10' });
+    expect(series?.occurrences).toBeUndefined();
+  });
+
+  it('rejects an invalid custom interval', async () => {
+    const { c, closed } = editor(null);
+    c.amount.set('20');
+    c.repeat.set(true);
+    c.custom.set(true);
+    c.interval.set('0');
+    await c.save();
+    expect(c.error()).toBe(s.t().editor.invalidInterval);
+    c.interval.set('61');
+    await c.save();
+    expect(c.error()).toBe(s.t().editor.invalidInterval);
+    expect(closed).not.toHaveBeenCalled();
+  });
+
+  it('rejects an end month before the first occurrence', async () => {
+    const { c, closed } = editor(null);
+    c.amount.set('20');
+    c.repeat.set(true);
+    c.ended.set(true);
+    c.until.set('2026-09');
+    await c.save();
+    expect(c.error()).toBe(s.t().editor.invalidUntil);
+    c.until.set('');
+    await c.save();
+    expect(c.error()).toBe(s.t().editor.invalidUntil);
+    expect(closed).not.toHaveBeenCalled();
+  });
+
+  it('loads a custom interval and an end month from the series', () => {
+    seed({ '2026-10': [tx({ id: 'rent', recurrenceId: 'r1' })] }, [{ ...RENT, interval: 4, until: '2028-01' }]);
+    TestBed.resetTestingModule();
+    const { c } = editor('rent');
+    expect(c.custom()).toBe(true);
+    expect(c.interval()).toBe('4');
+    expect(c.ended()).toBe(true);
+    expect(c.until()).toBe('2028-01');
+  });
+
+  it('picks the custom frequency through the action dialog', async () => {
+    const { c } = editor(null);
+    const pending = c.pickFrequency();
+    dialogs.close(s.t().editor.customFrequency);
+    await pending;
+    expect(c.custom()).toBe(true);
+  });
+
   it('updates a one-off transaction', async () => {
     const { c, closed } = editor('one');
     c.amount.set('60');

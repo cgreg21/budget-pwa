@@ -1,6 +1,6 @@
 import { Component, OnInit, computed, inject, input, output, signal } from '@angular/core';
 import {
-  MAX_OCCURRENCES, MIN_OCCURRENCES, RECURRENCE_FREQUENCIES, type RecurrenceFrequency,
+  MAX_INTERVAL, MAX_OCCURRENCES, MIN_INTERVAL, MIN_OCCURRENCES, RECURRENCE_FREQUENCIES, isMonthKey, type RecurrenceFrequency,
   type RecurrenceSettings, type Transaction, type TransactionInput, type TransactionKind,
 } from 'budget-lib';
 
@@ -43,6 +43,10 @@ export class EditorModalComponent implements OnInit {
   readonly frequency = signal<RecurrenceFrequency>('monthly');
   readonly limited = signal(false);
   readonly occurrences = signal('12');
+  readonly custom = signal(false);
+  readonly interval = signal('2');
+  readonly ended = signal(false);
+  readonly until = signal('');
   readonly error = signal('');
   readonly categoryGlyph = computed(() => categoryGlyph(this.b.iconOf(this.category())));
 
@@ -59,6 +63,10 @@ export class EditorModalComponent implements OnInit {
     this.frequency.set(series?.frequency ?? 'monthly');
     this.limited.set(series?.occurrences !== undefined);
     this.occurrences.set(String(series?.occurrences ?? 12));
+    this.custom.set(series?.interval !== undefined);
+    this.interval.set(String(series?.interval ?? 2));
+    this.ended.set(series?.until !== undefined);
+    this.until.set(series?.until ?? '');
   }
 
   async pickCategory(): Promise<void> {
@@ -73,10 +81,12 @@ export class EditorModalComponent implements OnInit {
 
   async pickFrequency(): Promise<void> {
     const t = this.s.t();
-    const labels = RECURRENCE_FREQUENCIES.map((f) => t.frequency[f]);
+    const labels = [...RECURRENCE_FREQUENCIES.map((f) => t.frequency[f]), t.editor.customFrequency];
     const picked = await this.dialogs.action({ title: t.editor.frequency, cancel: t.common.cancel, actions: labels });
     const index = picked === null ? -1 : labels.indexOf(picked);
-    if (index >= 0) this.frequency.set(RECURRENCE_FREQUENCIES[index]);
+    if (index < 0) return;
+    this.custom.set(index === RECURRENCE_FREQUENCIES.length);
+    if (!this.custom()) this.frequency.set(RECURRENCE_FREQUENCIES[index]);
   }
 
   async save(): Promise<void> {
@@ -92,6 +102,11 @@ export class EditorModalComponent implements OnInit {
     }
     this.error.set('');
 
+    const rhythmError = this.rhythmError();
+    if (rhythmError) {
+      this.error.set(rhythmError);
+      return;
+    }
     const existing = this.existing;
     const input: TransactionInput = {
       date: this.date(),
@@ -128,17 +143,41 @@ export class EditorModalComponent implements OnInit {
     if (this.existing && await deleteTransaction(this.b, this.s, this.dialogs, this.existing, this.snackbar)) this.closed.emit();
   }
 
+  toggleEnded(): void {
+    const next = !this.ended();
+    this.ended.set(next);
+    if (next && !this.until()) this.until.set(this.date().slice(0, 7));
+  }
+
   normalizeAmount(): void {
     this.amount.set(this.s.normalizeInput(this.amount()));
   }
 
+  private rhythmError(): string {
+    if (!this.repeat()) return '';
+    const t = this.s.t();
+    if (this.custom()) {
+      const interval = Number(this.interval());
+      if (!Number.isInteger(interval) || interval < MIN_INTERVAL || interval > MAX_INTERVAL) return t.editor.invalidInterval;
+    }
+    if (this.ended()) {
+      const series = this.existing && this.b.recurrenceOf(this.existing);
+      const start = series?.startMonth ?? this.date().slice(0, 7);
+      if (!isMonthKey(this.until()) || this.until() < start) return t.editor.invalidUntil;
+    }
+    return '';
+  }
+
   private recurrenceSettings(): RecurrenceSettings | null {
     if (!this.repeat()) return null;
-    if (!this.limited()) return { frequency: this.frequency() };
+    const settings: RecurrenceSettings = { frequency: this.custom() ? 'monthly' : this.frequency() };
+    if (this.custom()) settings.interval = Number(this.interval());
+    if (this.ended()) settings.until = this.until();
+    if (!this.limited()) return settings;
     const count = Math.round(Number(this.occurrences()));
-    const bounded = Number.isFinite(count)
+    settings.occurrences = Number.isFinite(count)
       ? Math.min(Math.max(count, MIN_OCCURRENCES), MAX_OCCURRENCES)
       : MIN_OCCURRENCES;
-    return { frequency: this.frequency(), occurrences: bounded };
+    return settings;
   }
 }

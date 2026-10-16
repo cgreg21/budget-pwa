@@ -24,10 +24,14 @@ export class RecurrencesPage {
     const t = this.s.t();
     const start = this.s.monthLabel(r.startMonth);
     const end = endMonth(r);
-    const range = end !== undefined && r.occurrences !== undefined
-      ? t.recurrences.range(start, this.s.monthLabel(end), r.occurrences)
-      : t.recurrences.from(start);
-    return `${t.frequency[r.frequency]} \u00B7 ${t.recurrences.dayOf(r.day)} \u00B7 ${r.category} \u00B7 ${range}`;
+    let range = t.recurrences.from(start);
+    if (end !== undefined) {
+      range = r.until === undefined && r.occurrences !== undefined
+        ? t.recurrences.range(start, this.s.monthLabel(end), r.occurrences)
+        : t.recurrences.rangeUntil(start, this.s.monthLabel(end));
+    }
+    const rhythm = r.interval === undefined ? t.frequency[r.frequency] : t.recurrences.everyMonths(r.interval);
+    return `${rhythm} \u00B7 ${t.recurrences.dayOf(r.day)} \u00B7 ${r.category} \u00B7 ${range}`;
   }
 
   async remove(r: Recurrence): Promise<void> {

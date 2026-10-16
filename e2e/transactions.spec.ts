@@ -68,6 +68,38 @@ test.describe('transactions', () => {
     await expect(page.getByText('1 066,80 €')).toBeVisible();
   });
 
+  test('adds a series with a custom interval and an end month', async ({ app, page }) => {
+    await open(app, '/budget');
+    await page.getByRole('button', { name: 'Ajouter', exact: true }).click();
+    await page.getByLabel('Montant').fill('30');
+    await page.getByLabel('Description').fill('Assurance test');
+
+    await page.getByRole('switch').first().click();
+    await page.getByRole('button', { name: 'Mensuelle', exact: true }).click();
+    await page.getByRole('dialog').getByRole('button', { name: 'Personnalisée', exact: true }).click();
+    await page.getByLabel('Tous les combien de mois').fill('5');
+    await page.locator('#editor-ended').click();
+    await page.getByLabel('Dernier mois').fill('2030-12');
+    await page.getByRole('button', { name: 'Enregistrer' }).click();
+
+    await expect(page.getByText('Transaction ajoutée')).toBeVisible();
+    await page.goto('/settings/recurrences');
+    await expect(page.getByText(/tous les 5 mois/)).toBeVisible();
+    await expect(page.getByText(/Décembre 2030/)).toBeVisible();
+  });
+
+  test('rejects an invalid custom interval', async ({ app, page }) => {
+    await open(app, '/budget');
+    await page.getByRole('button', { name: 'Ajouter', exact: true }).click();
+    await page.getByLabel('Montant').fill('30');
+    await page.getByRole('switch').first().click();
+    await page.getByRole('button', { name: 'Mensuelle', exact: true }).click();
+    await page.getByRole('dialog').getByRole('button', { name: 'Personnalisée', exact: true }).click();
+    await page.getByLabel('Tous les combien de mois').fill('0');
+    await page.getByRole('button', { name: 'Enregistrer' }).click();
+    await expect(page.getByText('Saisissez un nombre de mois entre 1 et 60.')).toBeVisible();
+  });
+
   test('navigates between months', async ({ app, page }) => {
     await open(app, '/budget');
     await page.getByRole('button', { name: 'Mois précédent' }).click();

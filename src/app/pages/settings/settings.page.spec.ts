@@ -501,6 +501,8 @@ describe('RecurrencesPage', () => {
     expect(c.details(rec())).toBe(`${t.frequency.monthly} \u00B7 ${t.recurrences.dayOf(3)} \u00B7 Logement \u00B7 ${t.recurrences.from(s.monthLabel('2026-01'))}`);
     expect(c.details(rec({ occurrences: 3, frequency: 'yearly' })))
       .toBe(`${t.frequency.yearly} \u00B7 ${t.recurrences.dayOf(3)} \u00B7 Logement \u00B7 ${t.recurrences.range(s.monthLabel('2026-01'), s.monthLabel('2028-01'), 3)}`);
+    expect(c.details(rec({ interval: 5, until: '2026-11' })))
+      .toBe(`${t.recurrences.everyMonths(5)} \u00B7 ${t.recurrences.dayOf(3)} \u00B7 Logement \u00B7 ${t.recurrences.rangeUntil(s.monthLabel('2026-01'), s.monthLabel('2026-11'))}`);
     expect(fixture.nativeElement.querySelectorAll('.setting')).toHaveLength(2);
     expect(fixture.nativeElement.textContent).toContain(t.common.noDescription);
   });

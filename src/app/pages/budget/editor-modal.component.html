@@ -37,7 +37,13 @@
 
     @if (repeat()) {
       <span class="field-label">{{ s.t().editor.frequency }}</span>
-      <button type="button" class="select" (click)="pickFrequency()">{{ s.t().frequency[frequency()] }}</button>
+      <button type="button" class="select" (click)="pickFrequency()">{{ custom() ? s.t().editor.customFrequency : s.t().frequency[frequency()] }}</button>
+
+      @if (custom()) {
+        <label class="field-label" for="editor-interval">{{ s.t().editor.interval }}</label>
+        <input id="editor-interval" class="input" type="number" inputmode="numeric"
+               [value]="interval()" (input)="interval.set($any($event.target).value)" />
+      }
 
       <div class="mt-3 flex items-center justify-between">
         <span class="mr-3 text-base">{{ s.t().editor.limited }}</span>
@@ -52,6 +58,21 @@
         <label class="field-label" for="editor-occurrences">{{ s.t().editor.occurrences }}</label>
         <input id="editor-occurrences" class="input" type="number" inputmode="numeric"
                [value]="occurrences()" (input)="occurrences.set($any($event.target).value)" />
+      }
+
+      <div class="mt-3 flex items-center justify-between">
+        <span class="mr-3 text-base">{{ s.t().editor.ended }}</span>
+        <button type="button" role="switch" id="editor-ended" [attr.aria-checked]="ended()"
+                class="relative h-7 w-12 shrink-0 rounded-full transition-colors" [class]="ended() ? 'bg-brand' : 'bg-line'"
+                (click)="toggleEnded()">
+          <span class="absolute top-0.5 size-6 rounded-full bg-white shadow transition-all" [class]="ended() ? 'left-[22px]' : 'left-0.5'"></span>
+        </button>
+      </div>
+
+      @if (ended()) {
+        <label class="field-label" for="editor-until">{{ s.t().editor.until }}</label>
+        <input id="editor-until" class="input" type="month" [value]="until()"
+               (input)="until.set($any($event.target).value)" />
       }
     }
 
