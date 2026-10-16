@@ -3,8 +3,9 @@
 
 <app-month-bar [month]="b.selectedMonth()" (monthChange)="b.selectMonth($event)" (labelTap)="monthPickerOpen.set(true)" />
 
-<div class="mx-2 my-1 grid grid-cols-2 wide:mx-4 wide:grid-cols-4">
-  <div class="card col-span-2 animate-appear" [class]="levelCard()">
+<div class="flex min-h-0 flex-1 flex-col short:flex-row">
+<div class="mx-2 my-1 grid grid-cols-2 wide:mx-4 wide:grid-cols-4 short:order-last short:my-0 short:w-52 short:shrink-0 short:grid-cols-1 short:content-start short:overflow-y-auto">
+  <div class="card col-span-2 animate-appear short:col-span-1" [class]="levelCard()">
     <div class="card-title">{{ s.t().budget.balance }} - {{ s.t().levels[level()] }}</div>
     <div class="text-right text-[30px] font-bold" [class]="levelText()">{{ s.formatAmount(b.totals().balance) }}</div>
   </div>
@@ -18,7 +19,7 @@
   </div>
 </div>
 
-<div class="relative min-h-0 flex-1 overflow-hidden wide:mx-2">
+<div class="relative min-h-0 flex-1 overflow-hidden wide:mx-2 short:min-w-0">
   <div class="flex h-full w-[200%] transition-transform duration-300 ease-out wide:w-full wide:gap-2"
        [style.transform]="layout.wide() ? null : tab() === 'recurring' ? 'translateX(-50%)' : 'translateX(0)'">
     @for (panel of panels(); track panel.key) {
@@ -68,6 +69,7 @@
       </div>
     }
   </div>
+</div>
 </div>
 
 @if (selecting()) {

@@ -1,7 +1,7 @@
-<section class="px-4 py-3">
-  <span class="field-label mt-0">{{ title() }}</span>
+<section class="px-4 py-3 short:grid short:grid-cols-[1fr_auto] short:gap-x-4">
+  <span class="field-label mt-0 short:col-span-2">{{ title() }}</span>
   @if (slices().length > 0) {
-    <svg class="mx-auto my-3 block animate-fade" [attr.width]="size" [attr.height]="size" [attr.viewBox]="'0 0 ' + size + ' ' + size" role="img">
+    <svg class="mx-auto my-3 block animate-fade short:col-start-2 short:row-start-2 short:sticky short:top-0 short:mt-0 short:self-start" [attr.width]="size" [attr.height]="size" [attr.viewBox]="'0 0 ' + size + ' ' + size" role="img">
       @for (part of parts(); track part.label) {
         @if (part.full) {
           <circle [attr.cx]="center" [attr.cy]="center" [attr.r]="(outer + inner) / 2" fill="none"
@@ -15,7 +15,7 @@
         }
       }
     </svg>
-    <div class="-mx-4 pb-3">
+    <div class="-mx-4 pb-3 short:col-start-1 short:row-start-2 short:min-w-0">
       @for (item of legend(); track item.label) {
         <div class="row">
           <div class="flex items-center">
@@ -33,6 +33,6 @@
       }
     </div>
   } @else {
-    <p class="empty-text">{{ s.t().stats.noData }}</p>
+    <p class="empty-text short:col-span-2">{{ s.t().stats.noData }}</p>
   }
 </section>
