@@ -88,6 +88,15 @@ describe('SettingsPage', () => {
     expect(c.calendarStatusText()).toContain(s.t().calendar.lastSync(`${s.formatDate('2026-10-12')} 09:07`));
   });
 
+  it('opens the About page from the header button', async () => {
+    const navigate = vi.spyOn(router, 'navigateByUrl').mockResolvedValue(true);
+    const fixture = await page();
+    const button = fixture.nativeElement.querySelector(`header button[aria-label="${s.t().about.title}"]`) as HTMLButtonElement;
+    expect(button).not.toBeNull();
+    button.click();
+    expect(navigate).toHaveBeenCalledWith('/settings/about');
+  });
+
   it('labels the options', async () => {
     const c = (await page()).componentInstance;
     expect(c.languageName('fr')).toBe('Fran\u00E7ais');

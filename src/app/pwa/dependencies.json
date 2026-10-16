@@ -1,0 +1,74 @@
+{
+  "dependencies": [
+    {
+      "name": "@angular/common",
+      "version": "22.2.2",
+      "license": "MIT"
+    },
+    {
+      "name": "@angular/compiler",
+      "version": "22.2.2",
+      "license": "MIT"
+    },
+    {
+      "name": "@angular/core",
+      "version": "22.2.2",
+      "license": "MIT"
+    },
+    {
+      "name": "@angular/forms",
+      "version": "22.2.2",
+      "license": "MIT"
+    },
+    {
+      "name": "@angular/platform-browser",
+      "version": "22.2.2",
+      "license": "MIT"
+    },
+    {
+      "name": "@angular/router",
+      "version": "22.2.2",
+      "license": "MIT"
+    },
+    {
+      "name": "@angular/service-worker",
+      "version": "22.2.2",
+      "license": "MIT"
+    },
+    {
+      "name": "budget-lib",
+      "version": "0.1.9",
+      "license": "Apache-2.0"
+    },
+    {
+      "name": "rxjs",
+      "version": "7.8.2",
+      "license": "Apache-2.0"
+    },
+    {
+      "name": "tailwindcss",
+      "version": "4.3.3",
+      "license": "MIT"
+    },
+    {
+      "name": "tslib",
+      "version": "2.8.1",
+      "license": "0BSD"
+    },
+    {
+      "name": "zone.js",
+      "version": "0.16.3",
+      "license": "MIT"
+    }
+  ],
+  "assets": [
+    {
+      "name": "DM Sans",
+      "license": "OFL-1.1"
+    },
+    {
+      "name": "Material Design Icons",
+      "license": "Apache-2.0"
+    }
+  ]
+}

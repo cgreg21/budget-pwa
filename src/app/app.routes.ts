@@ -17,6 +17,7 @@ export const routes: Routes = [
         path: 'settings/profiles',
         loadComponent: () => import('./pages/settings/profiles.page').then((module) => module.ProfilesPage),
       },
+      { path: 'settings/about', loadComponent: () => import('./pages/settings/about.page').then((module) => module.AboutPage) },
       { path: '**', redirectTo: 'budget' },
     ],
   },

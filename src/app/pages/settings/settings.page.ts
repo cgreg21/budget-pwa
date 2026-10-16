@@ -107,6 +107,10 @@ export class SettingsPage {
     void this.router.navigateByUrl('/settings/profiles');
   }
 
+  openAbout(): void {
+    void this.router.navigateByUrl('/settings/about');
+  }
+
   profileName(): string {
     return this.profiles.active().name || this.s.t().profiles.defaultName;
   }

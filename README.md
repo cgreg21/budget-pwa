@@ -25,6 +25,7 @@ Le style utilise Tailwind CSS v4 (`src/styles.css`, thème sombre/clair via vari
 - Export et import de la configuration (réglages, seuils, accès au calendrier et son mot de passe) dans un fichier chiffré par une phrase secrète, pour la reprendre sur un autre appareil.
 - Synchronisation optionnelle des transactions via un calendrier CalDAV.
 - Service worker Angular pour la mise en cache de l’application et son ouverture hors ligne.
+- **À propos** (bouton d’information de l’en-tête des Réglages, `/settings/about`) : version de l’application, bibliothèques utilisées (version et licence) et ressources embarquées (police, icônes). La liste vient de `src/app/pwa/dependencies.json`, régénéré par `npm run dependencies:generate` à partir de `package.json` et des paquets installés (`node_modules`) ; ce script s’exécute automatiquement après `npm install` et avant `start`, `build`, `typecheck` et `test`, donc la liste suit chaque changement de bibliothèque. Les ressources (polices, icônes) sont déclarées dans `scripts/generate-dependencies.mjs`. Commitez le fichier généré.
 
 ## Développement
 

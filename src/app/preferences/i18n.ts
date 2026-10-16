@@ -107,6 +107,7 @@ export interface Strings {
     namePlaceholder: string; deleteBody(name: string): string; switchBody(name: string): string; help: string;
     current: string; settingsEntry: string;
   };
+  about: { title: string; intro: string; version: string; license: string; libraries: string; assets: string };
 }
 
 const en: Strings = {
@@ -285,6 +286,10 @@ const en: Strings = {
     help: 'Each profile has its own transactions, categories, recurring transactions, settings and calendar sync.',
     current: 'Profile', settingsEntry: 'Profiles',
   },
+  about: {
+    title: 'About', intro: 'The libraries and assets this app is built with.', version: 'Version', license: 'License',
+    libraries: 'Libraries', assets: 'Assets',
+  },
 };
 
 const fr: Strings = {
@@ -462,6 +467,10 @@ const fr: Strings = {
     switchBody: (name) => `Passer au profil « ${name} » ? L\u2019application se recharge.`,
     help: 'Chaque profil a ses propres transactions, catégories, transactions récurrentes, réglages et synchronisation du calendrier.',
     current: 'Profil', settingsEntry: 'Profils',
+  },
+  about: {
+    title: 'À propos', intro: 'Les bibliothèques et ressources utilisées par cette application.', version: 'Version', license: 'Licence',
+    libraries: 'Bibliothèques', assets: 'Ressources',
   },
 };
 

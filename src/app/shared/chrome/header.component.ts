@@ -24,6 +24,9 @@ export class HeaderComponent {
   readonly actionLabel = input<string | null>(null);
   readonly actionIcon = input<string>(UI_ICONS.trash);
   readonly actionTap = output<void>();
+  /** Label of the information button (opens the About page); `null` hides it. */
+  readonly infoLabel = input<string | null>(null);
+  readonly infoTap = output<void>();
   /** Label of the button entering the multi-selection mode; `null` hides it. */
   readonly selectLabel = input<string | null>(null);
   readonly selecting = input(false);

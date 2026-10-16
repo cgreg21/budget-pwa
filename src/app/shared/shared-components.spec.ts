@@ -67,6 +67,22 @@ describe('HeaderComponent', () => {
     click(fixture, 'button', 1);
     expect(taps).toHaveBeenCalledOnce();
   });
+
+  it('shows the information button only when it has a label', () => {
+    const fixture = TestBed.createComponent(HeaderComponent);
+    fixture.componentRef.setInput('title', 'Settings');
+    fixture.detectChanges();
+    expect(text(fixture, 'button')).toEqual([UI_ICONS.menu]);
+
+    const taps = vi.fn();
+    fixture.componentInstance.infoTap.subscribe(taps);
+    fixture.componentRef.setInput('infoLabel', 'About');
+    fixture.detectChanges();
+    expect(text(fixture, 'button')).toEqual([UI_ICONS.menu, UI_ICONS.info]);
+    expect(fixture.nativeElement.querySelectorAll('button')[1].getAttribute('aria-label')).toBe('About');
+    click(fixture, 'button', 1);
+    expect(taps).toHaveBeenCalledOnce();
+  });
 });
 
 describe('TabBarComponent', () => {

@@ -1,0 +1,27 @@
+<header class="flex items-center bg-surface px-3 py-2">
+  <a routerLink="/settings" class="flex size-11 items-center justify-center rounded-full text-[26px] font-mdi transition-transform active:scale-90"
+     [attr.aria-label]="s.t().common.back">{{ ui.previous }}</a>
+  <h1 class="ml-2 flex-1 truncate text-xl font-bold">{{ s.t().about.title }}</h1>
+</header>
+<div class="min-h-0 flex-1 overflow-y-auto px-4 py-3 wide:px-6">
+  <div class="min-w-0 wide:max-w-xl">
+    <div class="setting" data-testid="app-version">
+      <span>{{ s.t().appName }}</span><span class="setting-value">{{ s.t().about.version }} {{ version }}</span>
+    </div>
+    <p class="row-sub mb-2">{{ s.t().about.intro }}</p>
+    <span class="section-title">{{ s.t().about.libraries }}</span>
+    @for (library of libraries; track library.name) {
+      <div class="setting" data-testid="library">
+        <span class="min-w-0 truncate">{{ library.name }}</span>
+        <span class="setting-value whitespace-nowrap">{{ s.t().about.version }} {{ library.version }} · {{ s.t().about.license }} {{ library.license }}</span>
+      </div>
+    }
+    <span class="section-title">{{ s.t().about.assets }}</span>
+    @for (asset of assets; track asset.name) {
+      <div class="setting" data-testid="asset">
+        <span class="min-w-0 truncate">{{ asset.name }}</span>
+        <span class="setting-value whitespace-nowrap">{{ s.t().about.license }} {{ asset.license }}</span>
+      </div>
+    }
+  </div>
+</div>

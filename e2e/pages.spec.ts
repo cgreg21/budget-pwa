@@ -87,10 +87,12 @@ test.describe('settings', () => {
     await expect(page.locator('h1')).toHaveText('Settings');
   });
 
-  test('opens the recurring transactions page', async ({ app, page }) => {
+  test('opens the About page with the libraries from the header', async ({ app, page }) => {
     await open(app, '/settings');
-    await page.getByRole('tab', { name: 'Budget' }).click();
-    await page.getByRole('button', { name: /Transactions récurrentes/ }).click();
-    await expect(page).toHaveURL(/\/settings\/recurrences$/);
+    await page.getByRole('button', { name: 'À propos', exact: true }).click();
+    await expect(page).toHaveURL(/\/settings\/about$/);
+    await expect(page.locator('h1')).toHaveText('À propos');
+    await expect(page.getByTestId('library').filter({ hasText: '@angular/core' })).toContainText('Licence MIT');
+    await expect(page.getByTestId('library').filter({ hasText: 'budget-lib' })).toContainText('Licence Apache-2.0');
   });
 });

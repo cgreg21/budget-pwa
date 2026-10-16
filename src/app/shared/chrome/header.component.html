@@ -28,6 +28,12 @@
             [attr.aria-label]="actionLabel()" [attr.title]="actionLabel()"
             (click)="actionTap.emit()">{{ actionIcon() }}</button>
   }
+  @if (infoLabel() !== null) {
+    <button type="button"
+            class="ml-2 flex size-11 items-center justify-center rounded-full bg-card text-[22px] text-ink font-mdi transition-transform active:scale-90"
+            [attr.aria-label]="infoLabel()" [attr.title]="infoLabel()"
+            (click)="infoTap.emit()">{{ ui.info }}</button>
+  }
   @if (addLabel() !== null) {
     <button type="button"
             class="ml-2 flex size-11 items-center justify-center rounded-full bg-brand text-[22px] text-on-brand font-mdi transition-transform active:scale-90"
