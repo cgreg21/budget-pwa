@@ -1,0 +1,44 @@
+<app-header [title]="s.t().schedule.title" />
+
+<div class="min-h-0 flex-1 overflow-y-auto overflow-x-hidden px-3 pb-4 md:px-5">
+  <div class="flex flex-wrap items-center gap-1 py-2" role="group" [attr.aria-label]="s.t().schedule.horizon">
+    @for (count of horizons; track count) {
+      <button type="button" class="chip" [class.chip-active]="horizon() === count" [attr.aria-pressed]="horizon() === count"
+              (click)="horizon.set(count)">{{ s.t().schedule.months(count) }}</button>
+    }
+  </div>
+
+  @if (months().length === 0) {
+    <div class="px-6 py-16 text-center text-muted">
+      <div class="mb-3 text-5xl font-mdi">{{ ui.calendar }}</div>
+      <p>{{ s.t().schedule.empty }}</p>
+    </div>
+  } @else {
+    @for (group of months(); track group.month) {
+      <section class="mb-2" [attr.data-month]="group.month">
+        <span class="section-title mt-2">{{ s.monthLabel(group.month) }}</span>
+        @for (item of group.items; track item.date + item.recurrence.id) {
+          <div class="setting">
+            <span class="row-icon">{{ glyphOf(item.recurrence.category) }}</span>
+            <div class="min-w-0 flex-1">
+              <div class="row-title">{{ item.recurrence.description || s.t().common.noDescription }}</div>
+              <div class="row-sub">{{ s.formatDate(item.date) }} &middot; {{ item.recurrence.category }}</div>
+            </div>
+            <span class="row-amount ml-2 whitespace-nowrap" [class]="item.recurrence.kind">{{ s.formatSigned(item.recurrence.kind, item.recurrence.amount) }}</span>
+          </div>
+        }
+        <div class="row-sub flex justify-between px-1 pt-1">
+          <span>{{ s.t().schedule.income }} {{ s.formatAmount(group.income) }}</span>
+          <span>{{ s.t().schedule.expense }} {{ s.formatAmount(group.expense) }}</span>
+          <span>{{ s.t().schedule.net }} {{ s.formatAmount(group.income - group.expense) }}</span>
+        </div>
+      </section>
+    }
+    <div class="setting mt-3 flex-wrap gap-x-4" data-testid="schedule-total">
+      <span class="font-bold">{{ s.t().schedule.total }}</span>
+      <span class="income">{{ s.formatSigned('income', total().income) }}</span>
+      <span class="expense">{{ s.formatSigned('expense', total().expense) }}</span>
+      <span class="row-amount" [class]="total().net >= 0 ? 'income' : 'expense'">{{ s.formatAmount(total().net) }}</span>
+    </div>
+  }
+</div>

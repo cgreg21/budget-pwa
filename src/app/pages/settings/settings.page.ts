@@ -13,6 +13,7 @@ import { SnackbarService } from '../../snackbar.service';
 import { InstallService } from '../../install.service';
 import { glyph, UI_ICONS } from '../../icons';
 import { OnboardingService } from '../../onboarding.service';
+import { ProfileService } from '../../profile.service';
 import { parseAmount, SettingsService } from '../../settings.service';
 import { AutofocusDirective } from '../../shared/autofocus.directive';
 import { SecuritySettingsComponent } from './security-settings.component';
@@ -43,6 +44,7 @@ export class SettingsPage {
   readonly calendar = inject(CalendarSyncService);
   readonly install = inject(InstallService);
   readonly onboarding = inject(OnboardingService);
+  readonly profiles = inject(ProfileService);
   private readonly configArchive = inject(ConfigArchiveService);
   private readonly dialogs = inject(DialogService);
   private readonly snackbar = inject(SnackbarService);
@@ -109,6 +111,14 @@ export class SettingsPage {
 
   openRecurrences(): void {
     void this.router.navigateByUrl('/settings/recurrences');
+  }
+
+  openProfiles(): void {
+    void this.router.navigateByUrl('/settings/profiles');
+  }
+
+  profileName(): string {
+    return this.profiles.active().name || this.s.t().profiles.defaultName;
   }
 
   languageName(language: AppLanguage): string {

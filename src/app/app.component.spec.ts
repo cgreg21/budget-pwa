@@ -76,7 +76,7 @@ describe('AppComponent', () => {
     const fixture = shell();
     const c = fixture.componentInstance;
     const t = TestBed.inject(SettingsService).t();
-    expect(c.items().map((i) => i.label)).toEqual([t.nav.transactions, t.categories.title, t.stats.title, t.stats.history, t.trash.title]);
+    expect(c.items().map((i) => i.label)).toEqual([t.nav.transactions, t.categories.title, t.schedule.title, t.stats.title, t.stats.history, t.trash.title]);
     expect(c.isActive('/budget')).toBe(false);
     expect(c.isActive('/settings')).toBe(true);
     expect(c.isActive('/settings/recurrences')).toBe(true);
@@ -94,7 +94,7 @@ describe('AppComponent', () => {
     const navigate = vi.spyOn(router, 'navigateByUrl').mockResolvedValue(true);
     const fixture = shell();
     drawer.show();
-    (fixture.nativeElement.querySelectorAll('nav button')[2] as HTMLButtonElement).click();
+    (fixture.nativeElement.querySelectorAll('nav button')[3] as HTMLButtonElement).click();
     expect(navigate).toHaveBeenCalledWith('/stats');
     expect(drawer.opened()).toBe(false);
   });

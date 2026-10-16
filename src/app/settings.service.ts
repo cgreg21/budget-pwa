@@ -5,9 +5,10 @@ import {
 } from 'budget-lib';
 
 import { STRINGS, type Strings } from './i18n';
+import { profileKey } from './profiles';
 import { readValidJson } from './storage';
 
-const SETTINGS_KEY = 'budget-pwa:settings:v1';
+const SETTINGS_KEY = profileKey('budget-pwa:settings:v1');
 
 // The mobile design is dark first; the library defaults to the system theme.
 const DEFAULT_SETTINGS: GeneralSettings = { ...DEFAULT_GENERAL_SETTINGS, language: 'fr', theme: 'dark' };

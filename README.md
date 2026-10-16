@@ -14,6 +14,8 @@ Le style utilise Tailwind CSS v4 (`src/styles.css`, thème sombre/clair via vari
 
 ## Fonctionnalités
 
+- **Échéancier** (`/schedule`) : les prochaines occurrences des transactions récurrentes, regroupées par mois avec revenus, dépenses et solde, sur 1, 3, 6 ou 12 mois.
+- **Profils** (Réglages > Général > Profils, `/settings/profiles`) : plusieurs jeux de données indépendants (transactions, catégories, récurrences, réglages, synchronisation du calendrier et son mot de passe). Changer de profil recharge l'application ; le profil actif ne peut pas être supprimé.
 - Transactions par mois : création, modification, suppression, recherche, filtre revenu/dépense et récurrences quotidiennes, hebdomadaires (plusieurs occurrences par mois, à partir du jour de la transaction), mensuelles, bimestrielles, trimestrielles, semestrielles, annuelles ou personnalisées (tous les N jours, semaines, mois, bimestres, trimestres, semestres ou années, de 1 à 60), avec une durée limitée par un nombre d'occurrences et/ou un dernier mois.
 - Catégories, indicateurs de solde, statistiques par catégorie et historique.
 - Réglages de devise, langue de formatage, thème et seuils du solde.
@@ -66,7 +68,7 @@ Le serveur CalDAV doit autoriser l’origine `https://cgreg21.github.io` (voir [
 
 ## Stockage et confidentialité
 
-Les transactions, catégories, récurrences et seuils sont conservés dans le `localStorage` du navigateur, sous la clé `budget-pwa:data:v1`. Sans synchronisation activée, les données restent locales. Lorsque le calendrier est activé, seules les transactions et la liste des catégories sont échangées avec le serveur CalDAV choisi. Les sauvegardes JSON restent exportées et restaurées manuellement depuis les réglages. Le contenu local n’est pas chiffré : protégez l’accès au profil de navigateur et exportez régulièrement une sauvegarde.
+Les transactions, catégories, récurrences et seuils sont conservés dans le `localStorage` du navigateur, sous la clé `budget-pwa:data:v1`. Le profil « Principal » garde les clés d'origine (`budget-pwa:data:v1`, `…:trash:v1`, `…:settings:v1`, `…:calendar*:v1`) ; les autres profils utilisent les mêmes clés préfixées `budget-pwa:profile:<id>:` et un mot de passe CalDAV distinct (`calendar-password:<id>`). La liste des profils est dans `budget-pwa:profiles:v1`. Sans synchronisation activée, les données restent locales. Lorsque le calendrier est activé, seules les transactions et la liste des catégories sont échangées avec le serveur CalDAV choisi. Les sauvegardes JSON restent exportées et restaurées manuellement depuis les réglages. Le contenu local n’est pas chiffré : protégez l’accès au profil de navigateur et exportez régulièrement une sauvegarde.
 
 ### Configuration chiffrée
 

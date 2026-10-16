@@ -8,13 +8,16 @@
  * the caller then asks the user again rather than failing.
  */
 
+import { activeSecretName } from './profiles';
+
 const DB_NAME = 'budget-pwa-secrets';
 const DB_VERSION = 1;
 const STORE = 'secrets';
 const KEY_ID = 'aes-key';
 const IV_BYTES = 12;
 
-export const CALENDAR_PASSWORD_SECRET = 'calendar-password';
+export const CALENDAR_PASSWORD_BASE_NAME = 'calendar-password';
+export const CALENDAR_PASSWORD_SECRET = activeSecretName(CALENDAR_PASSWORD_BASE_NAME);
 
 interface StoredSecret { iv: ArrayBuffer; data: ArrayBuffer }
 

@@ -33,6 +33,7 @@ import {
   type TrashedTransaction,
 } from 'budget-lib';
 
+import { profileKey } from './profiles';
 import { readValidJson } from './storage';
 
 /** Income and expenses of one month. */
@@ -49,8 +50,8 @@ export interface BudgetData {
   thresholds: BalanceThresholds;
 }
 
-const DATA_KEY = 'budget-pwa:data:v1';
-const TRASH_KEY = 'budget-pwa:trash:v1';
+const DATA_KEY = profileKey('budget-pwa:data:v1');
+const TRASH_KEY = profileKey('budget-pwa:trash:v1');
 
 function newId(): string {
   return typeof crypto.randomUUID === 'function'

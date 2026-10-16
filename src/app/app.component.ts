@@ -16,6 +16,7 @@ import { LayoutService } from './layout.service';
 import { UpdateService } from './update.service';
 import { CalendarSyncService } from './calendar-sync.service';
 import { UI_ICONS } from './icons';
+import { profileKey } from './profiles';
 import { SettingsService } from './settings.service';
 
 const DRAWER_WIDTH = 280;
@@ -63,6 +64,7 @@ export class AppComponent {
     return [
       { url: '/budget', icon: UI_ICONS.transactions, label: t.nav.transactions },
       { url: '/categories', icon: UI_ICONS.categories, label: t.categories.title },
+      { url: '/schedule', icon: UI_ICONS.calendar, label: t.schedule.title },
       { url: '/stats', icon: UI_ICONS.stats, label: t.stats.title },
       { url: '/history', icon: UI_ICONS.history, label: t.stats.history },
       { url: '/trash', icon: UI_ICONS.trash, label: t.trash.title },
@@ -89,7 +91,7 @@ export class AppComponent {
 
   constructor() {
     window.addEventListener('storage', (event) => {
-      if (event.key === 'budget-pwa:data:v1') window.location.reload();
+      if (event.key === profileKey('budget-pwa:data:v1')) window.location.reload();
     });
     // Non-passive so the browser's back/forward swipe is cancelled: while the drawer is dragged, and
     // for horizontal moves of a touch that started on a screen edge (where that gesture begins).

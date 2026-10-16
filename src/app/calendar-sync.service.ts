@@ -10,11 +10,12 @@ import { BudgetService } from './budget.service';
 import { CALENDAR_PASSWORD_SECRET, isSecretStorageAvailable, readSecret, writeSecret } from './secrets';
 import { SettingsService } from './settings.service';
 import { SnackbarService } from './snackbar.service';
+import { profileKey } from './profiles';
 import { readValidJson } from './storage';
 
-const CONFIG_KEY = 'budget-pwa:calendar:v1';
-const BASELINE_KEY = 'budget-pwa:calendar-baseline:v1';
-const PROXY_KEY = 'budget-pwa:calendar-proxy:v1';
+const CONFIG_KEY = profileKey('budget-pwa:calendar:v1');
+const BASELINE_KEY = profileKey('budget-pwa:calendar-baseline:v1');
+const PROXY_KEY = profileKey('budget-pwa:calendar-proxy:v1');
 
 /** A proxy address reduced to what the transport needs: `https://host[/prefix]`, no trailing slash. */
 export function normalizeProxyUrl(value: string): string {

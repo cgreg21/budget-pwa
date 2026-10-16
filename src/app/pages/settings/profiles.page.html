@@ -1,0 +1,28 @@
+<header class="flex items-center bg-surface px-3 py-2">
+  <a routerLink="/settings" class="flex size-11 items-center justify-center rounded-full text-[26px] font-mdi transition-transform active:scale-90"
+     [attr.aria-label]="s.t().common.back">{{ ui.previous }}</a>
+  <h1 class="ml-2 flex-1 truncate text-xl font-bold">{{ s.t().profiles.title }}</h1>
+</header>
+<div class="min-h-0 flex-1 overflow-y-auto px-4 py-3 md:px-6">
+  <p class="row-sub mb-2">{{ s.t().profiles.help }}</p>
+  @for (profile of p.profiles(); track profile.id) {
+    <div class="mb-2" data-testid="profile">
+      <div class="setting">
+        <input class="input min-w-0 flex-1 bg-transparent" type="text" [attr.maxlength]="maxLength"
+               [value]="profile.name" [placeholder]="s.t().profiles.defaultName" [attr.aria-label]="s.t().profiles.namePlaceholder"
+               (change)="rename(profile, $any($event.target).value)" />
+        @if (profile.id === p.activeId()) {
+          <span class="setting-value ml-2 whitespace-nowrap">{{ s.t().profiles.active }}</span>
+        }
+      </div>
+      @if (profile.id !== p.activeId()) {
+        <button type="button" class="secondary compact w-auto" (click)="use(profile)">{{ s.t().profiles.use }}</button>
+        <button type="button" class="danger compact w-auto" (click)="remove(profile)">{{ s.t().common.delete }}</button>
+      }
+    </div>
+  }
+  <span class="section-title">{{ s.t().profiles.add }}</span>
+  <input class="input setting" type="text" [attr.maxlength]="maxLength" [placeholder]="s.t().profiles.addPlaceholder"
+         [attr.aria-label]="s.t().profiles.addPlaceholder" [ngModel]="newName()" (ngModelChange)="newName.set($event)" (keydown.enter)="add()" />
+  <button type="button" class="primary w-full" [disabled]="newName().trim() === ''" (click)="add()">{{ s.t().profiles.add }}</button>
+</div>

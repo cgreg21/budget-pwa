@@ -101,6 +101,15 @@ export interface Strings {
     rangeUntil(start: string, end: string): string; everyUnits(count: number, unit: RecurrenceFrequency): string;
     dayOf(day: number): string;
   };
+  schedule: {
+    title: string; empty: string; horizon: string; months(count: number): string;
+    income: string; expense: string;     net: string; total: string;
+  };
+  profiles: {
+    title: string; defaultName: string; active: string; use: string; add: string; addPlaceholder: string;
+    namePlaceholder: string; deleteBody(name: string): string; switchBody(name: string): string; help: string;
+    current: string; settingsEntry: string;
+  };
 }
 
 const en: Strings = {
@@ -274,6 +283,18 @@ const en: Strings = {
     },
     dayOf: (day) => `day ${day}`,
   },
+  schedule: {
+    title: 'Schedule', empty: 'No upcoming occurrence. Recurring transactions you create appear here.',
+    horizon: 'Period', months: (count) => count === 1 ? '1 month' : `${count} months`,
+    income: 'Income', expense: 'Expenses', net: 'Balance', total: 'Total',
+  },
+  profiles: {
+    title: 'Profiles', defaultName: 'Main', active: 'Active', use: 'Use', add: 'Add', addPlaceholder: 'New profile name',
+    namePlaceholder: 'Profile name', deleteBody: (name) => `Delete the profile "${name}" and all of its data? This cannot be undone.`,
+    switchBody: (name) => `Switch to "${name}"? The app reloads.`,
+    help: 'Each profile has its own transactions, categories, recurring transactions, settings and calendar sync.',
+    current: 'Profile', settingsEntry: 'Profiles',
+  },
 };
 
 const fr: Strings = {
@@ -446,6 +467,18 @@ const fr: Strings = {
       return count === 1 ? `chaque ${one}` : `tous les ${count} ${many}`;
     },
     dayOf: (day) => `le ${day}`,
+  },
+  schedule: {
+    title: 'Échéancier', empty: 'Aucune échéance à venir. Les transactions récurrentes que vous créez apparaissent ici.',
+    horizon: 'Période', months: (count) => `${count} mois`,
+    income: 'Revenus', expense: 'Dépenses', net: 'Solde', total: 'Total',
+  },
+  profiles: {
+    title: 'Profils', defaultName: 'Principal', active: 'Actif', use: 'Utiliser', add: 'Ajouter', addPlaceholder: 'Nom du nouveau profil',
+    namePlaceholder: 'Nom du profil', deleteBody: (name) => `Supprimer le profil « ${name} » et toutes ses données ? Cette action est irréversible.`,
+    switchBody: (name) => `Passer au profil « ${name} » ? L\u2019application se recharge.`,
+    help: 'Chaque profil a ses propres transactions, catégories, transactions récurrentes, réglages et synchronisation du calendrier.',
+    current: 'Profil', settingsEntry: 'Profils',
   },
 };
 

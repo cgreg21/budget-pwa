@@ -4,6 +4,9 @@
 <div class="min-w-0 md:max-w-xl">
 @if (tab() === 'general') {
   <span class="section-title mt-0">{{ s.t().settings.general }}</span>
+  <button type="button" class="setting" (click)="openProfiles()">
+    <span>{{ s.t().profiles.settingsEntry }}</span><span class="setting-value">{{ profileName() }} &#x203A;</span>
+  </button>
   <button type="button" class="setting" (click)="pickLanguage()">
     <span>{{ s.t().settings.language }}</span><span class="setting-value">{{ languageName(s.settings().language) }}</span>
   </button>
