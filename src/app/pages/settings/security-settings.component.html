@@ -18,7 +18,7 @@
     </div>
   }
   <button type="button" class="secondary w-full" (click)="lock.lock()">{{ s.t().lock.lockNow }}</button>
-  <button type="button" class="secondary w-full" (click)="open('disable')">{{ s.t().lock.disable }}</button>
+  <button type="button" class="secondary w-full" (click)="disable()">{{ s.t().lock.disable }}</button>
 }
 
 @if (mode() !== 'none') {
@@ -28,14 +28,12 @@
       <input id="lock-current" class="input" type="password" inputmode="numeric" autocomplete="off" [maxLength]="8"
              [value]="current()" (input)="current.set(digits($any($event.target).value))" />
     }
-    @if (mode() !== 'disable') {
-      <label class="field-label" for="lock-new">{{ s.t().lock.newPin }}</label>
-      <input id="lock-new" class="input" type="password" inputmode="numeric" autocomplete="off" [maxLength]="8"
-             [value]="pin()" (input)="pin.set(digits($any($event.target).value))" />
-      <label class="field-label" for="lock-confirm">{{ s.t().lock.confirmPin }}</label>
-      <input id="lock-confirm" class="input" type="password" inputmode="numeric" autocomplete="off" [maxLength]="8"
-             [value]="confirm()" (input)="confirm.set(digits($any($event.target).value))" />
-    }
+    <label class="field-label" for="lock-new">{{ s.t().lock.newPin }}</label>
+    <input id="lock-new" class="input" type="password" inputmode="numeric" autocomplete="off" [maxLength]="8"
+           [value]="pin()" (input)="pin.set(digits($any($event.target).value))" />
+    <label class="field-label" for="lock-confirm">{{ s.t().lock.confirmPin }}</label>
+    <input id="lock-confirm" class="input" type="password" inputmode="numeric" autocomplete="off" [maxLength]="8"
+           [value]="confirm()" (input)="confirm.set(digits($any($event.target).value))" />
     @if (error()) {
       <p class="error">{{ error() }}</p>
     }

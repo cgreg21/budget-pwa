@@ -21,7 +21,7 @@ export interface Strings {
   lock: {
     title: string; help: string; enable: string; newPin: string; confirmPin: string; currentPin: string; pinInvalid: string;
     pinMismatch: string; wrongPin: string; unlock: string; biometric: string; biometricUnlock: string; biometricFailed: string;
-    change: string; disable: string; lockNow: string; saved: string; disabled: string; blocked(seconds: number): string;
+    change: string; disable: string; disableConfirm: string; lockNow: string; saved: string; disabled: string; blocked(seconds: number): string;
   };
   selection: {
     select: string; cancel: string; selectAll: string; none: string; count(n: number): string; delete: string; category: string;
@@ -117,7 +117,7 @@ const en: Strings = {
     enable: 'Set a PIN', newPin: 'New PIN (4 to 8 digits)', confirmPin: 'Confirm the PIN', currentPin: 'Current PIN', pinInvalid: 'The PIN must have 4 to 8 digits.',
     pinMismatch: 'The PINs do not match.', wrongPin: 'Wrong PIN.', unlock: 'Unlock', biometric: 'Unlock with the device (fingerprint, face…)',
     biometricUnlock: 'Use the device unlock', biometricFailed: 'Device unlock failed or was cancelled.', change: 'Change the PIN', disable: 'Remove the lock',
-    lockNow: 'Lock now', saved: 'Lock saved', disabled: 'Lock removed', blocked: (seconds) => `Too many attempts. Try again in ${seconds} s.`,
+        disableConfirm: 'The app will open without asking for a PIN.', lockNow: 'Lock now', saved: 'Lock saved', disabled: 'Lock removed', blocked: (seconds) => `Too many attempts. Try again in ${seconds} s.`,
   },
   selection: {
     select: 'Select', cancel: 'Cancel', selectAll: 'Select all', none: 'Select transactions', count: (n) => `${n} selected`, delete: 'Delete',
@@ -276,7 +276,7 @@ const fr: Strings = {
     enable: 'Définir un code PIN', newPin: 'Nouveau PIN (4 à 8 chiffres)', confirmPin: 'Confirmer le PIN', currentPin: 'PIN actuel', pinInvalid: 'Le PIN doit comporter 4 à 8 chiffres.',
     pinMismatch: 'Les PIN ne correspondent pas.', wrongPin: 'PIN incorrect.', unlock: 'Déverrouiller', biometric: 'Déverrouiller avec l’appareil (empreinte, visage…)',
     biometricUnlock: 'Utiliser le déverrouillage de l’appareil', biometricFailed: 'Le déverrouillage de l’appareil a échoué ou a été annulé.', change: 'Changer le PIN', disable: 'Retirer le verrouillage',
-    lockNow: 'Verrouiller maintenant', saved: 'Verrouillage enregistré', disabled: 'Verrouillage retiré', blocked: (seconds) => `Trop de tentatives. Réessayez dans ${seconds} s.`,
+        disableConfirm: 'L’application s’ouvrira sans demander de code PIN.', lockNow: 'Verrouiller maintenant', saved: 'Verrouillage enregistré', disabled: 'Verrouillage retiré', blocked: (seconds) => `Trop de tentatives. Réessayez dans ${seconds} s.`,
   },
   selection: {
     select: 'Sélectionner', cancel: 'Annuler', selectAll: 'Tout sélectionner', none: 'Sélectionner des transactions', count: (n) => `${n} sélectionnée(s)`, delete: 'Supprimer',

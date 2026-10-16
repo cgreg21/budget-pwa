@@ -1,10 +1,11 @@
 import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
 
+import { DialogService } from '../../dialog.service';
 import { LockService } from '../../lock.service';
 import { SettingsService } from '../../settings.service';
 import { SnackbarService } from '../../snackbar.service';
 
-type Mode = 'none' | 'set' | 'change' | 'disable';
+type Mode = 'none' | 'set' | 'change';
 
 @Component({
   selector: 'app-security-settings',
@@ -16,6 +17,7 @@ export class SecuritySettingsComponent {
   readonly s = inject(SettingsService);
   readonly lock = inject(LockService);
   private readonly snackbar = inject(SnackbarService);
+  private readonly dialog = inject(DialogService);
   readonly mode = signal<Mode>('none');
   readonly current = signal('');
   readonly pin = signal('');
@@ -37,12 +39,6 @@ export class SecuritySettingsComponent {
       this.error.set(t.wrongPin);
       return;
     }
-    if (mode === 'disable') {
-      this.lock.disable();
-      this.snackbar.show(t.disabled);
-      this.open('none');
-      return;
-    }
     if (!LockService.isValidPin(this.pin())) {
       this.error.set(t.pinInvalid);
       return;
@@ -53,6 +49,15 @@ export class SecuritySettingsComponent {
     }
     await this.lock.setPin(this.pin());
     this.snackbar.show(t.saved);
+    this.open('none');
+  }
+
+  async disable(): Promise<void> {
+    const t = this.s.t();
+    const ok = await this.dialog.confirm({ title: t.lock.disable, message: t.lock.disableConfirm, ok: t.common.ok, cancel: t.common.cancel });
+    if (!ok) return;
+    this.lock.disable();
+    this.snackbar.show(t.lock.disabled);
     this.open('none');
   }
 
