@@ -214,6 +214,11 @@
   .input, .select, .search {
     @apply box-border h-12 w-full rounded-md border border-line bg-surface px-3.5 text-ink outline-none focus:border-brand;
   }
+  /* iOS gives date/month fields an intrinsic width wider than the column: force them to fit. */
+  .input[type="date"], .input[type="month"] {
+    @apply block min-w-0 max-w-full appearance-none text-left;
+    -webkit-appearance: none;
+  }
   .select {
     @apply my-1 flex items-center text-left;
   }
