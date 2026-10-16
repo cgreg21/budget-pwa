@@ -28,6 +28,9 @@ export class HeaderComponent {
   readonly selectLabel = input<string | null>(null);
   readonly selecting = input(false);
   readonly selectTap = output<void>();
+  /** Label of the add button; `null` hides it. */
+  readonly addLabel = input<string | null>(null);
+  readonly addTap = output<void>();
   readonly syncLabel = computed(() => this.settings.t().calendar.syncNow);
   private readonly settings = inject(SettingsService);
 }

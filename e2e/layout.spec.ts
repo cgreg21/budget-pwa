@@ -1,6 +1,6 @@
 import { expect, hasHorizontalOverflow, isWide, open, test } from './fixtures';
 
-const ROUTES = ['/budget', '/categories', '/schedule', '/stats', '/history', '/trash', '/settings', '/settings/recurrences', '/settings/profiles'];
+const ROUTES = ['/budget', '/categories', '/schedule', '/stats', '/history', '/trash', '/settings', '/settings/profiles'];
 
 test.describe('responsive layout', () => {
   for (const route of ROUTES) {

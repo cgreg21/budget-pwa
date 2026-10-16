@@ -83,9 +83,8 @@ test.describe('transactions', () => {
     await page.getByRole('button', { name: 'Enregistrer' }).click();
 
     await expect(page.getByText('Transaction ajoutée')).toBeVisible();
-    await page.goto('/settings/recurrences');
-    await expect(page.getByText(/tous les 5 mois/)).toBeVisible();
-    await expect(page.getByText(/Décembre 2030/)).toBeVisible();
+    await page.goto('/schedule');
+    await expect(page.getByText('Assurance test').first()).toBeVisible();
   });
 
   test('adds a series repeating every few weeks', async ({ app, page }) => {
@@ -102,8 +101,8 @@ test.describe('transactions', () => {
     await page.getByRole('button', { name: 'Enregistrer' }).click();
 
     await expect(page.getByText('Transaction ajoutée')).toBeVisible();
-    await page.goto('/settings/recurrences');
-    await expect(page.getByText(/tous les 2 semaines/)).toBeVisible();
+    await page.goto('/schedule');
+    await expect(page.getByText('Sport test').first()).toBeVisible();
   });
 
   test('adds a monthly series spread over ten months a year', async ({ app, page }) => {
@@ -117,8 +116,8 @@ test.describe('transactions', () => {
     await page.getByRole('button', { name: 'Enregistrer' }).click();
 
     await expect(page.getByText('Transaction ajoutée')).toBeVisible();
-    await page.goto('/settings/recurrences');
-    await expect(page.getByText(/10 mois par an/)).toBeVisible();
+    await page.goto('/schedule');
+    await expect(page.getByText('EDF test').first()).toBeVisible();
   });
 
   test('rejects a number of months per year out of range', async ({ app, page }) => {

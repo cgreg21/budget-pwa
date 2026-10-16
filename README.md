@@ -2,7 +2,7 @@
 
 Application de budget installable dans un navigateur, construite avec Angular et TypeScript. Son interface reprend l’organisation et les couleurs de `budget-mobile`, avec une navigation adaptée au bureau et au téléphone.
 
-La navigation utilise Angular Router : la coque est partagée entre les pages, et Transactions, Catégories, Statistiques, Historique et Réglages (dont `/settings/recurrences`) sont des composants routés chargés à la demande sur `/budget`, `/categories`, `/stats`, `/history` et `/settings`.
+La navigation utilise Angular Router : la coque est partagée entre les pages, et Transactions, Catégories, Statistiques, Historique et Réglages sont des composants routés chargés à la demande sur `/budget`, `/categories`, `/stats`, `/history` et `/settings`.
 
 Le style utilise Tailwind CSS v4 (`src/styles.css`, thème sombre/clair via variables `--c-*`) et reproduit à l’identique l’UX/UI de `budget-mobile` : tiroir, barre de mois, feuilles modales, onglets avec bouton flottant, lignes à balayer, graphiques SVG. L’import bancaire n’est volontairement pas repris. Les composants réutilisables sont dans `src/app/shared/` et les écrans dans `src/app/pages/`.
 

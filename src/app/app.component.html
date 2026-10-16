@@ -36,15 +36,16 @@
         </button>
       }
     </nav>
-    @if (calendar.active()) {
-      <button type="button" class="mx-4 mb-4 mt-2 flex items-center rounded-md border border-line bg-card px-3.5 py-3 text-left transition-transform active:scale-[0.98]"
-              [attr.title]="calendar.status().message || s.t().calendar.title" (click)="onCalendarTap()">
-        <span class="mr-3 text-xl font-mdi"
-              [class]="calendar.status().state === 'error' ? 'text-bad' : calendar.status().state === 'offline' ? 'text-amber' : calendar.status().state === 'online' ? 'text-green' : 'text-muted'">{{ calendarIcon() }}</span>
-        <span class="flex-1 text-sm font-medium text-muted" role="status">{{ s.t().calendar.states[calendar.status().state] }}</span>
-      </button>
-    }
-    <div class="px-5 text-xs text-muted" data-testid="app-version">v{{ version }}</div>
+    <div class="flex items-center gap-2 px-4">
+      @if (calendar.active()) {
+        <button type="button" class="flex size-9 items-center justify-center rounded-md text-xl font-mdi transition-transform active:scale-90"
+                [class]="calendar.status().state === 'error' ? 'text-bad' : calendar.status().state === 'offline' ? 'text-amber' : calendar.status().state === 'online' ? 'text-green' : 'text-muted'"
+                [attr.title]="calendar.status().message || s.t().calendar.title" (click)="onCalendarTap()">
+          {{ calendarIcon() }}<span class="sr-only" role="status">{{ s.t().calendar.states[calendar.status().state] }}</span>
+        </button>
+      }
+      <div class="text-xs text-muted" data-testid="app-version">v{{ version }}</div>
+    </div>
   </aside>
 
   @if (updates.available() && !updates.dismissed()) {

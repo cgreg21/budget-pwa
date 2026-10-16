@@ -109,9 +109,6 @@ export class SettingsPage {
     this.calendarEnabled.set(this.calendar.active());
   }
 
-  openRecurrences(): void {
-    void this.router.navigateByUrl('/settings/recurrences');
-  }
 
   openProfiles(): void {
     void this.router.navigateByUrl('/settings/profiles');

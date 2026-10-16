@@ -1,6 +1,6 @@
-<app-header [title]="s.t().schedule.title" />
+<app-header [title]="s.t().schedule.title" [addLabel]="s.t().editor.newRecurringTitle" (addTap)="editing.set(true)" />
 
-<div class="min-h-0 flex-1 overflow-y-auto overflow-x-hidden px-3 pb-4 wide:px-5">
+<div class="min-h-0 flex-1 overflow-y-auto overflow-x-hidden px-3 pb-4 wide:px-5" (scroll)="openRow.set(null)">
   <div class="flex flex-wrap items-center gap-1 py-2" role="group" [attr.aria-label]="s.t().schedule.horizon">
     @for (count of horizons; track count) {
       <button type="button" class="chip" [class.chip-active]="horizon() === count" [attr.aria-pressed]="horizon() === count"
@@ -18,14 +18,15 @@
       <section class="mb-2" [attr.data-month]="group.month">
         <span class="section-title mt-2">{{ s.monthLabel(group.month) }}</span>
         @for (item of group.items; track item.date + item.recurrence.id) {
-          <div class="setting">
+          <app-swipe-row [open]="openRow() === item.date + item.recurrence.id" [removeLabel]="s.t().common.delete"
+                         (openChange)="setOpenRow(item.date + item.recurrence.id, $event)" (remove)="remove(item.recurrence)">
             <span class="row-icon">{{ glyphOf(item.recurrence.category) }}</span>
             <div class="min-w-0 flex-1">
               <div class="row-title">{{ item.recurrence.description || s.t().common.noDescription }}</div>
               <div class="row-sub">{{ s.formatDate(item.date) }} &middot; {{ item.recurrence.category }}</div>
             </div>
-            <span class="row-amount ml-2 whitespace-nowrap" [class]="item.recurrence.kind">{{ s.formatSigned(item.recurrence.kind, item.recurrence.amount) }}</span>
-          </div>
+            <span class="row-amount ml-2 whitespace-nowrap" [class]="item.recurrence.kind">{{ s.formatSigned(item.recurrence.kind, item.amount) }}</span>
+          </app-swipe-row>
         }
         <div class="row-sub flex justify-between px-1 pt-1">
           <span>{{ s.t().schedule.income }} {{ s.formatAmount(group.income) }}</span>
@@ -42,3 +43,7 @@
     </div>
   }
 </div>
+
+@if (editing()) {
+  <app-editor-modal [recurringOnly]="true" (closed)="editing.set(false)" />
+}

@@ -28,4 +28,10 @@
             [attr.aria-label]="actionLabel()" [attr.title]="actionLabel()"
             (click)="actionTap.emit()">{{ actionIcon() }}</button>
   }
+  @if (addLabel() !== null) {
+    <button type="button"
+            class="ml-2 flex size-11 items-center justify-center rounded-full bg-brand text-[22px] text-on-brand font-mdi transition-transform active:scale-90"
+            [attr.aria-label]="addLabel()" [attr.title]="addLabel()"
+            (click)="addTap.emit()">{{ ui.add }}</button>
+  }
 </header>

@@ -1,8 +1,9 @@
-import { LAST_MONTH, monthKeyOf, occurrenceDates, shiftMonth, type MonthKey, type Recurrence } from 'budget-lib';
+import { LAST_MONTH, monthKeyOf, occurrencesIn, shiftMonth, type MonthKey, type Recurrence } from 'budget-lib';
 
 /** One date a recurrence falls on. */
 export interface ScheduledOccurrence {
   date: string;
+  amount: number;
   recurrence: Recurrence;
 }
 
@@ -24,8 +25,8 @@ export function scheduleOccurrences(recurrences: readonly Recurrence[], from: st
   for (let step = 0; step < months; step++) {
     const month = shiftMonth(first, step);
     for (const recurrence of recurrences) {
-      for (const date of occurrenceDates(recurrence, month)) {
-        if (date >= from) scheduled.push({ date, recurrence });
+      for (const { date, amount } of occurrencesIn(recurrence, month)) {
+        if (date >= from) scheduled.push({ date, amount, recurrence });
       }
     }
     if (month === LAST_MONTH) break;
@@ -46,8 +47,8 @@ export function groupByMonth(occurrences: readonly ScheduledOccurrence[]): Sched
       groups.push(group);
     }
     group.items.push(occurrence);
-    if (occurrence.recurrence.kind === 'income') group.income += occurrence.recurrence.amount;
-    else group.expense += occurrence.recurrence.amount;
+    if (occurrence.recurrence.kind === 'income') group.income += occurrence.amount;
+    else group.expense += occurrence.amount;
   }
   return groups;
 }

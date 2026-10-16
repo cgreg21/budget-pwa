@@ -48,12 +48,13 @@ export interface Strings {
   };
   levels: { critical: string; low: string; medium: string; high: string };
   editor: {
-    newTitle: string; editTitle: string; amount: string; date: string; description: string;
+    newTitle: string; newRecurringTitle: string; editTitle: string; amount: string; date: string; description: string;
     category: string; repeat: string; frequency: string; limited: string;
     occurrences: string; invalidAmount: string; invalidDate: string; scopeTitle: string;
     customFrequency: string; interval: string; invalidInterval: string; unit: string;
     units: Record<RecurrenceFrequency, string>;
     ended: string; until: string; invalidUntil: string;
+    installments: string; installmentsHelp: string; addInstallment: string; removeInstallment: string; invalidInstallment: string;
     partial: string; activeMonths: string; partialHelp: string; invalidActiveMonths: string;
     scopeBody: string; occurrenceOnly: string; seriesToo: string;
   };
@@ -66,7 +67,7 @@ export interface Strings {
     amountFormat: string; theme: string; themeSystem: string; themeLight: string;
     themeDark: string; formatLocale: string; thresholds: string; thresholdsHelp: string;
     low: string; medium: string; high: string; thresholdsOrder: string; thresholdsSaved: string;
-    manage: string; recurrences: string; chooseOption: string;
+    manage: string; chooseOption: string;
     tabs: { general: string; budget: string; calendar: string; data: string };
   };
   calendar: {
@@ -97,14 +98,8 @@ export interface Strings {
     label: string; skip: string; next: string; start: string; replayTitle: string; replayHelp: string; replay: string;
     slides: { title: string; body: string }[];
   };
-  recurrences: {
-    title: string; empty: string; deleteBody(name: string): string;
-    from(month: string): string; range(start: string, end: string, count: number): string;
-    rangeUntil(start: string, end: string): string; everyUnits(count: number, unit: RecurrenceFrequency): string;
-    dayOf(day: number): string; perYear(months: number): string;
-  };
   schedule: {
-    title: string; empty: string; horizon: string; months(count: number): string;
+    title: string; empty: string; horizon: string; months(count: number): string; deleteBody(name: string): string;
     income: string; expense: string;     net: string; total: string;
   };
   profiles: {
@@ -170,12 +165,13 @@ const en: Strings = {
   },
   levels: { critical: 'Critical', low: 'Low', medium: 'Medium', high: 'Comfortable' },
   editor: {
-    newTitle: 'New transaction', editTitle: 'Edit transaction', amount: 'Amount', date: 'Date',
+    newTitle: 'New transaction', newRecurringTitle: 'New recurring transaction', editTitle: 'Edit transaction', amount: 'Amount', date: 'Date',
     description: 'Description', category: 'Category', repeat: 'Repeat',
     frequency: 'Frequency', limited: 'Limit the number of occurrences',
     occurrences: 'Occurrences', invalidAmount: 'Enter an amount greater than zero.', invalidDate: 'Enter a valid date.',
     customFrequency: 'Custom', interval: 'Repeat every', invalidInterval: 'Enter a number between 1 and 60.',
     unit: 'Unit', units: { daily: 'Days', weekly: 'Weeks', monthly: 'Months', bimonthly: 'Two-month periods', quarterly: 'Quarters', semiannual: 'Half-years', yearly: 'Years' },
+    installments: 'Other dates', installmentsHelp: 'Extra dates of each period of the series, each with its own amount.', addInstallment: 'Add a date', removeInstallment: 'Remove this date', invalidInstallment: 'Each extra date needs a positive amount and must fall within the same period as the main date, not before it.',
     ended: 'End on a given month', until: 'Last month', invalidUntil: 'The last month cannot be before the first one.',
     partial: 'Spread over part of the year', activeMonths: 'Months per year',
     partialHelp: 'Due every month from the first date for this many months, then paused until the same month next year.',
@@ -198,7 +194,7 @@ const en: Strings = {
     thresholdsHelp: 'Below Low: critical. Low to Medium: low. Medium to High: medium. Above High: comfortable.',
     low: 'Low (x)', medium: 'Medium (y)', high: 'High (z)',
     thresholdsOrder: 'Thresholds must satisfy x < y < z.', thresholdsSaved: 'Thresholds saved',
-    manage: 'Manage', recurrences: 'Recurring transactions',
+    manage: 'Manage',
     chooseOption: 'Choose',
     tabs: { general: 'General', budget: 'Budget', calendar: 'Calendar', data: 'Data' },
   },
@@ -276,22 +272,10 @@ const en: Strings = {
       { title: 'Sync with your calendar', body: 'Connect an online calendar in Settings to keep your transactions on all your devices.' },
     ],
   },
-  recurrences: {
-    title: 'Recurring transactions', empty: 'No recurring transaction yet. Enable "Repeat" when adding a transaction.',
-    deleteBody: (name) => `Stop "${name}"? Occurrences already created stay in their months.`,
-    from: (month) => `from ${month}`, range: (start, end, count) => `${start} - ${end} (${count} times)`,
-    rangeUntil: (start, end) => `${start} - ${end}`, everyUnits: (count, unit) => {
-      const [one, many] = {
-        daily: ['day', 'days'], weekly: ['week', 'weeks'], monthly: ['month', 'months'], bimonthly: ['two-month period', 'two-month periods'],
-        quarterly: ['quarter', 'quarters'], semiannual: ['half-year', 'half-years'], yearly: ['year', 'years'],
-      }[unit];
-      return count === 1 ? `every ${one}` : `every ${count} ${many}`;
-    },
-    dayOf: (day) => `day ${day}`, perYear: (months) => `(${months} months a year)`,
-  },
   schedule: {
     title: 'Schedule', empty: 'No upcoming occurrence. Recurring transactions you create appear here.',
     horizon: 'Period', months: (count) => count === 1 ? '1 month' : `${count} months`,
+    deleteBody: (name) => `Delete the recurring transaction "${name}" and all its future dates?`,
     income: 'Income', expense: 'Expenses', net: 'Balance', total: 'Total',
   },
   profiles: {
@@ -359,12 +343,13 @@ const fr: Strings = {
   },
   levels: { critical: 'Critique', low: 'Faible', medium: 'Moyen', high: 'Confortable' },
   editor: {
-    newTitle: 'Nouvelle transaction', editTitle: 'Modifier la transaction',
+    newTitle: 'Nouvelle transaction', newRecurringTitle: 'Nouvelle transaction r?currente', editTitle: 'Modifier la transaction',
     amount: 'Montant', date: 'Date', description: 'Description', category: 'Catégorie',
     repeat: 'Répéter', frequency: 'Fréquence', limited: "Limiter le nombre d'occurrences",
     occurrences: 'Occurrences', invalidAmount: 'Saisissez un montant supérieur à zéro.', invalidDate: 'Saisissez une date valide.',
     customFrequency: 'Personnalisée', interval: 'Répéter tous les', invalidInterval: 'Saisissez un nombre entre 1 et 60.',
     unit: 'Unité', units: { daily: 'Jours', weekly: 'Semaines', monthly: 'Mois', bimonthly: 'Bimestres', quarterly: 'Trimestres', semiannual: 'Semestres', yearly: 'Années' },
+    installments: 'Autres dates', installmentsHelp: 'Dates supplémentaires de chaque période de la série, chacune avec son propre montant.', addInstallment: 'Ajouter une date', removeInstallment: 'Retirer cette date', invalidInstallment: 'Chaque date supplémentaire doit avoir un montant positif et tomber dans la même période que la date principale, pas avant.',
     ended: 'Terminer à un mois donné', until: 'Dernier mois', invalidUntil: 'Le dernier mois ne peut pas précéder le premier.',
     partial: 'Échelonner sur une partie de l’année', activeMonths: 'Mois par an',
     partialHelp: 'Dû chaque mois à partir de la première date pendant ce nombre de mois, puis en pause jusqu’au même mois l’année suivante.',
@@ -387,7 +372,7 @@ const fr: Strings = {
     thresholdsHelp: 'Sous Faible : critique. De Faible à Moyen : faible. De Moyen à Élevé : moyen. Au-delà d’Élevé : confortable.',
     low: 'Faible (x)', medium: 'Moyen (y)', high: 'Élevé (z)',
     thresholdsOrder: 'Les seuils doivent respecter x < y < z.', thresholdsSaved: 'Seuils enregistrés',
-    manage: 'Gérer', recurrences: 'Transactions récurrentes',
+    manage: 'Gérer',
     chooseOption: 'Choisir',
     tabs: { general: 'Général', budget: 'Budget', calendar: 'Agenda', data: 'Données' },
   },
@@ -465,22 +450,10 @@ const fr: Strings = {
       { title: 'Synchronisation avec votre agenda', body: 'Connectez un agenda en ligne dans les réglages pour retrouver vos transactions sur tous vos appareils.' },
     ],
   },
-  recurrences: {
-    title: 'Transactions récurrentes', empty: 'Aucune transaction récurrente. Activez « Répéter » en ajoutant une transaction.',
-    deleteBody: (name) => `Arrêter « ${name} » ? Les occurrences déjà créées restent dans leurs mois.`,
-    from: (month) => `à partir de ${month}`, range: (start, end, count) => `${start} - ${end} (${count} fois)`,
-    rangeUntil: (start, end) => `${start} - ${end}`, everyUnits: (count, unit) => {
-      const [one, many] = {
-        daily: ['jour', 'jours'], weekly: ['semaine', 'semaines'], monthly: ['mois', 'mois'], bimonthly: ['bimestre', 'bimestres'],
-        quarterly: ['trimestre', 'trimestres'], semiannual: ['semestre', 'semestres'], yearly: ['an', 'ans'],
-      }[unit];
-      return count === 1 ? `chaque ${one}` : `tous les ${count} ${many}`;
-    },
-    dayOf: (day) => `le ${day}`, perYear: (months) => `(${months} mois par an)`,
-  },
   schedule: {
     title: 'Échéancier', empty: 'Aucune échéance à venir. Les transactions récurrentes que vous créez apparaissent ici.',
     horizon: 'Période', months: (count) => `${count} mois`,
+    deleteBody: (name) => `Supprimer la transaction récurrente « ${name} » et toutes ses échéances à venir ?`,
     income: 'Revenus', expense: 'Dépenses', net: 'Solde', total: 'Total',
   },
   profiles: {

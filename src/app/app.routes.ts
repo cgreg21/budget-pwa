@@ -14,10 +14,6 @@ export const routes: Routes = [
       { path: 'trash', loadComponent: () => import('./pages/trash/trash.page').then((module) => module.TrashPage) },
       { path: 'settings', loadComponent: () => import('./pages/settings/settings.page').then((module) => module.SettingsPage) },
       {
-        path: 'settings/recurrences',
-        loadComponent: () => import('./pages/settings/recurrences.page').then((module) => module.RecurrencesPage),
-      },
-      {
         path: 'settings/profiles',
         loadComponent: () => import('./pages/settings/profiles.page').then((module) => module.ProfilesPage),
       },

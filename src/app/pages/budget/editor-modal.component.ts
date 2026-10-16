@@ -1,13 +1,13 @@
 import { Component, OnInit, computed, inject, input, output, signal } from '@angular/core';
 import {
-  RECURRENCE_FREQUENCIES, MAX_ACTIVE_MONTHS, MAX_INTERVAL, MAX_OCCURRENCES, MIN_ACTIVE_MONTHS, MIN_INTERVAL, MIN_OCCURRENCES, isMonthKey, type RecurrenceFrequency,
+  RECURRENCE_FREQUENCIES, MAX_ACTIVE_MONTHS, canHaveInstallments, dayOf, maxInstallmentOffset, monthKeyOf, monthsBetween, occurrenceDate, shiftMonth, type Installment, MAX_INTERVAL, MAX_OCCURRENCES, MIN_ACTIVE_MONTHS, MIN_INTERVAL, MIN_OCCURRENCES, isMonthKey, type RecurrenceFrequency,
   type RecurrenceSettings, type Transaction, type TransactionInput, type TransactionKind,
 } from 'budget-lib';
 
 import { BudgetService } from '../../budget.service';
 import { DialogService } from '../../dialog.service';
 import { SnackbarService } from '../../snackbar.service';
-import { categoryGlyph } from '../../icons';
+import { UI_ICONS, categoryGlyph } from '../../icons';
 import { parseAmount, SettingsService } from '../../settings.service';
 import { SheetComponent } from '../../shared/sheet.component';
 import { deleteTransaction } from './delete-transaction';
@@ -25,11 +25,14 @@ export class EditorModalComponent implements OnInit {
   private readonly dialogs = inject(DialogService);
   private readonly snackbar = inject(SnackbarService);
   readonly frequencies = RECURRENCE_FREQUENCIES;
+  readonly ui = UI_ICONS;
 
   /** The transaction to edit, or `null` for a new one. */
   readonly id = input<string | null>(null);
   /** Kind preselected for a new transaction (home-screen shortcuts). */
   readonly initialKind = input<TransactionKind>('expense');
+  /** New transaction form restricted to recurring ones: the repeat switch is hidden and always on. */
+  readonly recurringOnly = input(false);
   readonly closed = output<void>();
 
   existing: Transaction | undefined;
@@ -51,6 +54,8 @@ export class EditorModalComponent implements OnInit {
   readonly activeMonths = signal('10');
   /** Spreading a monthly series over part of the year only makes sense at a plain monthly rhythm. */
   readonly canBePartial = computed(() => this.repeat() && !this.custom() && this.frequency() === 'monthly');
+  /** Extra dates of each period of the series, with their own amounts. */
+  readonly installments = signal<{ date: string; amount: string }[]>([]);
   readonly error = signal('');
   readonly categoryGlyph = computed(() => categoryGlyph(this.b.iconOf(this.category())));
 
@@ -63,7 +68,7 @@ export class EditorModalComponent implements OnInit {
     this.amount.set(existing ? this.s.formatInput(existing.amount) : '');
     this.description.set(existing?.description ?? '');
     this.category.set(existing?.category ?? this.b.defaultCategory);
-    this.repeat.set(series !== undefined);
+    this.repeat.set(series !== undefined || this.recurringOnly());
     this.frequency.set(series?.frequency ?? 'monthly');
     this.limited.set(series?.occurrences !== undefined);
     this.occurrences.set(String(series?.occurrences ?? 12));
@@ -73,6 +78,10 @@ export class EditorModalComponent implements OnInit {
     this.until.set(series?.until ?? '');
     this.partial.set(series?.activeMonths !== undefined);
     this.activeMonths.set(String(series?.activeMonths ?? 10));
+    this.installments.set((series?.installments ?? []).map((item) => ({
+      date: occurrenceDate({ ...series!, day: item.day }, shiftMonth(series!.startMonth, item.offset)),
+      amount: this.s.formatInput(item.amount),
+    })));
   }
 
   async pickCategory(): Promise<void> {
@@ -157,6 +166,18 @@ export class EditorModalComponent implements OnInit {
     if (this.existing && await deleteTransaction(this.b, this.s, this.dialogs, this.existing, this.snackbar)) this.closed.emit();
   }
 
+  addInstallment(): void {
+    this.installments.update((list) => [...list, { date: this.date(), amount: '' }]);
+  }
+
+  removeInstallment(index: number): void {
+    this.installments.update((list) => list.filter((_, i) => i !== index));
+  }
+
+  setInstallment(index: number, patch: Partial<{ date: string; amount: string }>): void {
+    this.installments.update((list) => list.map((item, i) => (i === index ? { ...item, ...patch } : item)));
+  }
+
   toggleEnded(): void {
     const next = !this.ended();
     this.ended.set(next);
@@ -165,6 +186,27 @@ export class EditorModalComponent implements OnInit {
 
   normalizeAmount(): void {
     this.amount.set(this.s.normalizeInput(this.amount()));
+  }
+
+  /** Installments only make sense on a monthly-based series due all year. */
+  readonly installmentsAllowed = computed(() => this.repeat() && canHaveInstallments({
+    frequency: this.frequency(), interval: this.custom() ? Number(this.interval()) : undefined,
+    activeMonths: this.canBePartial() && this.partial() ? Number(this.activeMonths()) : undefined,
+  }));
+
+  /** The installments as stored (month offset from the series' first month); `null` when one is invalid. */
+  private parsedInstallments(): Installment[] | null {
+    const series = this.existing && this.b.recurrenceOf(this.existing);
+    const base = series?.startMonth ?? this.date().slice(0, 7);
+    const limit = maxInstallmentOffset({ frequency: this.frequency(), interval: this.custom() ? Number(this.interval()) : undefined });
+    const parsed: Installment[] = [];
+    for (const item of this.installments()) {
+      const amount = parseAmount(item.amount);
+      const offset = /^\d{4}-\d{2}-\d{2}$/.test(item.date) ? monthsBetween(base, monthKeyOf(item.date)) : -1;
+      if (!Number.isFinite(amount) || amount <= 0 || offset < 0 || offset > limit) return null;
+      parsed.push({ offset, day: dayOf(item.date), amount });
+    }
+    return parsed;
   }
 
   private rhythmError(): string {
@@ -178,6 +220,7 @@ export class EditorModalComponent implements OnInit {
       const months = Number(this.activeMonths());
       if (!Number.isInteger(months) || months < MIN_ACTIVE_MONTHS || months > MAX_ACTIVE_MONTHS) return t.editor.invalidActiveMonths;
     }
+    if (this.installmentsAllowed() && this.parsedInstallments() === null) return t.editor.invalidInstallment;
     if (this.ended()) {
       const series = this.existing && this.b.recurrenceOf(this.existing);
       const start = series?.startMonth ?? this.date().slice(0, 7);
@@ -192,6 +235,8 @@ export class EditorModalComponent implements OnInit {
     if (this.custom()) settings.interval = Number(this.interval());
     if (this.ended()) settings.until = this.until();
     if (this.canBePartial() && this.partial()) settings.activeMonths = Number(this.activeMonths());
+    const installments = this.installmentsAllowed() ? this.parsedInstallments() : null;
+    if (installments && installments.length > 0) settings.installments = installments;
     if (!this.limited()) return settings;
     const count = Math.round(Number(this.occurrences()));
     settings.occurrences = Number.isFinite(count)

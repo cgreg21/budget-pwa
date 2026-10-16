@@ -11,7 +11,6 @@ import { DialogService } from '../../dialog.service';
 import { InstallService } from '../../install.service';
 import { SettingsService } from '../../settings.service';
 import { SnackbarService } from '../../snackbar.service';
-import { RecurrencesPage } from './recurrences.page';
 import { SettingsPage } from './settings.page';
 
 const DATA_KEY = 'budget-pwa:data:v1';
@@ -155,12 +154,6 @@ describe('SettingsPage', () => {
     expect(c.message()).toBe('');
     expect(b.thresholds()).toEqual({ low: 50, medium: 200, high: 900 });
     expect(TestBed.inject(SnackbarService).current()?.text).toBe(s.t().snackbar.thresholdsSaved);
-  });
-
-  it('navigates to the recurrences', async () => {
-    const navigate = vi.spyOn(router, 'navigateByUrl').mockResolvedValue(true);
-    (await page()).componentInstance.openRecurrences();
-    expect(navigate).toHaveBeenCalledWith('/settings/recurrences');
   });
 
   it('exports a backup as a JSON download', async () => {
@@ -465,66 +458,5 @@ describe('SettingsPage', () => {
       expect(c.passphraseMode()).toBeNull();
       expect(c.backupError()).toBe(s.t().config.unreadable);
     });
-  });
-});
-
-describe('RecurrencesPage', () => {
-  let b: BudgetService;
-  let s: SettingsService;
-  let dialogs: DialogService;
-
-  beforeEach(() => {
-    vi.stubGlobal('matchMedia', vi.fn(() => ({ matches: false, addEventListener: () => undefined })));
-    localStorage.setItem(DATA_KEY, JSON.stringify({
-      months: {}, categories: DEFAULT_CATEGORIES,
-      recurrences: [rec(), rec({ id: 'r2', description: '', occurrences: 3, frequency: 'yearly', kind: 'income' })],
-      thresholds: { low: 100, medium: 500, high: 1000 },
-    }));
-    TestBed.configureTestingModule({ providers: [provideRouter([])] });
-    b = TestBed.inject(BudgetService);
-    s = TestBed.inject(SettingsService);
-    dialogs = TestBed.inject(DialogService);
-  });
-
-  afterEach(() => vi.unstubAllGlobals());
-
-  const page = (): ComponentFixture<RecurrencesPage> => {
-    const fixture = TestBed.createComponent(RecurrencesPage);
-    fixture.detectChanges();
-    return fixture;
-  };
-
-  it('describes each series', () => {
-    const fixture = page();
-    const c = fixture.componentInstance;
-    const t = s.t();
-    expect(c.details(rec())).toBe(`${t.frequency.monthly} \u00B7 ${t.recurrences.dayOf(3)} \u00B7 Logement \u00B7 ${t.recurrences.from(s.monthLabel('2026-01'))}`);
-    expect(c.details(rec({ occurrences: 3, frequency: 'yearly' })))
-      .toBe(`${t.frequency.yearly} \u00B7 ${t.recurrences.dayOf(3)} \u00B7 Logement \u00B7 ${t.recurrences.range(s.monthLabel('2026-01'), s.monthLabel('2028-01'), 3)}`);
-    expect(c.details(rec({ interval: 5, until: '2026-11' })))
-      .toBe(`${t.recurrences.everyUnits(5, 'monthly')} \u00B7 ${t.recurrences.dayOf(3)} \u00B7 Logement \u00B7 ${t.recurrences.rangeUntil(s.monthLabel('2026-01'), s.monthLabel('2026-11'))}`);
-    expect(fixture.nativeElement.querySelectorAll('.setting')).toHaveLength(2);
-    expect(fixture.nativeElement.textContent).toContain(t.common.noDescription);
-  });
-
-  it('removes a series after confirmation', async () => {
-    const c = page().componentInstance;
-    let pending = c.remove(rec({ id: 'r2', description: '' }));
-    expect(dialogs.current()?.message).toBe(s.t().recurrences.deleteBody(s.t().common.noDescription));
-    dialogs.close(null);
-    await pending;
-    expect(b.recurrences()).toHaveLength(2);
-    pending = c.remove(rec());
-    expect(dialogs.current()?.message).toBe(s.t().recurrences.deleteBody('Loyer'));
-    dialogs.close(s.t().common.delete);
-    await pending;
-    expect(b.recurrences().map((r) => r.id)).toEqual(['r2']);
-  });
-
-  it('shows the empty message without series', () => {
-    localStorage.setItem(DATA_KEY, JSON.stringify({ months: {}, categories: DEFAULT_CATEGORIES, recurrences: [], thresholds: { low: 1, medium: 2, high: 3 } }));
-    TestBed.resetTestingModule();
-    TestBed.configureTestingModule({ providers: [provideRouter([])] });
-    expect(page().nativeElement.textContent).toContain(TestBed.inject(SettingsService).t().recurrences.empty);
   });
 });

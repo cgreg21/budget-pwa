@@ -45,12 +45,5 @@ describe('i18n dictionaries', () => {
     for (const count of [0, 1, 7]) expect(strings.calendar.conflicts(count)).toContain(String(count));
     expect(strings.categories.exists('Loisirs')).toContain('Loisirs');
     expect(strings.categories.deleteBody('Loisirs')).toContain('Loisirs');
-    expect(strings.recurrences.deleteBody('Gym')).toContain('Gym');
-    expect(strings.recurrences.from('Janvier 2026')).toContain('Janvier 2026');
-    const range = strings.recurrences.range('Janvier 2026', 'Juin 2026', 6);
-    expect(range).toContain('Janvier 2026');
-    expect(range).toContain('Juin 2026');
-    expect(range).toContain('6');
-    for (const day of [1, 15, 31]) expect(strings.recurrences.dayOf(day)).toContain(String(day));
   });
 });

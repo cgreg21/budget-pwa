@@ -1,5 +1,5 @@
 <app-sheet [full]="true" (dismiss)="closed.emit()">
-  <h2 class="modal-title">{{ existing ? s.t().editor.editTitle : s.t().editor.newTitle }}</h2>
+  <h2 class="modal-title">{{ existing ? s.t().editor.editTitle : recurringOnly() ? s.t().editor.newRecurringTitle : s.t().editor.newTitle }}</h2>
 
   <div class="min-h-0 flex-1 overflow-y-auto">
     <div class="grid grid-cols-2">
@@ -26,14 +26,17 @@
       <span>{{ category() }}</span>
     </button>
 
-    <div class="mt-3 flex items-center justify-between">
-      <span class="text-base">{{ s.t().editor.repeat }}</span>
-      <button type="button" role="switch" [attr.aria-checked]="repeat()"
-              class="relative h-7 w-12 rounded-full transition-colors" [class]="repeat() ? 'bg-brand' : 'bg-line'"
-              (click)="repeat.set(!repeat())">
-        <span class="absolute top-0.5 size-6 rounded-full bg-white shadow transition-all" [class]="repeat() ? 'left-[22px]' : 'left-0.5'"></span>
-      </button>
-    </div>
+    @if (!recurringOnly()) {
+      <div class="mt-3 flex items-center justify-between">
+        <span class="text-base">{{ s.t().editor.repeat }}</span>
+        <button type="button" role="switch" [attr.aria-checked]="repeat()"
+                class="relative h-7 w-12 rounded-full transition-colors" [class]="repeat() ? 'bg-brand' : 'bg-line'"
+                (click)="repeat.set(!repeat())">
+          <span class="absolute top-0.5 size-6 rounded-full bg-white shadow transition-all" [class]="repeat() ? 'left-[22px]' : 'left-0.5'"></span>
+        </button>
+      </div>
+  
+    }
 
     @if (repeat()) {
       <span class="field-label">{{ s.t().editor.frequency }}</span>
@@ -99,6 +102,24 @@
         <input id="editor-until" class="input" type="month" [value]="until()"
                (input)="until.set($any($event.target).value)" />
       }
+    }
+
+    @if (installmentsAllowed()) {
+      <span class="field-label">{{ s.t().editor.installments }}</span>
+      @for (item of installments(); track $index; let i = $index) {
+        <div class="mb-2 grid grid-cols-[1fr_1fr_auto] items-center gap-2">
+          <input class="input" type="date" [value]="item.date" [attr.aria-label]="s.t().editor.date"
+                 (input)="setInstallment(i, { date: $any($event.target).value })" />
+          <input class="input" type="text" inputmode="decimal" autocomplete="off" [attr.aria-label]="s.t().editor.amount"
+                 [placeholder]="s.formatInput(0)" [value]="item.amount"
+                 (input)="setInstallment(i, { amount: $any($event.target).value })"
+                 (blur)="setInstallment(i, { amount: s.normalizeInput(item.amount) })" />
+          <button type="button" class="flex size-11 items-center justify-center rounded-full text-[22px] text-bad font-mdi"
+                  [attr.aria-label]="s.t().editor.removeInstallment" (click)="removeInstallment(i)">{{ ui.trash }}</button>
+        </div>
+      }
+      <button type="button" class="secondary w-full" (click)="addInstallment()">{{ s.t().editor.addInstallment }}</button>
+      <p class="row-sub">{{ s.t().editor.installmentsHelp }}</p>
     }
 
     @if (error()) {

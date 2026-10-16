@@ -294,6 +294,51 @@ describe('EditorModalComponent', () => {
     expect(series?.occurrences).toBeUndefined();
   });
 
+  it('adds one series holding the extra dates and amounts', async () => {
+    const { c } = editor(null);
+    c.amount.set('100');
+    c.date.set('2026-02-15');
+    c.repeat.set(true);
+    c.frequency.set('yearly');
+    c.addInstallment();
+    c.setInstallment(0, { date: '2026-05-10', amount: '150' });
+    c.addInstallment();
+    c.setInstallment(1, { date: '2026-09-15', amount: '200' });
+    await c.save();
+    const series = b.recurrences().filter((r) => r.amount === 100);
+    expect(series).toHaveLength(1);
+    expect(series[0].installments).toEqual([{ offset: 3, day: 10, amount: 150 }, { offset: 7, day: 15, amount: 200 }]);
+  });
+
+  it('loads the installments of an existing series', () => {
+    b.add({ date: '2026-02-15', description: 'Tax', category: b.defaultCategory, kind: 'expense', amount: 100 },
+      { frequency: 'yearly', installments: [{ offset: 3, day: 10, amount: 150 }] });
+    const existing = b.transactions().find((t) => t.description === 'Tax')!;
+    const { c } = editor(existing.id);
+    expect(c.installments()).toEqual([{ date: '2026-05-10', amount: c.s.formatInput(150) }]);
+  });
+
+  it('rejects an extra date outside the period', async () => {
+    const { c } = editor(null);
+    c.amount.set('100');
+    c.date.set('2026-02-15');
+    c.repeat.set(true);
+    c.frequency.set('quarterly');
+    c.addInstallment();
+    c.setInstallment(0, { date: '2026-09-15', amount: '50' });
+    await c.save();
+    expect(c.error()).toBe(c.s.t().editor.invalidInstallment);
+  });
+
+  it('rejects an extra date without an amount', async () => {
+    const { c } = editor(null);
+    c.amount.set('100');
+    c.repeat.set(true);
+    c.addInstallment();
+    await c.save();
+    expect(c.error()).toBe(c.s.t().editor.invalidInstallment);
+  });
+
   it('adds a series repeating every few days or weeks', async () => {
     const { c } = editor(null);
     c.amount.set('8');
