@@ -12,7 +12,7 @@
        [style.opacity]="backdropOpacity()"
        (click)="onBackdropClick()"></div>
 
-  <aside class="absolute inset-y-0 left-0 z-30 flex w-[280px] shrink-0 touch-pan-y flex-col bg-surface pb-[calc(8px+env(safe-area-inset-bottom))] shadow-pop ease-out wide:static wide:order-first wide:border-r wide:border-line wide:shadow-none"
+  <aside class="absolute inset-y-0 left-0 z-30 flex w-[280px] shrink-0 touch-pan-y flex-col bg-surface pb-[calc(2px+env(safe-area-inset-bottom))] shadow-pop ease-out wide:static wide:order-first wide:border-r wide:border-line wide:shadow-none"
          [class]="dragging() ? '' : 'transition-transform duration-200'"
          [style.transform]="layout.wide() ? null : 'translateX(' + drawerX() + 'px)'"
          [attr.inert]="drawerActive() ? null : ''">
@@ -36,15 +36,15 @@
         </button>
       }
     </nav>
-    <div class="flex items-center gap-2 px-4">
+    <div class="flex items-center gap-2 px-5">
       @if (calendar.active()) {
-        <button type="button" class="flex size-9 items-center justify-center rounded-md text-xl font-mdi transition-transform active:scale-90"
+        <button type="button" class="flex size-8 items-center justify-center rounded-md text-xl font-mdi transition-transform active:scale-90"
                 [class]="calendar.status().state === 'error' ? 'text-bad' : calendar.status().state === 'offline' ? 'text-amber' : calendar.status().state === 'online' ? 'text-green' : 'text-muted'"
                 [attr.title]="calendar.status().message || s.t().calendar.title" (click)="onCalendarTap()">
           {{ calendarIcon() }}<span class="sr-only" role="status">{{ s.t().calendar.states[calendar.status().state] }}</span>
         </button>
       }
-      <div class="text-xs text-muted" data-testid="app-version">v{{ version }}</div>
+      <div class="ml-auto text-xs text-muted" data-testid="app-version">v{{ version }}</div>
     </div>
   </aside>
 
