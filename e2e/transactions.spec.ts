@@ -77,7 +77,7 @@ test.describe('transactions', () => {
     await page.getByRole('switch').first().click();
     await page.getByRole('button', { name: 'Mensuelle', exact: true }).click();
     await page.getByRole('dialog').getByRole('button', { name: 'Personnalisée', exact: true }).click();
-    await page.getByLabel('Tous les combien de mois').fill('5');
+    await page.getByLabel('Répéter tous les').fill('5');
     await page.locator('#editor-ended').click();
     await page.getByLabel('Dernier mois').fill('2030-12');
     await page.getByRole('button', { name: 'Enregistrer' }).click();
@@ -88,6 +88,24 @@ test.describe('transactions', () => {
     await expect(page.getByText(/Décembre 2030/)).toBeVisible();
   });
 
+  test('adds a series repeating every few weeks', async ({ app, page }) => {
+    await open(app, '/budget');
+    await page.getByRole('button', { name: 'Ajouter', exact: true }).click();
+    await page.getByLabel('Montant').fill('9');
+    await page.getByLabel('Description').fill('Sport test');
+    await page.getByRole('switch').first().click();
+    await page.getByRole('button', { name: 'Mensuelle', exact: true }).click();
+    await page.getByRole('dialog').getByRole('button', { name: 'Personnalisée', exact: true }).click();
+    await page.getByRole('button', { name: 'Mois', exact: true }).click();
+    await page.getByRole('dialog').getByRole('button', { name: 'Semaines', exact: true }).click();
+    await page.getByLabel('Répéter tous les').fill('2');
+    await page.getByRole('button', { name: 'Enregistrer' }).click();
+
+    await expect(page.getByText('Transaction ajoutée')).toBeVisible();
+    await page.goto('/settings/recurrences');
+    await expect(page.getByText(/tous les 2 semaines/)).toBeVisible();
+  });
+
   test('rejects an invalid custom interval', async ({ app, page }) => {
     await open(app, '/budget');
     await page.getByRole('button', { name: 'Ajouter', exact: true }).click();
@@ -95,9 +113,23 @@ test.describe('transactions', () => {
     await page.getByRole('switch').first().click();
     await page.getByRole('button', { name: 'Mensuelle', exact: true }).click();
     await page.getByRole('dialog').getByRole('button', { name: 'Personnalisée', exact: true }).click();
-    await page.getByLabel('Tous les combien de mois').fill('0');
+    await page.getByLabel('Répéter tous les').fill('0');
     await page.getByRole('button', { name: 'Enregistrer' }).click();
-    await expect(page.getByText('Saisissez un nombre de mois entre 1 et 60.')).toBeVisible();
+    await expect(page.getByText('Saisissez un nombre entre 1 et 60.')).toBeVisible();
+  });
+
+  test('adds a weekly series that repeats within the month', async ({ app, page }) => {
+    await open(app, '/budget');
+    await page.getByRole('button', { name: 'Ajouter', exact: true }).click();
+    await page.getByLabel('Montant').fill('15');
+    await page.getByLabel('Description').fill('Marché test');
+    await page.getByRole('switch').first().click();
+    await page.getByRole('button', { name: 'Mensuelle', exact: true }).click();
+    await page.getByRole('dialog').getByRole('button', { name: 'Hebdomadaire', exact: true }).click();
+    await page.getByRole('button', { name: 'Enregistrer' }).click();
+
+    await expect(page.getByText('Transaction ajoutée')).toBeVisible();
+    await expect(page.getByText('Marché test').nth(1)).toBeVisible();
   });
 
   test('navigates between months', async ({ app, page }) => {

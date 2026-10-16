@@ -40,9 +40,17 @@
       <button type="button" class="select" (click)="pickFrequency()">{{ custom() ? s.t().editor.customFrequency : s.t().frequency[frequency()] }}</button>
 
       @if (custom()) {
-        <label class="field-label" for="editor-interval">{{ s.t().editor.interval }}</label>
-        <input id="editor-interval" class="input" type="number" inputmode="numeric"
-               [value]="interval()" (input)="interval.set($any($event.target).value)" />
+        <div class="grid grid-cols-2 gap-2">
+          <div>
+            <label class="field-label" for="editor-interval">{{ s.t().editor.interval }}</label>
+            <input id="editor-interval" class="input" type="number" inputmode="numeric"
+                   [value]="interval()" (input)="interval.set($any($event.target).value)" />
+          </div>
+          <div>
+            <span class="field-label">{{ s.t().editor.unit }}</span>
+            <button type="button" class="select" (click)="pickUnit()">{{ s.t().editor.units[frequency()] }}</button>
+          </div>
+        </div>
       }
 
       <div class="mt-3 flex items-center justify-between">

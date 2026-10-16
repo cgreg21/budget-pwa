@@ -14,7 +14,7 @@ Le style utilise Tailwind CSS v4 (`src/styles.css`, thème sombre/clair via vari
 
 ## Fonctionnalités
 
-- Transactions par mois : création, modification, suppression, recherche, filtre revenu/dépense et récurrences mensuelles, bimestrielles, trimestrielles, semestrielles, annuelles ou personnalisées (tous les N mois, de 1 à 60), avec une durée limitée par un nombre d'occurrences et/ou un dernier mois.
+- Transactions par mois : création, modification, suppression, recherche, filtre revenu/dépense et récurrences quotidiennes, hebdomadaires (plusieurs occurrences par mois, à partir du jour de la transaction), mensuelles, bimestrielles, trimestrielles, semestrielles, annuelles ou personnalisées (tous les N jours, semaines, mois, bimestres, trimestres, semestres ou années, de 1 à 60), avec une durée limitée par un nombre d'occurrences et/ou un dernier mois.
 - Catégories, indicateurs de solde, statistiques par catégorie et historique.
 - Réglages de devise, langue de formatage, thème et seuils du solde.
 - Export et restauration de sauvegardes JSON au format commun de `budget-lib`.

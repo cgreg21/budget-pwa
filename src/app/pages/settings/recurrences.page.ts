@@ -30,7 +30,7 @@ export class RecurrencesPage {
         ? t.recurrences.range(start, this.s.monthLabel(end), r.occurrences)
         : t.recurrences.rangeUntil(start, this.s.monthLabel(end));
     }
-    const rhythm = r.interval === undefined ? t.frequency[r.frequency] : t.recurrences.everyMonths(r.interval);
+    const rhythm = r.interval === undefined ? t.frequency[r.frequency] : t.recurrences.everyUnits(r.interval, r.frequency);
     return `${rhythm} \u00B7 ${t.recurrences.dayOf(r.day)} \u00B7 ${r.category} \u00B7 ${range}`;
   }
 

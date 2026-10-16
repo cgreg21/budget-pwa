@@ -294,6 +294,49 @@ describe('EditorModalComponent', () => {
     expect(series?.occurrences).toBeUndefined();
   });
 
+  it('adds a series repeating every few days or weeks', async () => {
+    const { c } = editor(null);
+    c.amount.set('8');
+    c.repeat.set(true);
+    c.custom.set(true);
+    let pending = c.pickUnit();
+    dialogs.close(s.t().editor.units.weekly);
+    await pending;
+    expect(c.frequency()).toBe('weekly');
+    c.interval.set('2');
+    await c.save();
+    const series = b.recurrences().find((r) => r.amount === 8);
+    expect(series).toMatchObject({ frequency: 'weekly', interval: 2, day: 13 });
+    const dates = b.transactions().filter((t) => t.recurrenceId === series!.id).map((t) => t.date);
+    expect(dates).toEqual(['2026-10-13', '2026-10-27']);
+
+    pending = c.pickUnit();
+    dialogs.close(null);
+    await pending;
+    expect(c.frequency()).toBe('weekly');
+  });
+
+  it('offers every frequency as a unit of the custom interval', async () => {
+    const { c } = editor(null);
+    const pending = c.pickUnit();
+    const units = s.t().editor.units;
+    expect(dialogs.current()?.actions).toEqual(
+      [units.daily, units.weekly, units.monthly, units.bimonthly, units.quarterly, units.semiannual, units.yearly],
+    );
+    dialogs.close(s.t().editor.units.yearly);
+    await pending;
+    expect(c.frequency()).toBe('yearly');
+  });
+
+  it('loads the unit of a custom series', () => {
+    seed({ '2026-10': [tx({ id: 'rent', recurrenceId: 'r1' })] }, [{ ...RENT, frequency: 'daily', interval: 3 }]);
+    TestBed.resetTestingModule();
+    const { c } = editor('rent');
+    expect(c.custom()).toBe(true);
+    expect(c.frequency()).toBe('daily');
+    expect(c.interval()).toBe('3');
+  });
+
   it('adds a series with a custom interval and an end month', async () => {
     const { c } = editor(null);
     c.amount.set('20');
@@ -353,6 +396,18 @@ describe('EditorModalComponent', () => {
     dialogs.close(s.t().editor.customFrequency);
     await pending;
     expect(c.custom()).toBe(true);
+  });
+
+  it('adds a weekly series that fills the month with one occurrence per week', async () => {
+    const { c } = editor(null);
+    c.amount.set('15');
+    c.repeat.set(true);
+    c.frequency.set('weekly');
+    await c.save();
+    const series = b.recurrences().find((r) => r.amount === 15);
+    expect(series).toMatchObject({ frequency: 'weekly', day: 13, startMonth: '2026-10' });
+    const dates = b.transactions().filter((t) => t.recurrenceId === series!.id).map((t) => t.date);
+    expect(dates).toEqual(['2026-10-13', '2026-10-20', '2026-10-27']);
   });
 
   it('updates a one-off transaction', async () => {

@@ -1,6 +1,6 @@
 import { Component, OnInit, computed, inject, input, output, signal } from '@angular/core';
 import {
-  MAX_INTERVAL, MAX_OCCURRENCES, MIN_INTERVAL, MIN_OCCURRENCES, RECURRENCE_FREQUENCIES, isMonthKey, type RecurrenceFrequency,
+  RECURRENCE_FREQUENCIES, MAX_INTERVAL, MAX_OCCURRENCES, MIN_INTERVAL, MIN_OCCURRENCES, isMonthKey, type RecurrenceFrequency,
   type RecurrenceSettings, type Transaction, type TransactionInput, type TransactionKind,
 } from 'budget-lib';
 
@@ -89,6 +89,14 @@ export class EditorModalComponent implements OnInit {
     if (!this.custom()) this.frequency.set(RECURRENCE_FREQUENCIES[index]);
   }
 
+  async pickUnit(): Promise<void> {
+    const t = this.s.t();
+    const labels = RECURRENCE_FREQUENCIES.map((unit) => t.editor.units[unit]);
+    const picked = await this.dialogs.action({ title: t.editor.unit, cancel: t.common.cancel, actions: labels });
+    const index = picked === null ? -1 : labels.indexOf(picked);
+    if (index >= 0) this.frequency.set(RECURRENCE_FREQUENCIES[index]);
+  }
+
   async save(): Promise<void> {
     const t = this.s.t();
     const amount = parseAmount(this.amount());
@@ -170,7 +178,7 @@ export class EditorModalComponent implements OnInit {
 
   private recurrenceSettings(): RecurrenceSettings | null {
     if (!this.repeat()) return null;
-    const settings: RecurrenceSettings = { frequency: this.custom() ? 'monthly' : this.frequency() };
+    const settings: RecurrenceSettings = { frequency: this.frequency() };
     if (this.custom()) settings.interval = Number(this.interval());
     if (this.ended()) settings.until = this.until();
     if (!this.limited()) return settings;

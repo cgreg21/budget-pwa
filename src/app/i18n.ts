@@ -3,7 +3,7 @@
  * `Strings` is the contract: both dictionaries implement it in full, so a
  * missing translation is a compile error rather than a blank label.
  */
-import type { AppLanguage, CalendarState, ConfigFileErrorCode } from 'budget-lib';
+import type { AppLanguage, CalendarState, ConfigFileErrorCode, RecurrenceFrequency } from 'budget-lib';
 
 export interface Strings {
   appName: string;
@@ -28,7 +28,7 @@ export interface Strings {
     restore: string; deleteForever: string; chooseCategory: string; deleted(n: number): string; recategorised(n: number): string;
     restored(n: number): string; deletedForever(n: number): string; deleteForeverBody(n: number): string;
   };
-  frequency: { monthly: string; bimonthly: string; quarterly: string; semiannual: string; yearly: string };
+  frequency: { daily: string; weekly: string; monthly: string; bimonthly: string; quarterly: string; semiannual: string; yearly: string };
   trash: {
     title: string; empty: string; help: string; restore: string; deleteForever: string; emptyAction: string;
     emptyBody(count: number): string; deleteForeverBody(details: string): string; deletedOn(date: string): string;
@@ -50,7 +50,8 @@ export interface Strings {
     newTitle: string; editTitle: string; amount: string; date: string; description: string;
     category: string; repeat: string; frequency: string; limited: string;
     occurrences: string; invalidAmount: string; invalidDate: string; scopeTitle: string;
-    customFrequency: string; interval: string; invalidInterval: string;
+    customFrequency: string; interval: string; invalidInterval: string; unit: string;
+    units: Record<RecurrenceFrequency, string>;
     ended: string; until: string; invalidUntil: string;
     scopeBody: string; occurrenceOnly: string; seriesToo: string;
   };
@@ -97,7 +98,7 @@ export interface Strings {
   recurrences: {
     title: string; empty: string; deleteBody(name: string): string;
     from(month: string): string; range(start: string, end: string, count: number): string;
-    rangeUntil(start: string, end: string): string; everyMonths(count: number): string;
+    rangeUntil(start: string, end: string): string; everyUnits(count: number, unit: RecurrenceFrequency): string;
     dayOf(day: number): string;
   };
 }
@@ -129,7 +130,7 @@ const en: Strings = {
     deleted: (n) => `${n} moved to the trash`, recategorised: (n) => `${n} updated`, restored: (n) => `${n} restored`,
     deletedForever: (n) => `${n} permanently deleted`, deleteForeverBody: (n) => `Permanently delete ${n} transaction(s)? This cannot be undone.`,
   },
-  frequency: { monthly: 'Monthly', bimonthly: 'Every 2 months', quarterly: 'Quarterly', semiannual: 'Every 6 months', yearly: 'Yearly' },
+  frequency: { daily: 'Daily', weekly: 'Weekly', monthly: 'Monthly', bimonthly: 'Every 2 months', quarterly: 'Quarterly', semiannual: 'Every 6 months', yearly: 'Yearly' },
   trash: {
     title: 'Trash', empty: 'The trash is empty.',
     help: 'Deleted transactions stay here, and in the calendar, until you restore them or empty the trash.',
@@ -161,7 +162,8 @@ const en: Strings = {
     description: 'Description', category: 'Category', repeat: 'Repeat',
     frequency: 'Frequency', limited: 'Limit the number of occurrences',
     occurrences: 'Occurrences', invalidAmount: 'Enter an amount greater than zero.', invalidDate: 'Enter a valid date.',
-    customFrequency: 'Custom', interval: 'Every how many months', invalidInterval: 'Enter a number of months between 1 and 60.',
+    customFrequency: 'Custom', interval: 'Repeat every', invalidInterval: 'Enter a number between 1 and 60.',
+    unit: 'Unit', units: { daily: 'Days', weekly: 'Weeks', monthly: 'Months', bimonthly: 'Two-month periods', quarterly: 'Quarters', semiannual: 'Half-years', yearly: 'Years' },
     ended: 'End on a given month', until: 'Last month', invalidUntil: 'The last month cannot be before the first one.',
     scopeTitle: 'Apply the change to',
     scopeBody: 'This transaction is part of a recurring series.',
@@ -263,7 +265,13 @@ const en: Strings = {
     title: 'Recurring transactions', empty: 'No recurring transaction yet. Enable "Repeat" when adding a transaction.',
     deleteBody: (name) => `Stop "${name}"? Occurrences already created stay in their months.`,
     from: (month) => `from ${month}`, range: (start, end, count) => `${start} - ${end} (${count} times)`,
-    rangeUntil: (start, end) => `${start} - ${end}`, everyMonths: (count) => `every ${count} months`,
+    rangeUntil: (start, end) => `${start} - ${end}`, everyUnits: (count, unit) => {
+      const [one, many] = {
+        daily: ['day', 'days'], weekly: ['week', 'weeks'], monthly: ['month', 'months'], bimonthly: ['two-month period', 'two-month periods'],
+        quarterly: ['quarter', 'quarters'], semiannual: ['half-year', 'half-years'], yearly: ['year', 'years'],
+      }[unit];
+      return count === 1 ? `every ${one}` : `every ${count} ${many}`;
+    },
     dayOf: (day) => `day ${day}`,
   },
 };
@@ -295,7 +303,7 @@ const fr: Strings = {
     deleted: (n) => `${n} déplacée(s) dans la corbeille`, recategorised: (n) => `${n} modifiée(s)`, restored: (n) => `${n} restaurée(s)`,
     deletedForever: (n) => `${n} supprimée(s) définitivement`, deleteForeverBody: (n) => `Supprimer définitivement ${n} transaction(s) ? Cette action est irréversible.`,
   },
-  frequency: { monthly: 'Mensuelle', bimonthly: 'Bimestrielle', quarterly: 'Trimestrielle', semiannual: 'Semestrielle', yearly: 'Annuelle' },
+  frequency: { daily: 'Quotidienne', weekly: 'Hebdomadaire', monthly: 'Mensuelle', bimonthly: 'Bimestrielle', quarterly: 'Trimestrielle', semiannual: 'Semestrielle', yearly: 'Annuelle' },
   trash: {
     title: 'Corbeille', empty: 'La corbeille est vide.',
     help: 'Les transactions supprimées restent ici, et dans le calendrier, jusqu’à leur restauration ou jusqu’à ce que vous vidiez la corbeille.',
@@ -327,7 +335,8 @@ const fr: Strings = {
     amount: 'Montant', date: 'Date', description: 'Description', category: 'Catégorie',
     repeat: 'Répéter', frequency: 'Fréquence', limited: "Limiter le nombre d'occurrences",
     occurrences: 'Occurrences', invalidAmount: 'Saisissez un montant supérieur à zéro.', invalidDate: 'Saisissez une date valide.',
-    customFrequency: 'Personnalisée', interval: 'Tous les combien de mois', invalidInterval: 'Saisissez un nombre de mois entre 1 et 60.',
+    customFrequency: 'Personnalisée', interval: 'Répéter tous les', invalidInterval: 'Saisissez un nombre entre 1 et 60.',
+    unit: 'Unité', units: { daily: 'Jours', weekly: 'Semaines', monthly: 'Mois', bimonthly: 'Bimestres', quarterly: 'Trimestres', semiannual: 'Semestres', yearly: 'Années' },
     ended: 'Terminer à un mois donné', until: 'Dernier mois', invalidUntil: 'Le dernier mois ne peut pas précéder le premier.',
     scopeTitle: 'Appliquer la modification à',
     scopeBody: 'Cette transaction fait partie d’une série récurrente.',
@@ -429,7 +438,13 @@ const fr: Strings = {
     title: 'Transactions récurrentes', empty: 'Aucune transaction récurrente. Activez « Répéter » en ajoutant une transaction.',
     deleteBody: (name) => `Arrêter « ${name} » ? Les occurrences déjà créées restent dans leurs mois.`,
     from: (month) => `à partir de ${month}`, range: (start, end, count) => `${start} - ${end} (${count} fois)`,
-    rangeUntil: (start, end) => `${start} - ${end}`, everyMonths: (count) => `tous les ${count} mois`,
+    rangeUntil: (start, end) => `${start} - ${end}`, everyUnits: (count, unit) => {
+      const [one, many] = {
+        daily: ['jour', 'jours'], weekly: ['semaine', 'semaines'], monthly: ['mois', 'mois'], bimonthly: ['bimestre', 'bimestres'],
+        quarterly: ['trimestre', 'trimestres'], semiannual: ['semestre', 'semestres'], yearly: ['an', 'ans'],
+      }[unit];
+      return count === 1 ? `chaque ${one}` : `tous les ${count} ${many}`;
+    },
     dayOf: (day) => `le ${day}`,
   },
 };
