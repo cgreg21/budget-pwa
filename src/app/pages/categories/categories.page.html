@@ -1,6 +1,6 @@
 <app-header [title]="s.t().categories.title" />
 
-<form class="px-4 pb-1.5 pt-3 md:px-6" (submit)="$event.preventDefault(); add()">
+<form class="px-4 pb-1.5 pt-3 wide:px-6" (submit)="$event.preventDefault(); add()">
   <div class="flex items-center">
     <button type="button" class="mr-1.5 my-1 h-12 w-[52px] shrink-0 rounded-md border border-line bg-surface px-2.5 text-2xl font-mdi"
             [attr.aria-label]="s.t().categories.pickIcon" (click)="pickerTarget.set(NEW)">{{ glyphOf(newIcon()) }}</button>
@@ -14,7 +14,7 @@
 </form>
 
 <div class="relative min-h-0 flex-1">
-  <div class="h-full overflow-y-auto px-1 pb-6 md:grid md:grid-cols-2 md:content-start md:px-3">
+  <div class="h-full overflow-y-auto px-1 pb-6 wide:grid wide:grid-cols-2 wide:content-start wide:px-3">
     @for (category of b.categories(); track category.name; let index = $index) {
       <div class="animate-appear" [style.animation-delay.ms]="index < 12 ? index * 30 : 0">
         <app-swipe-row [open]="openRow() === category.name" [removeLabel]="s.t().common.delete"
@@ -24,7 +24,7 @@
         </app-swipe-row>
       </div>
     }
-    <div class="h-6 md:col-span-2"></div>
+    <div class="h-6 wide:col-span-2"></div>
   </div>
 </div>
 

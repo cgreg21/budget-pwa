@@ -1,8 +1,8 @@
 <app-header [title]="s.t().stats.title" />
 <app-month-bar [month]="month()" (monthChange)="month.set($event)" (labelTap)="monthPickerOpen.set(true)" />
 
-<div class="relative min-h-0 flex-1 overflow-hidden md:mx-2">
-  <div class="flex h-full w-[200%] transition-transform duration-300 ease-out md:w-full md:gap-4"
+<div class="relative min-h-0 flex-1 overflow-hidden wide:mx-2">
+  <div class="flex h-full w-[200%] transition-transform duration-300 ease-out wide:w-full wide:gap-4"
        [style.transform]="layout.wide() ? null : tab() === 'recurring' ? 'translateX(-50%)' : 'translateX(0)'">
     <div class="h-full w-1/2 overflow-y-auto" [attr.inert]="layout.wide() || tab() === 'all' ? null : ''">
       <app-category-pie [title]="s.t().stats.expensesByCategory" [slices]="expenseSlices()" />
@@ -13,7 +13,7 @@
   </div>
 </div>
 
-<div class="bg-surface md:hidden">
+<div class="bg-surface wide:hidden">
   <app-tab-bar [tabs]="tabs" [active]="tab()" (select)="tab.set($any($event))" />
 </div>
 

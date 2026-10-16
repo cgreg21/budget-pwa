@@ -1,5 +1,9 @@
 @import "tailwindcss";
 
+/* Tablet / desktop layout; a phone in landscape is wide but short, so it keeps the mobile layout. */
+@custom-variant wide (@media (min-width: 768px) and (min-height: 500px));
+@custom-variant short (@media (max-height: 499px));
+
 /* Relative URLs: the bundler copies the fonts next to the stylesheet, so the app works under any base href. */
 @font-face {
   font-family: "DM Sans";

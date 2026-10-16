@@ -1,4 +1,4 @@
-<div #shell [attr.inert]="lock.locked() ? '' : null" class="fixed inset-0 flex h-screen touch-pan-y flex-col overflow-hidden bg-bg text-ink md:flex-row"
+<div #shell [attr.inert]="lock.locked() ? '' : null" class="fixed inset-0 flex h-screen touch-pan-y flex-col overflow-hidden bg-bg pl-[env(safe-area-inset-left)] pr-[env(safe-area-inset-right)] text-ink wide:flex-row"
      (pointerdown)="onDown($event)" (pointermove)="onMove($event)" (pointerup)="onUp($event)" (pointercancel)="onUp($event)">
   <router-outlet />
 
@@ -6,13 +6,13 @@
     <div #edge class="absolute inset-y-0 left-0 z-20 w-6 touch-none" aria-hidden="true"></div>
   }
 
-  <div class="absolute inset-0 z-30 bg-backdrop md:hidden"
+  <div class="absolute inset-0 z-30 bg-backdrop wide:hidden"
        [class]="dragging() ? '' : 'transition-opacity duration-200'"
        [class.pointer-events-none]="!drawer.opened() && !dragging()"
        [style.opacity]="backdropOpacity()"
        (click)="onBackdropClick()"></div>
 
-  <aside class="absolute inset-y-0 left-0 z-30 flex w-[280px] shrink-0 touch-pan-y flex-col bg-surface pb-[calc(8px+env(safe-area-inset-bottom))] shadow-pop ease-out md:static md:order-first md:border-r md:border-line md:shadow-none"
+  <aside class="absolute inset-y-0 left-0 z-30 flex w-[280px] shrink-0 touch-pan-y flex-col bg-surface pb-[calc(8px+env(safe-area-inset-bottom))] shadow-pop ease-out wide:static wide:order-first wide:border-r wide:border-line wide:shadow-none"
          [class]="dragging() ? '' : 'transition-transform duration-200'"
          [style.transform]="layout.wide() ? null : 'translateX(' + drawerX() + 'px)'"
          [attr.inert]="drawerActive() ? null : ''">
@@ -48,7 +48,7 @@
   </aside>
 
   @if (updates.available() && !updates.dismissed()) {
-    <div class="absolute inset-x-3 bottom-[calc(12px+env(safe-area-inset-bottom))] z-20 flex items-center gap-3 rounded-md border border-line bg-card p-3 shadow-pop md:left-auto md:right-6 md:w-[440px]" role="dialog" [attr.aria-label]="s.t().update.title">
+    <div class="absolute inset-x-3 bottom-[calc(12px+env(safe-area-inset-bottom))] z-20 flex items-center gap-3 rounded-md border border-line bg-card p-3 shadow-pop wide:left-auto wide:right-6 wide:w-[440px]" role="dialog" [attr.aria-label]="s.t().update.title">
       <img src="icons/icon-192.png" alt="" class="size-11 shrink-0 rounded-md">
       <div class="min-w-0 flex-1">
         <div class="text-sm font-bold">{{ s.t().update.title }}</div>
@@ -60,7 +60,7 @@
       </div>
     </div>
   } @else if (install.banner()) {
-    <div class="absolute inset-x-3 bottom-[calc(12px+env(safe-area-inset-bottom))] z-20 flex items-center gap-3 rounded-md border border-line bg-card p-3 shadow-pop md:left-auto md:right-6 md:w-[440px]" role="dialog" [attr.aria-label]="s.t().install.title">
+    <div class="absolute inset-x-3 bottom-[calc(12px+env(safe-area-inset-bottom))] z-20 flex items-center gap-3 rounded-md border border-line bg-card p-3 shadow-pop wide:left-auto wide:right-6 wide:w-[440px]" role="dialog" [attr.aria-label]="s.t().install.title">
       <img src="icons/icon-192.png" alt="" class="size-11 shrink-0 rounded-md">
       <div class="min-w-0 flex-1">
         <div class="text-sm font-bold">{{ s.t().install.title }}</div>

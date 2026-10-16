@@ -1,6 +1,6 @@
 <app-header [title]="s.t().schedule.title" />
 
-<div class="min-h-0 flex-1 overflow-y-auto overflow-x-hidden px-3 pb-4 md:px-5">
+<div class="min-h-0 flex-1 overflow-y-auto overflow-x-hidden px-3 pb-4 wide:px-5">
   <div class="flex flex-wrap items-center gap-1 py-2" role="group" [attr.aria-label]="s.t().schedule.horizon">
     @for (count of horizons; track count) {
       <button type="button" class="chip" [class.chip-active]="horizon() === count" [attr.aria-pressed]="horizon() === count"

@@ -1,7 +1,7 @@
 <app-header [title]="s.t().settings.title" />
 
-<div class="min-h-0 flex-1 overflow-y-auto px-4 pb-4 pt-3 md:px-6" role="tabpanel">
-<div class="min-w-0 md:max-w-xl">
+<div class="min-h-0 flex-1 overflow-y-auto px-4 pb-4 pt-3 wide:px-6" role="tabpanel">
+<div class="min-w-0 wide:max-w-xl">
 @if (tab() === 'general') {
   <span class="section-title mt-0">{{ s.t().settings.general }}</span>
   <button type="button" class="setting" (click)="openProfiles()">

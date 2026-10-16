@@ -7,7 +7,7 @@
       <p>{{ s.t().trash.empty }}</p>
     </div>
   } @else {
-    <p class="row-sub mx-3 mb-1 md:mx-5">{{ s.t().trash.help }}</p>
+    <p class="row-sub mx-3 mb-1 wide:mx-5">{{ s.t().trash.help }}</p>
     <div class="pb-3">
       @for (item of b.trash(); track item.id) {
         @if (selecting()) {
@@ -36,7 +36,7 @@
       }
     </div>
     @if (b.trashedCategories().length > 0) {
-      <span class="section-title mx-3 mt-1 md:mx-5">{{ s.t().trash.categories }}</span>
+      <span class="section-title mx-3 mt-1 wide:mx-5">{{ s.t().trash.categories }}</span>
       <div class="pb-3" data-testid="trashed-categories">
         @for (item of b.trashedCategories(); track item.name) {
           <app-swipe-row [open]="openRow() === 'category:' + item.name ? openSide() : false"
