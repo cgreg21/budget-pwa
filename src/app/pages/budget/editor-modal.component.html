@@ -3,7 +3,7 @@
 
   <div class="min-h-0 flex-1 overflow-y-auto">
     <div class="grid grid-cols-2">
-      <button type="button" class="chip" [class.chip-active]="kind() === 'expense'" (click)="kind.set('expense')">{{ s.t().common.expense }}</button>
+      <button type="button" class="chip" [class.chip-active]="kind() === 'expense'" [class.chip-expense]="kind() === 'expense'" (click)="kind.set('expense')">{{ s.t().common.expense }}</button>
       <button type="button" class="chip" [class.chip-active]="kind() === 'income'" (click)="kind.set('income')">{{ s.t().common.income }}</button>
     </div>
 

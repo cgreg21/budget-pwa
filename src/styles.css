@@ -234,6 +234,9 @@
   .chip-active {
     @apply border-brand bg-brand text-on-brand;
   }
+  .chip-expense {
+    @apply border-danger bg-danger text-on-brand;
+  }
   .chip-editing {
     @apply border-amber bg-editing text-amber;
   }
