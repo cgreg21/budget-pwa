@@ -2,6 +2,8 @@
 
 /* Tablet / desktop layout; a phone in landscape is wide but short, so it keeps the mobile layout. */
 @custom-variant wide (@media (min-width: 768px) and (min-height: 500px));
+/* Permanent sidebar: only when wide and in landscape; a tablet in portrait keeps the drawer hidden. */
+@custom-variant sidebar (@media (min-width: 768px) and (min-height: 500px) and (orientation: landscape));
 @custom-variant short (@media (max-height: 499px));
 
 /* Relative URLs: the bundler copies the fonts next to the stylesheet, so the app works under any base href. */

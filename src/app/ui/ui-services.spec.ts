@@ -2,7 +2,7 @@ import { TestBed } from '@angular/core/testing';
 
 import { DialogService } from './dialog.service';
 import { DrawerService } from './drawer.service';
-import { LayoutService, WIDE_QUERY } from './layout.service';
+import { LayoutService, SIDEBAR_QUERY, WIDE_QUERY } from './layout.service';
 
 describe('DialogService', () => {
   const service = (): DialogService => TestBed.inject(DialogService);
@@ -60,14 +60,22 @@ describe('DrawerService', () => {
 describe('LayoutService', () => {
   afterEach(() => vi.unstubAllGlobals());
 
-  it('follows the wide media query', () => {
-    let listener: ((event: { matches: boolean }) => void) | undefined;
-    const matchMedia = vi.fn(() => ({ matches: true, addEventListener: (_: string, fn: typeof listener) => { listener = fn; } }));
+  it('follows the wide and sidebar media queries', () => {
+    const listeners = new Map<string, (event: { matches: boolean }) => void>();
+    const matchMedia = vi.fn((query: string) => ({
+      matches: true,
+      addEventListener: (_: string, fn: (event: { matches: boolean }) => void) => { listeners.set(query, fn); },
+    }));
     vi.stubGlobal('matchMedia', matchMedia);
     const layout = TestBed.inject(LayoutService);
     expect(matchMedia).toHaveBeenCalledWith(WIDE_QUERY);
+    expect(matchMedia).toHaveBeenCalledWith(SIDEBAR_QUERY);
     expect(layout.wide()).toBe(true);
-    listener?.({ matches: false });
+    expect(layout.sidebar()).toBe(true);
+    listeners.get(SIDEBAR_QUERY)?.({ matches: false });
+    expect(layout.wide()).toBe(true);
+    expect(layout.sidebar()).toBe(false);
+    listeners.get(WIDE_QUERY)?.({ matches: false });
     expect(layout.wide()).toBe(false);
   });
 });

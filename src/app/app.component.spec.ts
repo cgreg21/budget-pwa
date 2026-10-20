@@ -65,7 +65,7 @@ describe('AppComponent', () => {
     expect(c.backdropOpacity()).toBe(1);
     expect(c.drawerActive()).toBe(true);
     drawer.close();
-    layout.wide.set(true);
+    layout.sidebar.set(true);
     expect(c.drawerX()).toBe(0);
     expect(c.backdropOpacity()).toBe(0);
     expect(c.drawerActive()).toBe(true);
@@ -192,7 +192,7 @@ describe('AppComponent', () => {
     el.dispatchEvent(pointer('pointermove', { clientX: 300, clientY: 100 }));
     expect(c.dragging()).toBe(false);
 
-    layout.wide.set(true);
+    layout.sidebar.set(true);
     fixture.detectChanges();
     el.dispatchEvent(pointer('pointerdown', { clientX: 5, clientY: 100 }));
     el.dispatchEvent(pointer('pointermove', { clientX: 100, clientY: 100 }));

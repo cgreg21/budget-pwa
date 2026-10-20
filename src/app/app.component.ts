@@ -54,10 +54,10 @@ export class AppComponent {
   private swiped = false;
 
   readonly dragging = computed(() => this.dragX() !== null);
-  readonly drawerX = computed(() => this.layout.wide() ? 0 : this.dragX() ?? (this.drawer.opened() ? 0 : -DRAWER_WIDTH));
-  readonly backdropOpacity = computed(() => this.layout.wide() ? 0 : 1 + this.drawerX() / DRAWER_WIDTH);
-  /** The drawer is reachable: open on a phone, or always as the sidebar of the wide layout. */
-  readonly drawerActive = computed(() => this.layout.wide() || this.drawer.opened());
+  readonly drawerX = computed(() => this.layout.sidebar() ? 0 : this.dragX() ?? (this.drawer.opened() ? 0 : -DRAWER_WIDTH));
+  readonly backdropOpacity = computed(() => this.layout.sidebar() ? 0 : 1 + this.drawerX() / DRAWER_WIDTH);
+  /** The drawer is reachable: open on a phone or portrait tablet, or always as the sidebar of the landscape layout. */
+  readonly drawerActive = computed(() => this.layout.sidebar() || this.drawer.opened());
 
   readonly items = computed(() => {
     const t = this.s.t();
@@ -141,7 +141,7 @@ export class AppComponent {
 
   onDown(event: PointerEvent): void {
     if (event.pointerType === 'mouse' && event.button !== 0) return;
-    if (this.layout.wide()) return;
+    if (this.layout.sidebar()) return;
     if (!this.drawer.opened() && event.target !== this.edge()?.nativeElement) return;
     this.drag = { x: event.clientX, y: event.clientY, origin: this.drawerX(), id: event.pointerId, direction: null };
     this.swiped = false;

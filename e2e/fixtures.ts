@@ -87,7 +87,8 @@ export async function open(page: Page, path: string): Promise<void> {
   await expect(page.locator('h1')).toBeVisible();
 }
 
-/** Whether the permanent sidebar is shown (tablet and desktop) instead of the drawer. */
+/** Whether the permanent sidebar is shown (tablet in landscape and desktop) instead of the drawer. */
 export function isWide(page: Page): boolean {
-  return (page.viewportSize()?.width ?? 0) >= 768;
+  const size = page.viewportSize();
+  return !!size && size.width >= 768 && size.height >= 500 && size.width > size.height;
 }
